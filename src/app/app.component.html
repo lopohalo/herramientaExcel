@@ -42,6 +42,11 @@
             <button type="button" (click)="ejecutarSegundoResumen()" class="btn btn-outline-primary">Ejecutar Segunda EJC</button>
           </div>
         </ng-template>
+        <ng-template [ngIf]="mostrarBoton == 1">
+          <div class="col-4">
+            <button type="button" (click)="ejecutarModeloDeResumidos(contadormodelo)" class="btn btn-outline-primary">Ejecutar tercera EJC</button>
+          </div>
+        </ng-template>
         <div class="col-4">
           <button type="button" (click)="ejecutarResumenIngresos()" class="btn btn-outline-primary">Ejecutar resumen</button>
         </div>
@@ -56,6 +61,7 @@
           <th class="columnas">CONCEPTO</th>
           <!-- <th class="columnas">CONCEPTOS DE INGRESO</th> -->
           <th class="columnas" style="background-color: rgb(155, 155, 229);">APROPIACION INICIAL</th>
+          <th class="columnas" style="background-color: rgb(155, 155, 229);">RECAUDO</th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">CPC</th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">FUENTES DE FINANCIACION</th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">TERCEROS</th>
@@ -69,6 +75,7 @@
           <td class="columnas">{{item.CONCEPTO}}</td>
           <!-- <td class="columnas">{{item.ConceptosdeINGRESO}}</td> -->
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.APROPIACIONINICIAL}}</td>
+          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RECAUDO}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.FUENTESDEFINANCIACION}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.TERCEROS}}</td>
