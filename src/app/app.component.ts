@@ -854,7 +854,7 @@ export class AppComponent implements OnInit {
       console.log(this.datosTabla)
     }
   }
-  exportexcel(): void {
+  exportexcel1(): void {
     /* pass here the table id */
     let element = document.getElementById('excel-table');
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
@@ -862,11 +862,70 @@ export class AppComponent implements OnInit {
     /* generate workbook and add the worksheet */
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    const hoja = XLSX.utils.aoa_to_sheet(this.datosTabla);
+
+// Configurar el formato de la columna B como texto
+hoja['B'] = hoja['B'].map((celda: any) => {
+  celda.z = '@';
+  return celda;
+});
 
     /* save to file */
     XLSX.writeFile(wb, this.fileName);
 
   }
+
+  exportexcel() {
+     // Obtener la tabla
+  const tabla:any = document.getElementById('excel-table');
+
+ 
+
+  // Obtener los datos de la tabla en un arreglo de arreglos
+  const datos = this.getTablaData(tabla);
+
+  // Crear una hoja de Excel
+  const hoja:any = XLSX.utils.aoa_to_sheet(datos);
+
+  // Configurar el formato de la columna B como texto
+  const range = XLSX.utils.decode_range(hoja['!ref']);
+  for (let i = range.s.r + 1; i <= range.e.r; i++) {
+    const celda = hoja[XLSX.utils.encode_cell({r: i, c: 1})];
+    celda.z = '@';
+  }
+
+  // Crear un libro de Excel y agregar la hoja
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
+
+  // Descargar el archivo Excel
+  XLSX.writeFile(libro, 'tabla.xlsx');
+  }
+
+  getTablaData(tabla: HTMLElement): any[][] {
+    // Obtener las filas de la tabla
+    const filas = Array.from(tabla.querySelectorAll('tr'));
+  
+    // Obtener los encabezados de columna
+    const encabezados = filas.shift()?.querySelectorAll('th');
+  
+    // Obtener los datos de la tabla en un arreglo de arreglos
+    const datos = filas.map((fila) =>
+      Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
+    );
+  
+    // Agregar los encabezados de columna al inicio del arreglo de arreglos
+    if (encabezados) {
+      datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
+    }
+  
+    return datos;
+  }
+  
+
+  
+
+
   ejecutarResumenIngresos() {
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
       acc[codigo.RUBROPRESUPEUSTAL] = ++acc[codigo.RUBROPRESUPEUSTAL] || 0;
@@ -1121,11 +1180,18 @@ if(contadorValor == 1){
         return 0;
       }); // ordenar los objetos por código
       this.datosTabla = mergedArray
-      console.log(mergedArray);
+      this.actualizarTabla()
     }else{
       this.ejecutarModeloDeResumidos(this.contadormodelo)
     }
 
+  }
+
+  actualizarTabla(){
+    this.datosTabla.forEach((element:any) => {
+      element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
+      console.log(this.datosTabla)
+    });
   }
  
 }
