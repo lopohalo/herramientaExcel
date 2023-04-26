@@ -702,138 +702,138 @@ export class AppComponent implements OnInit {
   ]
   modeloInformacion = [
     {
-        RUBROPRESUPEUSTAL: "1 ",
-        CONCEPTOPRESUPUESTAL: "INGRESOS ",
+      RUBROPRESUPEUSTAL: "1 ",
+      CONCEPTOPRESUPUESTAL: "INGRESOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1 ",
-        CONCEPTOPRESUPUESTAL: "INGRESOS CORRIENTES ",
+      RUBROPRESUPEUSTAL: "1.1 ",
+      CONCEPTOPRESUPUESTAL: "INGRESOS CORRIENTES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02 ",
-        CONCEPTOPRESUPUESTAL: "INGRESOS NO TRIBUTARIOS ",
+      RUBROPRESUPEUSTAL: "1.1.02 ",
+      CONCEPTOPRESUPUESTAL: "INGRESOS NO TRIBUTARIOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.01 ",
-        CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES ",
+      RUBROPRESUPEUSTAL: "1.1.02.01 ",
+      CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.01.001 ",
-        CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES SOCIALES ",
+      RUBROPRESUPEUSTAL: "1.1.02.01.001 ",
+      CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES SOCIALES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.01.001.01 ",
-        CONCEPTOPRESUPUESTAL: "SALUD ",
+      RUBROPRESUPEUSTAL: "1.1.02.01.001.01 ",
+      CONCEPTOPRESUPUESTAL: "SALUD ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.02 ",
-        CONCEPTOPRESUPUESTAL: "TASAS Y DERECHOS ADMINISTRATIVOS ",
+      RUBROPRESUPEUSTAL: "1.1.02.02 ",
+      CONCEPTOPRESUPUESTAL: "TASAS Y DERECHOS ADMINISTRATIVOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.02.116 ",
-        CONCEPTOPRESUPUESTAL: "DERECHOS PECUNIARIOS EDUCACION SUPERIOR ",
+      RUBROPRESUPEUSTAL: "1.1.02.02.116 ",
+      CONCEPTOPRESUPUESTAL: "DERECHOS PECUNIARIOS EDUCACION SUPERIOR ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.03 ",
-        CONCEPTOPRESUPUESTAL: "MULTAS, SANCIONES E INTERESES DE MORA ",
+      RUBROPRESUPEUSTAL: "1.1.02.03 ",
+      CONCEPTOPRESUPUESTAL: "MULTAS, SANCIONES E INTERESES DE MORA ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.03.001 ",
-        CONCEPTOPRESUPUESTAL: "MULTAS Y SANCIONES ",
+      RUBROPRESUPEUSTAL: "1.1.02.03.001 ",
+      CONCEPTOPRESUPUESTAL: "MULTAS Y SANCIONES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05 ",
-        CONCEPTOPRESUPUESTAL: "VENTA DE BIENES Y SERVICIOS ",
+      RUBROPRESUPEUSTAL: "1.1.02.05 ",
+      CONCEPTOPRESUPUESTAL: "VENTA DE BIENES Y SERVICIOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05.001 ",
-        CONCEPTOPRESUPUESTAL: "VENTAS DE ESTABLECIMIENTOS DE MERCADO ",
+      RUBROPRESUPEUSTAL: "1.1.02.05.001 ",
+      CONCEPTOPRESUPUESTAL: "VENTAS DE ESTABLECIMIENTOS DE MERCADO ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05.001.08 ",
-        CONCEPTOPRESUPUESTAL: "SERVICIOS PRESTADOS A LAS EMPRESAS Y SERVICIOS DE PRODUCCION  ",
+      RUBROPRESUPEUSTAL: "1.1.02.05.001.08 ",
+      CONCEPTOPRESUPUESTAL: "SERVICIOS PRESTADOS A LAS EMPRESAS Y SERVICIOS DE PRODUCCION  ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05.001.09 ",
-        CONCEPTOPRESUPUESTAL: "SERVICIOS PARA LA COMUNIDAD, SOCIALES Y PERSONALES "
+      RUBROPRESUPEUSTAL: "1.1.02.05.001.09 ",
+      CONCEPTOPRESUPUESTAL: "SERVICIOS PARA LA COMUNIDAD, SOCIALES Y PERSONALES "
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05.002 ",
-        CONCEPTOPRESUPUESTAL: "VENTAS INCIDENTALES DE ESTABLECIMIENTOS NO DE MERCADO ",
+      RUBROPRESUPEUSTAL: "1.1.02.05.002 ",
+      CONCEPTOPRESUPUESTAL: "VENTAS INCIDENTALES DE ESTABLECIMIENTOS NO DE MERCADO ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.05.002.03 ",
-        CONCEPTOPRESUPUESTAL: "OTROS BIENES TRANSPORTABLES EXCEPTO PRODUCTOS METALICOS, MAQUINARIA Y EQUIPO ",
+      RUBROPRESUPEUSTAL: "1.1.02.05.002.03 ",
+      CONCEPTOPRESUPUESTAL: "OTROS BIENES TRANSPORTABLES EXCEPTO PRODUCTOS METALICOS, MAQUINARIA Y EQUIPO ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.06 ",
-        CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS CORRIENTES ",
+      RUBROPRESUPEUSTAL: "1.1.02.06 ",
+      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS CORRIENTES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.06.006 ",
-        CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE OTRAS ENTIDADES DEL GOBIERNO GENERAL ",
+      RUBROPRESUPEUSTAL: "1.1.02.06.006 ",
+      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE OTRAS ENTIDADES DEL GOBIERNO GENERAL ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.1.02.06.009.02 ",
-        CONCEPTOPRESUPUESTAL: "SISTEMA GENERAL DE PENSIONES ",
+      RUBROPRESUPEUSTAL: "1.1.02.06.009.02 ",
+      CONCEPTOPRESUPUESTAL: "SISTEMA GENERAL DE PENSIONES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2 ",
-        CONCEPTOPRESUPUESTAL: "RECURSOS DE CAPITAL ",
+      RUBROPRESUPEUSTAL: "1.2 ",
+      CONCEPTOPRESUPUESTAL: "RECURSOS DE CAPITAL ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.01 ",
-        CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS ",
+      RUBROPRESUPEUSTAL: "1.2.01 ",
+      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.01.02 ",
-        CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS NO FINANCIEROS ",
+      RUBROPRESUPEUSTAL: "1.2.01.02 ",
+      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS NO FINANCIEROS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.01.02.001 ",
-        CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS FIJOS ",
+      RUBROPRESUPEUSTAL: "1.2.01.02.001 ",
+      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS FIJOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.05 ",
-        CONCEPTOPRESUPUESTAL: "RENDIMIENTOS FINANCIEROS ",
+      RUBROPRESUPEUSTAL: "1.2.05 ",
+      CONCEPTOPRESUPUESTAL: "RENDIMIENTOS FINANCIEROS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.05.02 ",
-        CONCEPTOPRESUPUESTAL: "DEPOSITOS ",
+      RUBROPRESUPEUSTAL: "1.2.05.02 ",
+      CONCEPTOPRESUPUESTAL: "DEPOSITOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.08 ",
-        CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE CAPITAL ",
+      RUBROPRESUPEUSTAL: "1.2.08 ",
+      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE CAPITAL ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.08.01 ",
-        CONCEPTOPRESUPUESTAL: "DONACIONES ",
+      RUBROPRESUPEUSTAL: "1.2.08.01 ",
+      CONCEPTOPRESUPUESTAL: "DONACIONES ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.08.01.003 ",
-        CONCEPTOPRESUPUESTAL: "DEL SECTOR PRIVADO ",
+      RUBROPRESUPEUSTAL: "1.2.08.01.003 ",
+      CONCEPTOPRESUPUESTAL: "DEL SECTOR PRIVADO ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.08.02 ",
-        CONCEPTOPRESUPUESTAL: "INDEMNIZACIONES RELACIONADAS CON SEGUROS NO DE VIDA "
+      RUBROPRESUPEUSTAL: "1.2.08.02 ",
+      CONCEPTOPRESUPUESTAL: "INDEMNIZACIONES RELACIONADAS CON SEGUROS NO DE VIDA "
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.10 ",
-        CONCEPTOPRESUPUESTAL: "RECURSOS DEL BALANCE ",
+      RUBROPRESUPEUSTAL: "1.2.10 ",
+      CONCEPTOPRESUPUESTAL: "RECURSOS DEL BALANCE ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.10.02 ",
-        CONCEPTOPRESUPUESTAL: "SUPERAVIT FISCAL "
+      RUBROPRESUPEUSTAL: "1.2.10.02 ",
+      CONCEPTOPRESUPUESTAL: "SUPERAVIT FISCAL "
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.13 ",
-        CONCEPTOPRESUPUESTAL: "REINTEGROS Y OTROS RECURSOS NO APROPIADOS ",
+      RUBROPRESUPEUSTAL: "1.2.13 ",
+      CONCEPTOPRESUPUESTAL: "REINTEGROS Y OTROS RECURSOS NO APROPIADOS ",
     },
     {
-        RUBROPRESUPEUSTAL: "1.2.13.01 ",
-        CONCEPTOPRESUPUESTAL: "REINTEGROS "
+      RUBROPRESUPEUSTAL: "1.2.13.01 ",
+      CONCEPTOPRESUPUESTAL: "REINTEGROS "
     }
-]
+  ]
 
 
   ngOnInit(): void {
@@ -864,11 +864,11 @@ export class AppComponent implements OnInit {
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
     const hoja = XLSX.utils.aoa_to_sheet(this.datosTabla);
 
-// Configurar el formato de la columna B como texto
-hoja['B'] = hoja['B'].map((celda: any) => {
-  celda.z = '@';
-  return celda;
-});
+    // Configurar el formato de la columna B como texto
+    hoja['B'] = hoja['B'].map((celda: any) => {
+      celda.z = '@';
+      return celda;
+    });
 
     /* save to file */
     XLSX.writeFile(wb, this.fileName);
@@ -876,54 +876,116 @@ hoja['B'] = hoja['B'].map((celda: any) => {
   }
 
   exportexcel() {
-     // Obtener la tabla
-  const tabla:any = document.getElementById('excel-table');
+    // Obtener la tabla
+    const tabla: any = document.getElementById('excel-table');
 
- 
+    // Obtener los datos de la tabla en un arreglo de arreglos
+    const datos = this.getTablaData(tabla);
 
-  // Obtener los datos de la tabla en un arreglo de arreglos
-  const datos = this.getTablaData(tabla);
+    // Crear una hoja de Excel
+    const hoja: any = XLSX.utils.aoa_to_sheet(datos);
 
-  // Crear una hoja de Excel
-  const hoja:any = XLSX.utils.aoa_to_sheet(datos);
+    // Configurar el formato de la columna B como texto
+    const range = XLSX.utils.decode_range(hoja['!ref']);
+    for (let i = range.s.r + 1; i <= range.e.r; i++) {
+      const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
+      celda.z = '@';
+    }
 
-  // Configurar el formato de la columna B como texto
-  const range = XLSX.utils.decode_range(hoja['!ref']);
-  for (let i = range.s.r + 1; i <= range.e.r; i++) {
-    const celda = hoja[XLSX.utils.encode_cell({r: i, c: 1})];
-    celda.z = '@';
-  }
+    // Configurar el ancho de las columnas
+    const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }];
+    hoja['!cols'] = anchoColumnas;
 
-  // Crear un libro de Excel y agregar la hoja
-  const libro = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
+    // Configurar estilo de los encabezados
+    const encabezadosRange = XLSX.utils.decode_range(hoja['!ref']);
+    for (let i = encabezadosRange.s.c; i <= encabezadosRange.e.c; i++) {
+      const ref = XLSX.utils.encode_cell({ r: 0, c: i });
+      hoja[ref].s = {
+        fill: { fgColor: { rgb: '4682B4' } },
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        border: {
+          top: { style: 'thin', color: { auto: 1 } },
+          bottom: { style: 'thin', color: { auto: 1 } },
+          left: { style: 'thin', color: { auto: 1 } },
+          right: { style: 'thin', color: { auto: 1 } },
+        },
+      };
+    }
 
-  // Descargar el archivo Excel
-  XLSX.writeFile(libro, 'tabla.xlsx');
+    // Configurar estilo de las celdas de datos
+    const datosRange = XLSX.utils.decode_range(hoja['!ref']);
+    for (let i = datosRange.s.r + 1; i <= datosRange.e.r; i++) {
+      for (let j = datosRange.s.c; j <= datosRange.e.c; j++) {
+        const ref = XLSX.utils.encode_cell({ r: i, c: j });
+        hoja[ref].s = {
+          border: {
+            top: { style: 'thin', color: { auto: 1 } },
+            bottom: { style: 'thin', color: { auto: 1 } },
+            left: { style: 'thin', color: { auto: 1 } },
+            right: { style: 'thin', color: { auto: 1 } },
+          },
+        };
+        switch (j) {
+          case 0:
+            hoja[ref].s.fill = { fgColor: { rgb: 'C6EFCE' } };
+            break;
+          case 1:
+            hoja[ref].s.fill = { fgColor: { rgb: 'FFC7CE' } };
+            break;
+          case 2:
+            hoja[ref].s.fill = { fgColor: { rgb: 'FFEB9C' } };
+            break;
+          case 3:
+            hoja[ref].s.fill = { fgColor: { rgb: 'B4A7D6' } };
+            break;
+          case 4:
+            hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
+            break;
+          case 5:
+            hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
+            break;
+          case 6:
+            hoja[ref].s.fill = { fgColor: { rgb: 'CECEF6' } };
+            break;
+          case 7:
+            hoja[ref].s.fill = { fgColor: { rgb: 'F6CECE' } };
+            break;
+          case 8:
+            hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
+            break;
+        }
+      }
+    }
+    // Crear un libro de Excel y agregar la hoja
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
+
+    // Descargar el archivo Excel
+    XLSX.writeFile(libro, 'tabla.xlsx');
   }
 
   getTablaData(tabla: HTMLElement): any[][] {
     // Obtener las filas de la tabla
     const filas = Array.from(tabla.querySelectorAll('tr'));
-  
+
     // Obtener los encabezados de columna
     const encabezados = filas.shift()?.querySelectorAll('th');
-  
+
     // Obtener los datos de la tabla en un arreglo de arreglos
     const datos = filas.map((fila) =>
       Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
     );
-  
+
     // Agregar los encabezados de columna al inicio del arreglo de arreglos
     if (encabezados) {
       datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
     }
-  
+
     return datos;
   }
-  
 
-  
+
+
 
 
   ejecutarResumenIngresos() {
@@ -965,8 +1027,8 @@ hoja['B'] = hoja['B'].map((celda: any) => {
         } else {
           x = x + element.APROPIACIONINICIAL
           y = y + element.RECAUDO
-          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y , valor: x }))
-          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y , valor: x })
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x })
         }
       }
     }
@@ -1065,43 +1127,43 @@ hoja['B'] = hoja['B'].map((celda: any) => {
       });
     }
   }
-  ejecutarModeloDeResumidos(contadorValor:any) {
+  ejecutarModeloDeResumidos(contadorValor: any) {
     console.log(contadorValor)
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
-      acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor)] || 0;
+      acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] || 0;
       return acc;
     }, {});
     const duplicados = this.datosTabla.filter((codigo: any) => {
-      return busqueda[codigo.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor)];
+      return busqueda[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)];
     });
     let unicos: any = [];
 
     for (var i = 0; i < duplicados.length; i++) {
 
-      const elemento = duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0,contadorValor);
-      if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0,contadorValor))) {
+      const elemento = duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor);
+      if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor))) {
         unicos.push(elemento);
         this.unicosmodelo = unicos
       }
     }
 
 
-if(contadorValor == 1){
-    console.log('nada')
-}else {
-  let x =  unicos.filter((element:any) => element.length == contadorValor)
-  unicos = x
-  this.unicosmodelo = x
-}
- 
+    if (contadorValor == 1) {
+      console.log('nada')
+    } else {
+      let x = unicos.filter((element: any) => element.length == contadorValor)
+      unicos = x
+      this.unicosmodelo = x
+    }
 
 
 
 
-    
+
+
     let arreglosDuplicados: any = []
     unicos.forEach((element: any) => {
-      const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor) == element)
+      const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor) == element)
       arreglosDuplicados.push(arreglosSeparados)
     })
     let element1
@@ -1114,32 +1176,32 @@ if(contadorValor == 1){
         const element = element2[i]
         if (x == 0) {
           x = element.APROPIACIONINICIAL
-          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor), valor: x }))
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x }))
         } else {
-          if(element.APROPIACIONINICIAL == undefined){
+          if (element.APROPIACIONINICIAL == undefined) {
             x = x + 0
           } else {
             x = x + element.APROPIACIONINICIAL
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor), valor: x }))
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x }))
           }
-          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0,contadorValor), valor: x })
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x })
         }
       }
 
-      
+
     }
-    if(this.contadormodelo <= 9){
+    if (this.contadormodelo <= 9) {
       this.contadormodelo = this.contadormodelo - 1
-    } else{
+    } else {
       this.contadormodelo = 9
-    } 
-    
+    }
+
     this.extrayendoDuplicadosSumadosMODELO()
   }
   extrayendoDuplicadosSumadosMODELO() {
     let arraydeDuplicados: any = []
-      this.unicosmodelo.forEach((element: any) => {
-        console.log(element)
+    this.unicosmodelo.forEach((element: any) => {
+      console.log(element)
       console.log(localStorage.getItem(element))
       let x: any = localStorage.getItem(element)
       x = JSON.parse(x)
@@ -1155,22 +1217,22 @@ if(contadorValor == 1){
         this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
       });
     }
-    this.elementosUnificados.forEach((element:any) => {
+    this.elementosUnificados.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
       console.log(this.elementosUnificados)
     });
-    this.datosTabla.forEach((element:any) => {
+    this.datosTabla.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
     });
-    if(this.contadormodelo == 0){
+    if (this.contadormodelo == 0) {
       const mergedArray = this.datosTabla.concat(this.elementosUnificados);
-      mergedArray.sort((a:any, b:any) => {
-        const aCodeArray:any = a.RUBROPRESUPEUSTAL.split('.');
+      mergedArray.sort((a: any, b: any) => {
+        const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
         console.log(aCodeArray)
-        const bCodeArray:any = b.RUBROPRESUPEUSTAL.split('.');
+        const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
         console.log(bCodeArray)
-        
-        for(let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
+
+        for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
           const aCodePart = aCodeArray[i] || 0;
           const bCodePart = bCodeArray[i] || 0;
           if (aCodePart !== bCodePart) {
@@ -1181,17 +1243,17 @@ if(contadorValor == 1){
       }); // ordenar los objetos por código
       this.datosTabla = mergedArray
       this.actualizarTabla()
-    }else{
+    } else {
       this.ejecutarModeloDeResumidos(this.contadormodelo)
     }
 
   }
 
-  actualizarTabla(){
-    this.datosTabla.forEach((element:any) => {
+  actualizarTabla() {
+    this.datosTabla.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
       console.log(this.datosTabla)
     });
   }
- 
+
 }
