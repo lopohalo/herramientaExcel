@@ -37,16 +37,6 @@
         <div class="col-4">
           <button (click)="exportexcel()" class="btn btn-outline-success" type="button">Exportar a Excel</button>
         </div>
-        <ng-template [ngIf]="mostrarBoton == 1">
-          <div class="col-4">
-            <button type="button" (click)="ejecutarSegundoResumen()" class="btn btn-outline-primary">Ejecutar Segunda EJC</button>
-          </div>
-        </ng-template>
-        <ng-template [ngIf]="mostrarBoton == 1">
-          <div class="col-4">
-            <button type="button" (click)="ejecutarModeloDeResumidos(contadormodelo)" class="btn btn-outline-primary">Ejecutar tercera EJC</button>
-          </div>
-        </ng-template>
         <div class="col-4">
           <button type="button" (click)="ejecutarResumenIngresos()" class="btn btn-outline-primary">Ejecutar resumen</button>
         </div>

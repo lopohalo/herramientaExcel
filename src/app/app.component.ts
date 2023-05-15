@@ -703,135 +703,135 @@ export class AppComponent implements OnInit {
   modeloInformacion = [
     {
       RUBROPRESUPEUSTAL: "1 ",
-      CONCEPTOPRESUPUESTAL: "INGRESOS ",
+      CONCEPTO: "INGRESOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1 ",
-      CONCEPTOPRESUPUESTAL: "INGRESOS CORRIENTES ",
+      CONCEPTO: "INGRESOS CORRIENTES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02 ",
-      CONCEPTOPRESUPUESTAL: "INGRESOS NO TRIBUTARIOS ",
+      CONCEPTO: "INGRESOS NO TRIBUTARIOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.01 ",
-      CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES ",
+      CONCEPTO: "CONTRIBUCIONES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.01.001 ",
-      CONCEPTOPRESUPUESTAL: "CONTRIBUCIONES SOCIALES ",
+      CONCEPTO: "CONTRIBUCIONES SOCIALES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.01.001.01 ",
-      CONCEPTOPRESUPUESTAL: "SALUD ",
+      CONCEPTO: "SALUD ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.02 ",
-      CONCEPTOPRESUPUESTAL: "TASAS Y DERECHOS ADMINISTRATIVOS ",
+      CONCEPTO: "TASAS Y DERECHOS ADMINISTRATIVOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.02.116 ",
-      CONCEPTOPRESUPUESTAL: "DERECHOS PECUNIARIOS EDUCACION SUPERIOR ",
+      CONCEPTO: "DERECHOS PECUNIARIOS EDUCACION SUPERIOR ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.03 ",
-      CONCEPTOPRESUPUESTAL: "MULTAS, SANCIONES E INTERESES DE MORA ",
+      CONCEPTO: "MULTAS, SANCIONES E INTERESES DE MORA ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.03.001 ",
-      CONCEPTOPRESUPUESTAL: "MULTAS Y SANCIONES ",
+      CONCEPTO: "MULTAS Y SANCIONES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05 ",
-      CONCEPTOPRESUPUESTAL: "VENTA DE BIENES Y SERVICIOS ",
+      CONCEPTO: "VENTA DE BIENES Y SERVICIOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05.001 ",
-      CONCEPTOPRESUPUESTAL: "VENTAS DE ESTABLECIMIENTOS DE MERCADO ",
+      CONCEPTO: "VENTAS DE ESTABLECIMIENTOS DE MERCADO ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05.001.08 ",
-      CONCEPTOPRESUPUESTAL: "SERVICIOS PRESTADOS A LAS EMPRESAS Y SERVICIOS DE PRODUCCION  ",
+      CONCEPTO: "SERVICIOS PRESTADOS A LAS EMPRESAS Y SERVICIOS DE PRODUCCION  ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05.001.09 ",
-      CONCEPTOPRESUPUESTAL: "SERVICIOS PARA LA COMUNIDAD, SOCIALES Y PERSONALES "
+      CONCEPTO: "SERVICIOS PARA LA COMUNIDAD, SOCIALES Y PERSONALES "
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05.002 ",
-      CONCEPTOPRESUPUESTAL: "VENTAS INCIDENTALES DE ESTABLECIMIENTOS NO DE MERCADO ",
+      CONCEPTO: "VENTAS INCIDENTALES DE ESTABLECIMIENTOS NO DE MERCADO ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.05.002.03 ",
-      CONCEPTOPRESUPUESTAL: "OTROS BIENES TRANSPORTABLES EXCEPTO PRODUCTOS METALICOS, MAQUINARIA Y EQUIPO ",
+      CONCEPTO: "OTROS BIENES TRANSPORTABLES EXCEPTO PRODUCTOS METALICOS, MAQUINARIA Y EQUIPO ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.06 ",
-      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS CORRIENTES ",
+      CONCEPTO: "TRANSFERENCIAS CORRIENTES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.06.006 ",
-      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE OTRAS ENTIDADES DEL GOBIERNO GENERAL ",
+      CONCEPTO: "TRANSFERENCIAS DE OTRAS ENTIDADES DEL GOBIERNO GENERAL ",
     },
     {
       RUBROPRESUPEUSTAL: "1.1.02.06.009.02 ",
-      CONCEPTOPRESUPUESTAL: "SISTEMA GENERAL DE PENSIONES ",
+      CONCEPTO: "SISTEMA GENERAL DE PENSIONES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2 ",
-      CONCEPTOPRESUPUESTAL: "RECURSOS DE CAPITAL ",
+      CONCEPTO: "RECURSOS DE CAPITAL ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.01 ",
-      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS ",
+      CONCEPTO: "DISPOSICION DE ACTIVOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.01.02 ",
-      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS NO FINANCIEROS ",
+      CONCEPTO: "DISPOSICION DE ACTIVOS NO FINANCIEROS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.01.02.001 ",
-      CONCEPTOPRESUPUESTAL: "DISPOSICION DE ACTIVOS FIJOS ",
+      CONCEPTO: "DISPOSICION DE ACTIVOS FIJOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.05 ",
-      CONCEPTOPRESUPUESTAL: "RENDIMIENTOS FINANCIEROS ",
+      CONCEPTO: "RENDIMIENTOS FINANCIEROS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.05.02 ",
-      CONCEPTOPRESUPUESTAL: "DEPOSITOS ",
+      CONCEPTO: "DEPOSITOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.08 ",
-      CONCEPTOPRESUPUESTAL: "TRANSFERENCIAS DE CAPITAL ",
+      CONCEPTO: "TRANSFERENCIAS DE CAPITAL ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.08.01 ",
-      CONCEPTOPRESUPUESTAL: "DONACIONES ",
+      CONCEPTO: "DONACIONES ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.08.01.003 ",
-      CONCEPTOPRESUPUESTAL: "DEL SECTOR PRIVADO ",
+      CONCEPTO: "DEL SECTOR PRIVADO ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.08.02 ",
-      CONCEPTOPRESUPUESTAL: "INDEMNIZACIONES RELACIONADAS CON SEGUROS NO DE VIDA "
+      CONCEPTO: "INDEMNIZACIONES RELACIONADAS CON SEGUROS NO DE VIDA "
     },
     {
       RUBROPRESUPEUSTAL: "1.2.10 ",
-      CONCEPTOPRESUPUESTAL: "RECURSOS DEL BALANCE ",
+      CONCEPTO: "RECURSOS DEL BALANCE ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.10.02 ",
-      CONCEPTOPRESUPUESTAL: "SUPERAVIT FISCAL "
+      CONCEPTO: "SUPERAVIT FISCAL "
     },
     {
       RUBROPRESUPEUSTAL: "1.2.13 ",
-      CONCEPTOPRESUPUESTAL: "REINTEGROS Y OTROS RECURSOS NO APROPIADOS ",
+      CONCEPTO: "REINTEGROS Y OTROS RECURSOS NO APROPIADOS ",
     },
     {
       RUBROPRESUPEUSTAL: "1.2.13.01 ",
-      CONCEPTOPRESUPUESTAL: "REINTEGROS "
+      CONCEPTO: "REINTEGROS "
     }
   ]
 
@@ -1066,7 +1066,6 @@ export class AppComponent implements OnInit {
 
       let arregloSinRepetidos = Object.values(objetoSinRepetidos);
       this.datosTabla = arregloSinRepetidos
-      console.log(arregloSinRepetidos); // [1, 2, 3, 4, 5]
     }
     if (this.ejecucion == 0) {
       this.ejecucion = 1
@@ -1074,6 +1073,7 @@ export class AppComponent implements OnInit {
     } else {
       this.mostrarBoton = 1
       this.ejecucion = 0
+      this.ejecutarSegundoResumen()
       localStorage.clear()
     }
     console.log(this.ejecucion)
@@ -1114,8 +1114,8 @@ export class AppComponent implements OnInit {
     return false;
   }
   ejecutarSegundoResumen() {
-    for (let index = 0; index < this.informacion.length; index++) {
-      console.log(this.informacion[index])
+    console.log(this.informacion.length)
+    for (let index = 0; index <= this.informacion.length; index++) {
       let x = this.datosTabla.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == this.informacion[index].CODIGO.trim())
       x.forEach((element: any) => {
         element.CPC = this.informacion[index].CPC
@@ -1123,12 +1123,14 @@ export class AppComponent implements OnInit {
         element.FUENTESDEFINANCIACION = this.informacion[index].FUENTESDEFINANCIACION
         element.POLITICAPUBLICA = this.informacion[index].POLITICAPUBLICA
         this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
-        console.log(this.elementosUnificados)
+        if (index == this.informacion.length - 1) {
+          this.ejecutarModeloDeResumidos(this.contadormodelo)
+        }
       });
     }
+
   }
   ejecutarModeloDeResumidos(contadorValor: any) {
-    console.log(contadorValor)
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
       acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] || 0;
       return acc;
@@ -1137,17 +1139,13 @@ export class AppComponent implements OnInit {
       return busqueda[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)];
     });
     let unicos: any = [];
-
     for (var i = 0; i < duplicados.length; i++) {
-
       const elemento = duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor);
       if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor))) {
         unicos.push(elemento);
         this.unicosmodelo = unicos
       }
     }
-
-
     if (contadorValor == 1) {
       console.log('nada')
     } else {
@@ -1155,12 +1153,6 @@ export class AppComponent implements OnInit {
       unicos = x
       this.unicosmodelo = x
     }
-
-
-
-
-
-
     let arreglosDuplicados: any = []
     unicos.forEach((element: any) => {
       const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor) == element)
@@ -1172,23 +1164,30 @@ export class AppComponent implements OnInit {
       element1 = arreglosDuplicados[index].length;
       element2 = arreglosDuplicados[index]
       let x = 0
+      let y = 0
+      let w = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
         if (x == 0) {
+           y = element.RECAUDO
           x = element.APROPIACIONINICIAL
-          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x }))
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x}))
         } else {
-          if (element.APROPIACIONINICIAL == undefined) {
+          if(element.RECAUDO == undefined || null){
+            y = y + 0
+          }else {
+            y = y + element.RECAUDO
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x }))
+          }
+          if (element.APROPIACIONINICIAL == undefined || null) {
             x = x + 0
           } else {
             x = x + element.APROPIACIONINICIAL
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x }))
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x }))
           }
-          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), valor: x })
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x })
         }
       }
-
-
     }
     if (this.contadormodelo <= 9) {
       this.contadormodelo = this.contadormodelo - 1
@@ -1201,25 +1200,21 @@ export class AppComponent implements OnInit {
   extrayendoDuplicadosSumadosMODELO() {
     let arraydeDuplicados: any = []
     this.unicosmodelo.forEach((element: any) => {
-      console.log(element)
-      console.log(localStorage.getItem(element))
       let x: any = localStorage.getItem(element)
       x = JSON.parse(x)
       arraydeDuplicados = [...arraydeDuplicados, x]
       localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
     });
     for (let index = 0; index < arraydeDuplicados.length; index++) {
-      console.log(arraydeDuplicados[index].codigo)
       let x = this.modeloInformacion.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo)
-      console.log(x)
       x.forEach((element: any) => {
         element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
+        element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
         this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
       });
     }
     this.elementosUnificados.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
-      console.log(this.elementosUnificados)
     });
     this.datosTabla.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
@@ -1228,9 +1223,7 @@ export class AppComponent implements OnInit {
       const mergedArray = this.datosTabla.concat(this.elementosUnificados);
       mergedArray.sort((a: any, b: any) => {
         const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
-        console.log(aCodeArray)
         const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
-        console.log(bCodeArray)
 
         for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
           const aCodePart = aCodeArray[i] || 0;
@@ -1252,7 +1245,6 @@ export class AppComponent implements OnInit {
   actualizarTabla() {
     this.datosTabla.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
-      console.log(this.datosTabla)
     });
   }
 
