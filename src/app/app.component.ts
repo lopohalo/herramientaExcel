@@ -1019,16 +1019,54 @@ export class AppComponent implements OnInit {
       element2 = arreglosDuplicados[index]
       let x = 0
       let y = 0
+      let w = 0
+      let p = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
+        if (p == 0) {
+          if(element.POREJECUTAR == undefined){
+            p = 0
+          } else{
+            p = element.POREJECUTAR
+          }
+        } else {
+          p = p + element.POREJECUTAR
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
+        if (w == 0) {
+          if(element.PRESUPUESTODEFINITIVO == undefined){
+            w = 0
+          } else{
+            w = element.PRESUPUESTODEFINITIVO
+          }
+        } else {
+          w = w + element.PRESUPUESTODEFINITIVO
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
+        if (y == 0) {
+          if(element.RECAUDO == undefined){
+            y = 0
+          } else{
+            y = element.RECAUDO
+          }
+        } else {
+          y = y + element.RECAUDO
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
         if (x == 0) {
-          x = element.APROPIACIONINICIAL
-          y = element.RECAUDO
+          if(element.APROPIACIONINICIAL == undefined){
+            x = 0
+          } else{
+            x = element.APROPIACIONINICIAL
+          }
+          
         } else {
           x = x + element.APROPIACIONINICIAL
-          y = y + element.RECAUDO
-          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x }))
-          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x })
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
         }
       }
     }
@@ -1044,11 +1082,9 @@ export class AppComponent implements OnInit {
     })
     let arraydeDuplicados: any = []
     this.sinDuplicados.forEach((element: any) => {
-      console.log(localStorage.getItem(element.codigo))
       let x: any = localStorage.getItem(element.codigo)
       x = JSON.parse(x)
       arraydeDuplicados = [...arraydeDuplicados, x]
-      console.log(arraydeDuplicados)
       localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
     });
     for (let index = 0; index < arraydeDuplicados.length; index++) {
@@ -1056,6 +1092,8 @@ export class AppComponent implements OnInit {
       x.forEach((element: any) => {
         element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
         element.RECAUDO = arraydeDuplicados[index].recaudo
+        element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
+        element.POREJECUTAR = arraydeDuplicados[index].ejecutar
         this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
       });
 
@@ -1166,30 +1204,70 @@ export class AppComponent implements OnInit {
       let x = 0
       let y = 0
       let w = 0
+      let p = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
         // REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-        if(y == 0){
-          y = element.RECAUDO
-          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x}))
+        if (p == 0 ) {
+          if(element.POREJECUTAR == undefined){
+            p = 0
+          } else {
+            p = element.POREJECUTAR
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p  }))
+        } else {
+          if (element.POREJECUTAR == undefined || element.POREJECUTAR == null) {
+            p = p + 0
+          } else {
+            p = p + element.POREJECUTAR
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+        }
+        if (w == 0 ) {
+          if(element.PRESUPUESTODEFINITIVO == undefined){
+            w = 0
+          } else {
+            w = element.PRESUPUESTODEFINITIVO
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.PRESUPUESTODEFINITIVO == undefined || element.PRESUPUESTODEFINITIVO == null) {
+            w = w + 0
+          } else {
+            w = w + element.PRESUPUESTODEFINITIVO
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+        }
+        if (y == 0) {
+          if(element.RECAUDO == undefined){
+            y = 0
+          } else {
+            y = element.RECAUDO
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.RECAUDO == undefined || element.RECAUDO == null) {
+            y = y + 0
+          } else {
+            y = y + element.RECAUDO
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
         }
         if (x == 0) {
-          x = element.APROPIACIONINICIAL
-          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x}))
-        } else {
-          if(element.RECAUDO == undefined || null){
-            y = y + 0
-          }else {
-            y = y + element.RECAUDO
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x }))
+          if(element.APROPIACIONINICIAL == undefined){
+            x = 0
+          } else {
+            x = element.APROPIACIONINICIAL
           }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
           if (element.APROPIACIONINICIAL == undefined || null) {
             x = x + 0
           } else {
             x = x + element.APROPIACIONINICIAL
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x }))
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
           }
-          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x })
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p })
         }
       }
     }
@@ -1214,6 +1292,8 @@ export class AppComponent implements OnInit {
       x.forEach((element: any) => {
         element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
         element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
+        element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
+        element.POREJECUTAR = arraydeDuplicados[index].ejecutar
         this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
       });
     }
