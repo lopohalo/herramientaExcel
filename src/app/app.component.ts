@@ -1168,8 +1168,12 @@ export class AppComponent implements OnInit {
       let w = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
+        // REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+        if(y == 0){
+          y = element.RECAUDO
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x}))
+        }
         if (x == 0) {
-           y = element.RECAUDO
           x = element.APROPIACIONINICIAL
           localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x}))
         } else {
