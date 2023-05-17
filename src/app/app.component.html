@@ -3,6 +3,7 @@
 <p class="lead">No Plugins <b>Revision de Codigos y Resumen de cuentas</b></p>
 
 <!-- Upload  -->
+<ng-template [ngIf]="validartabla !== 1">
 <div class="container">
   <div class="row">
     <div class="col-12">
@@ -28,6 +29,7 @@
     </div>
   </div>
 </div>
+</ng-template>
 
 
 <div class="container">
@@ -43,6 +45,7 @@
       </div>
     </div>
     <div class="col-12">
+      <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
       <table id="excel-table" class="table table-bordered border border-3 table-hover">
         <thead>
         <tr>
@@ -77,6 +80,7 @@
         </tr>
         </tbody>
       </table>
+    </div>
     </div>
  
   

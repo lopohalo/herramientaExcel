@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { MatTableModule } from '@angular/material/table';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material/input'
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { MatInputModule } from '@angular/material/input'
     AppRoutingModule,
     BrowserAnimationsModule,
     MatTableModule,
-    MatInputModule
+    MatInputModule,
+    CommonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
