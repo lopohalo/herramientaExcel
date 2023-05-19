@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { elementAt, filter } from 'rxjs';
 import {
   formatNumber
- }
+}
   from '@angular/common';
 import * as numeral from 'numeral';
 import * as XLSX from 'xlsx'
@@ -14,8 +14,9 @@ import * as XLSX from 'xlsx'
 export class AppComponent implements OnInit {
   title = 'herramientaExcel';
   validartabla = 0
+  mostrarReporte: any = ''
   mostrarBoton = 0
-  contadormodelo = 13
+  contadormodelo = 16
   convertedJson!: string;
   fileName = 'tabla.xlsx';
   ejecucion = 0
@@ -28,682 +29,668 @@ export class AppComponent implements OnInit {
   informacion = [
     {
       CODIGO: "1 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.01.001.01.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.01.001.01.03 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01.03 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.01.001.01.05 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.01.001.01.05 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.03 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.03 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.04 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.01.04 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.03 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.03 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.04 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.01.02.04 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.02.116.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.02.116.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
-      CODIGO: "1.1.02.03 ",
-      CPC: "  ",
+      CODIGO: "1.1.02.03",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.03.001 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.03.001.05 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.03.001.05 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.05.001 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
-      CODIGO: "1.1.02.05.001.08 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.001.08 ",
-      CPC: "Servicios de consultoria en gestion administrativa ",
+      CODIGO: "1.1.02.05.001.08",
+      CPC: "83115",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05.001.09 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.001.09 ",
-      CPC: "Servicios de educacion superior nivel pregrado universitaria ",
+      CPC: "92512",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05.002 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.05.002.03 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.002.03 ",
-      CPC: "Libros publicados en fasciculos folletos hojas sueltas e impresos similares ",
+      CPC: "3229906",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05.002.06 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.002.06 ",
-      CPC: "Servicios de suministro de comidas a la mesa en cafeterias ",
+      CPC: "63312",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05.002.07 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.002.07 ",
-      CPC: "Servicios de alquiler o arrendamiento con o sin opcion de compra relativos a bienes inmuebles no residenciales diferentes a vivienda  propios o arrendados ",
+      CPC: "72112",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.05.002.09 ",
-      CPC: "  ",
-      FUENTESDEFINANCIACION: "  ",
-      TERCEROS: "  ",
-      POLITICAPUBLICA: "  "
-    },
-    {
-      CODIGO: "1.1.02.05.002.09 ",
-      CPC: "Servicios medicos generales ",
+      CPC: "93121",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "OTRAS TRANSFERENCIAS CORRIENTES DE OTRAS ENTIDADES CON DESTINACION ESPECIFICA LEGAL DEL GOBIERNO GENERAL ",
       TERCEROS: "MINISTERIO DE HACIENDA Y CREDITO PUBLICO ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06.006.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "OTRAS TRANSFERENCIAS CORRIENTES DE OTRAS ENTIDADES CON DESTINACION ESPECIFICA LEGAL DEL GOBIERNO GENERAL ",
       TERCEROS: "MINISTERIO DE HACIENDA Y CREDITO PUBLICO ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06.006.06 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006.06 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "OTRAS TRANSFERENCIAS CORRIENTES DE OTRAS ENTIDADES CON DESTINACION ESPECIFICA LEGAL DEL GOBIERNO GENERAL ",
       TERCEROS: "MINISTERIO DE EDUCACION NACIONAL ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06.006.07 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.006.07 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "ESTAMPILLAS ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06.009 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.009.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.009.02.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.009.02.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.1.02.06.009.02.03 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.1.02.06.009.02.03 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01.02.001 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01.02.001.03 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01.02.001.03.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.01.02.001.03.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.05 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.05.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.05.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "R.F. DE SISTEMA GENERAL DE SEGURIDAD SOCIAL EN SALUD - FONDOS ESPECIALES DEL MINISTERIO DE SALUD Y PROTECCION SOCIAL ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.08 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.08.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.08.01.003 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.08.01.003.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.08.01.003.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.08.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.08.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.10 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.10.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.10.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.13 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.13.01 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.13.01 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
     {
       CODIGO: "1.2.13.02 ",
-      CPC: "  ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
       POLITICAPUBLICA: "  "
     },
     {
       CODIGO: "1.2.13.02 ",
-      CPC: "No aplica ",
+      CPC: "0",
       FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
+    },
+    {
+      CODIGO: "1.1.02.05.001.08.03.01",
+      CPC: "83115",
+      FUENTESDEFINANCIACION: " COLCIENCIAS",
+      TERCEROS: "",
+      POLITICAPUBLICA: ""
+    },
+    {
+      CODIGO: "1.1.02.05.001.08.03.05",
+      CPC: "83115",
+      FUENTESDEFINANCIACION: "",
+      TERCEROS: "",
+      POLITICAPUBLICA: ""
+    },
+    {
+      CODIGO: "1.1.02.05.001.08.03.11",
+      CPC: "83115",
+      FUENTESDEFINANCIACION: "",
+      TERCEROS: "",
+      POLITICAPUBLICA: ""
+    },
+    {
+      CODIGO: "1.1.02.05.002.08",
+      CPC: "8912101",
+      FUENTESDEFINANCIACION: "",
+      TERCEROS: "",
+      POLITICAPUBLICA: ""
     }
   ]
   modeloInformacion = [
@@ -740,7 +727,7 @@ export class AppComponent implements OnInit {
       CONCEPTO: "DERECHOS PECUNIARIOS EDUCACION SUPERIOR ",
     },
     {
-      RUBROPRESUPEUSTAL: "1.1.02.03 ",
+      RUBROPRESUPEUSTAL: "1.1.02.03",
       CONCEPTO: "MULTAS, SANCIONES E INTERESES DE MORA ",
     },
     {
@@ -1805,6 +1792,7 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
+
   }
 
   fileUpload(event: any) {
@@ -1830,7 +1818,6 @@ export class AppComponent implements OnInit {
 
   corregirCodigos(): void {
     for (const userCode of this.datosTabla) {
-      console.log(userCode)
       const matchingEquivalence = this.equivalenciaINGRESO.find((equivalence: any) =>
         equivalence.RUBROPRESUPEUSTAL.trim() === userCode.RUBROPRESUPEUSTAL.trim()
       );
@@ -1839,517 +1826,567 @@ export class AppComponent implements OnInit {
         userCode.CONCEPTO = matchingEquivalence.CONCEPTO.trim();
       }
     }
-
-    console.log(this.datosTabla);
   }
   exportexcel1(): void {
-    /* pass here the table id */
     let element = document.getElementById('excel-table');
-    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+    const worksheet: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
 
-    /* generate workbook and add the worksheet */
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    const hoja = XLSX.utils.aoa_to_sheet(this.datosTabla);
+    // Recorremos solo la columna B y definimos las celdas como texto
+    const sheetData: any = worksheet['!ref']; // Obtenemos la referencia de todas las celdas
+    const range = XLSX.utils.decode_range(sheetData);
+    const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+     worksheet['!cols'] = anchoColumnas;
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      const cellAddress = XLSX.utils.encode_cell({ r: R, c: 1 }); // Columna B: c = 1
+      const cell = worksheet[cellAddress];
+      cell.t = 's'; // Definimos el tipo de celda como texto (string)
+    }
 
-    // Configurar el formato de la columna B como texto
-    hoja['B'] = hoja['B'].map((celda: any) => {
-      celda.z = '@';
-      return celda;
-    });
+    
 
-    /* save to file */
-    XLSX.writeFile(wb, this.fileName);
+    const book: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
+
+    XLSX.writeFile(book, this.fileName);
 
   }
 
   exportexcel() {
-    // Obtener la tabla
-    const tabla: any = document.getElementById('excel-table');
+    if(this.mostrarReporte == 'Ejecucion'){
+      let element = document.getElementById('excel-table');
+      const worksheet: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+  
+      // Recorremos solo la columna B y definimos las celdas como texto
+      const sheetData: any = worksheet['!ref']; // Obtenemos la referencia de todas las celdas
+      const range = XLSX.utils.decode_range(sheetData);
+      const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+       worksheet['!cols'] = anchoColumnas;
+      for (let R = range.s.r; R <= range.e.r; ++R) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: 1 }); // Columna B: c = 1
+        const cell = worksheet[cellAddress];
+        cell.t = 's'; // Definimos el tipo de celda como texto (string)
+      }
+  
+      
+  
+      const book: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
+  
+      XLSX.writeFile(book, this.fileName);
+    }else{
+ // Obtener la tabla
+ const tabla: any = document.getElementById('excel-table');
+
+ // Obtener los datos de la tabla en un arreglo de arreglos
+ const datos = this.getTablaData(tabla);
+
+ // Crear una hoja de Excel
+ const hoja: any = XLSX.utils.aoa_to_sheet(datos);
+
+ // Configurar el formato de la columna B como texto
+ const range = XLSX.utils.decode_range(hoja['!ref']);
+ for (let i = range.s.r + 1; i <= range.e.r; i++) {
+   const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
+   celda.z = '@';
+ }
+
+ // Configurar el ancho de las columnas
+ if (hoja) {
+   const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+   hoja['!cols'] = anchoColumnas;
+ } else {
+   console.error('La hoja de Excel es undefined.');
+ }
+
+ // Configurar estilo de los encabezados
+ const encabezadosRange = XLSX.utils.decode_range(hoja['!ref']);
+ for (let i = encabezadosRange.s.c; i <= encabezadosRange.e.c; i++) {
+   const ref = XLSX.utils.encode_cell({ r: 0, c: i });
+   hoja[ref].s = {
+     fill: { fgColor: { rgb: '4682B4' } },
+     font: { bold: true, color: { rgb: 'FFFFFF' } },
+     border: {
+       top: { style: 'thin', color: { auto: 1 } },
+       bottom: { style: 'thin', color: { auto: 1 } },
+       left: { style: 'thin', color: { auto: 1 } },
+       right: { style: 'thin', color: { auto: 1 } },
+     },
+   };
+ }
+
+ // Configurar estilo de las celdas de datos
+ const datosRange = XLSX.utils.decode_range(hoja['!ref']);
+ for (let i = datosRange.s.r + 1; i <= datosRange.e.r; i++) {
+   for (let j = datosRange.s.c; j <= datosRange.e.c; j++) {
+     const ref = XLSX.utils.encode_cell({ r: i, c: j });
+     hoja[ref].s = {
+       border: {
+         top: { style: 'thin', color: { auto: 1 } },
+         bottom: { style: 'thin', color: { auto: 1 } },
+         left: { style: 'thin', color: { auto: 1 } },
+         right: { style: 'thin', color: { auto: 1 } },
+       },
+     };
+     switch (j) {
+       case 0:
+         hoja[ref].s.fill = { fgColor: { rgb: 'C6EFCE' } };
+         break;
+       case 1:
+         hoja[ref].s.fill = { fgColor: { rgb: 'FFC7CE' } };
+         break;
+       case 2:
+         hoja[ref].s.fill = { fgColor: { rgb: 'FFEB9C' } };
+         break;
+       case 3:
+         hoja[ref].s.fill = { fgColor: { rgb: 'B4A7D6' } };
+         break;
+       case 4:
+         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
+         break;
+       case 5:
+         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
+         break;
+       case 6:
+         hoja[ref].s.fill = { fgColor: { rgb: 'CECEF6' } };
+         break;
+       case 7:
+         hoja[ref].s.fill = { fgColor: { rgb: 'F6CECE' } };
+         break;
+       case 8:
+         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
+         break;
+       case 9:
+         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
+         break;
+       case 10:
+         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
+         break;
+       case 11:
+         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
+         break;
+     }
+   }
+ }
+ // Crear un libro de Excel y agregar la hoja
+ if (datos.length > 0) {
+   // Crear un libro de Excel y agregar la hoja
+   const libro = XLSX.utils.book_new();
+   XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
+ 
+   // Descargar el archivo Excel
+   XLSX.writeFile(libro, 'tabla.xlsx');
+ } else {
+   console.error('No hay datos en la tabla para generar el archivo Excel.');
+ }
+    }
+   
+  }
+
+  getTablaData(tabla: HTMLElement): any[][] {
+    // Obtener las filas de la tabla
+    const filas = Array.from(tabla.querySelectorAll('tr'));
+
+    // Obtener los encabezados de columna
+    const encabezados = filas.shift()?.querySelectorAll('th');
 
     // Obtener los datos de la tabla en un arreglo de arreglos
-    const datos = this.getTablaData(tabla);
+    const datos = filas.map((fila) =>
+      Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
+    );
 
-    // Crear una hoja de Excel
-    const hoja: any = XLSX.utils.aoa_to_sheet(datos);
-
-    // Configurar el formato de la columna B como texto
-    const range = XLSX.utils.decode_range(hoja['!ref']);
-    for (let i = range.s.r + 1; i <= range.e.r; i++) {
-      const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
-      celda.z = '@';
+    // Agregar los encabezados de columna al inicio del arreglo de arreglos
+    if (encabezados) {
+      datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
     }
 
-    // Configurar el ancho de las columnas
-    const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
-    hoja['!cols'] = anchoColumnas;
+    return datos;
+  }
 
-    // Configurar estilo de los encabezados
-    const encabezadosRange = XLSX.utils.decode_range(hoja['!ref']);
-    for (let i = encabezadosRange.s.c; i <= encabezadosRange.e.c; i++) {
-      const ref = XLSX.utils.encode_cell({ r: 0, c: i });
-      hoja[ref].s = {
-        fill: { fgColor: { rgb: '4682B4' } },
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
-        border: {
-          top: { style: 'thin', color: { auto: 1 } },
-          bottom: { style: 'thin', color: { auto: 1 } },
-          left: { style: 'thin', color: { auto: 1 } },
-          right: { style: 'thin', color: { auto: 1 } },
-        },
-      };
+
+
+
+
+  ejecutarResumenIngresos() {
+    const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
+      acc[codigo.RUBROPRESUPEUSTAL] = ++acc[codigo.RUBROPRESUPEUSTAL] || 0;
+      return acc;
+    }, {});
+    const duplicados = this.datosTabla.filter((codigo: any) => {
+      return busqueda[codigo.RUBROPRESUPEUSTAL];
+
+    });
+    const unicos: any = [];
+
+    for (var i = 0; i < duplicados.length; i++) {
+
+      const elemento = duplicados[i].RUBROPRESUPEUSTAL;
+
+      if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL)) {
+        unicos.push(elemento);
+      }
     }
+    let arreglosDuplicados: any = []
+    unicos.forEach((element: any) => {
+      const arreglosSeparados = duplicados.filter((campo: any) => campo.RUBROPRESUPEUSTAL == element)
+      arreglosDuplicados.push(arreglosSeparados)
+    })
+    let element1
+    let element2
+    for (let index = 0; index < arreglosDuplicados.length; index++) {
+      element1 = arreglosDuplicados[index].length;
+      element2 = arreglosDuplicados[index]
+      let x = 0
+      let y = 0
+      let w = 0
+      let p = 0
+      for (let i = 0; i < element1; i++) {
+        const element = element2[i]
+        if (p == 0) {
+          if (element.POREJECUTAR == undefined) {
+            p = 0
+          } else {
+            p = element.POREJECUTAR
+          }
+        } else {
+          p = p + element.POREJECUTAR
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
+        if (w == 0) {
+          if (element.PRESUPUESTODEFINITIVO == undefined) {
+            w = 0
+          } else {
+            w = element.PRESUPUESTODEFINITIVO
+          }
+        } else {
+          w = w + element.PRESUPUESTODEFINITIVO
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
+        if (y == 0) {
+          if (element.RECAUDO == undefined) {
+            y = 0
+          } else {
+            y = element.RECAUDO
+          }
+        } else {
+          y = y + element.RECAUDO
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
+        }
+        if (x == 0) {
+          if (element.APROPIACIONINICIAL == undefined) {
+            x = 0
+          } else {
+            x = element.APROPIACIONINICIAL
+          }
 
-    // Configurar estilo de las celdas de datos
-    const datosRange = XLSX.utils.decode_range(hoja['!ref']);
-    for (let i = datosRange.s.r + 1; i <= datosRange.e.r; i++) {
-      for (let j = datosRange.s.c; j <= datosRange.e.c; j++) {
-        const ref = XLSX.utils.encode_cell({ r: i, c: j });
-        hoja[ref].s = {
-          border: {
-            top: { style: 'thin', color: { auto: 1 } },
-            bottom: { style: 'thin', color: { auto: 1 } },
-            left: { style: 'thin', color: { auto: 1 } },
-            right: { style: 'thin', color: { auto: 1 } },
-          },
-        };
-        switch (j) {
-          case 0:
-            hoja[ref].s.fill = { fgColor: { rgb: 'C6EFCE' } };
-            break;
-          case 1:
-            hoja[ref].s.fill = { fgColor: { rgb: 'FFC7CE' } };
-            break;
-          case 2:
-            hoja[ref].s.fill = { fgColor: { rgb: 'FFEB9C' } };
-            break;
-          case 3:
-            hoja[ref].s.fill = { fgColor: { rgb: 'B4A7D6' } };
-            break;
-          case 4:
-            hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-            break;
-          case 5:
-            hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-            break;
-          case 6:
-            hoja[ref].s.fill = { fgColor: { rgb: 'CECEF6' } };
-            break;
-          case 7:
-            hoja[ref].s.fill = { fgColor: { rgb: 'F6CECE' } };
-            break;
-          case 8:
-            hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-            break;
-          case 9:
-            hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-            break;
-          case 10:
-            hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-            break;
-          case 11:
-            hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-            break;
-        } 
+        } else {
+          x = x + element.APROPIACIONINICIAL
+          localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
         }
       }
-      // Crear un libro de Excel y agregar la hoja
-      const libro = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
-
-      // Descargar el archivo Excel
-      XLSX.writeFile(libro, 'tabla.xlsx');
     }
+    this.extrayendoDuplicadosSumados()
+  }
 
-    getTablaData(tabla: HTMLElement): any[][] {
-      // Obtener las filas de la tabla
-      const filas = Array.from(tabla.querySelectorAll('tr'));
 
-      // Obtener los encabezados de columna
-      const encabezados = filas.shift()?.querySelectorAll('th');
-
-      // Obtener los datos de la tabla en un arreglo de arreglos
-      const datos = filas.map((fila) =>
-        Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
-      );
-
-      // Agregar los encabezados de columna al inicio del arreglo de arreglos
-      if (encabezados) {
-        datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
+  extrayendoDuplicadosSumados() {
+    this.datosDuplicados.forEach((i: any) => {
+      if (!this.elementoRepite(i.codigo)) {
+        this.sinDuplicados.push(i);
       }
-
-      return datos;
-    }
-
-
-
-
-
-    ejecutarResumenIngresos() {
-      const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
-        acc[codigo.RUBROPRESUPEUSTAL.trim()] = ++acc[codigo.RUBROPRESUPEUSTAL.trim()] || 0;
-        return acc;
-      }, {});
-      const duplicados = this.datosTabla.filter((codigo: any) => {
-        return busqueda[codigo.RUBROPRESUPEUSTAL.trim()];
-
+    })
+    let arraydeDuplicados: any = []
+    this.sinDuplicados.forEach((element: any) => {
+      let x: any = localStorage.getItem(element.codigo)
+      x = JSON.parse(x)
+      arraydeDuplicados = [...arraydeDuplicados, x]
+      localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
+    });
+    for (let index = 0; index < arraydeDuplicados.length; index++) {
+      let x = this.datosTabla.filter((element: any) => element.RUBROPRESUPEUSTAL == arraydeDuplicados[index].codigo)
+      x.forEach((element: any) => {
+        element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
+        element.RECAUDO = arraydeDuplicados[index].recaudo
+        element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
+        element.POREJECUTAR = arraydeDuplicados[index].ejecutar
+        this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL.trim() == element.RUBROPRESUPEUSTAL.trim() ? element : element1)
       });
-      const unicos: any = [];
 
-      for (var i = 0; i < duplicados.length; i++) {
-
-        const elemento = duplicados[i].RUBROPRESUPEUSTAL;
-
-        if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim())) {
-          unicos.push(elemento);
-        }
-      }
-      let arreglosDuplicados: any = []
-      unicos.forEach((element: any) => {
-        const arreglosSeparados = duplicados.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim() == element)
-        arreglosDuplicados.push(arreglosSeparados)
-      })
-      let element1
-      let element2
-      for (let index = 0; index < arreglosDuplicados.length; index++) {
-        element1 = arreglosDuplicados[index].length;
-        element2 = arreglosDuplicados[index]
-        let x = 0
-        let y = 0
-        let w = 0
-        let p = 0
-        for (let i = 0; i < element1; i++) {
-          const element = element2[i]
-          if (p == 0) {
-            if (element.POREJECUTAR == undefined) {
-              p = 0
-            } else {
-              p = element.POREJECUTAR
-            }
-          } else {
-            p = p + element.POREJECUTAR
-            localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
-            this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
-          }
-          if (w == 0) {
-            if (element.PRESUPUESTODEFINITIVO == undefined) {
-              w = 0
-            } else {
-              w = element.PRESUPUESTODEFINITIVO
-            }
-          } else {
-            w = w + element.PRESUPUESTODEFINITIVO
-            localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
-            this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
-          }
-          if (y == 0) {
-            if (element.RECAUDO == undefined) {
-              y = 0
-            } else {
-              y = element.RECAUDO
-            }
-          } else {
-            y = y + element.RECAUDO
-            localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
-            this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
-          }
-          if (x == 0) {
-            if (element.APROPIACIONINICIAL == undefined) {
-              x = 0
-            } else {
-              x = element.APROPIACIONINICIAL
-            }
-
-          } else {
-            x = x + element.APROPIACIONINICIAL
-            localStorage.setItem(element.RUBROPRESUPEUSTAL, JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p }))
-            this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL, recaudo: y, valor: x, definitivo: w, ejecutar: p })
-          }
-        }
-      }
-      this.extrayendoDuplicadosSumados()
-    }
-
-
-    extrayendoDuplicadosSumados() {
-      this.datosDuplicados.forEach((i: any) => {
-        if (!this.elementoRepite(i.codigo)) {
-          this.sinDuplicados.push(i);
-        }
-      })
-      let arraydeDuplicados: any = []
-      this.sinDuplicados.forEach((element: any) => {
-        let x: any = localStorage.getItem(element.codigo)
-        x = JSON.parse(x)
-        arraydeDuplicados = [...arraydeDuplicados, x]
-        localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
+      let objetoSinRepetidos: any = {};
+      this.elementosUnificados.forEach(function (elemento: any) {
+        objetoSinRepetidos[elemento.RUBROPRESUPEUSTAL] = elemento;
       });
-      for (let index = 0; index < arraydeDuplicados.length; index++) {
-        let x = this.datosTabla.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo)
-        x.forEach((element: any) => {
-          element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
-          element.RECAUDO = arraydeDuplicados[index].recaudo
-          element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
-          element.POREJECUTAR = arraydeDuplicados[index].ejecutar
-          this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL.trim() == element.RUBROPRESUPEUSTAL.trim() ? element : element1)
-        });
 
-        let objetoSinRepetidos: any = {};
-        this.elementosUnificados.forEach(function (elemento: any) {
-          objetoSinRepetidos[elemento.RUBROPRESUPEUSTAL.trim()] = elemento;
-        });
-
-        let arregloSinRepetidos = Object.values(objetoSinRepetidos);
-        this.datosTabla = arregloSinRepetidos
-      }
-      if (this.ejecucion == 0) {
-        this.ejecucion = 1
-        this.ejecutarResumenIngresos()
-      } else {
-        this.mostrarBoton = 1
-        this.ejecucion = 0
-        this.ejecutarSegundoResumen()
-        localStorage.clear()
-      }
+      let arregloSinRepetidos = Object.values(objetoSinRepetidos);
+      this.datosTabla = arregloSinRepetidos
     }
-    elementoRepite(valor: any) {
-      let vecesRepetidas = 0;
-      for (let i of this.sinDuplicados) {
-        if (i.codigo == valor) {
-          vecesRepetidas++;
-          if (vecesRepetidas > 0) {
-            return true;
-            break;
-          }
+    if (this.ejecucion == 0) {
+      this.ejecucion = 1
+      this.ejecutarResumenIngresos()
+    } else {
+      this.mostrarBoton = 1
+      this.ejecucion = 0
+      this.ejecutarSegundoResumen()
+      localStorage.clear()
+    }
+  }
+  elementoRepite(valor: any) {
+    let vecesRepetidas = 0;
+    for (let i of this.sinDuplicados) {
+      if (i.codigo == valor) {
+        vecesRepetidas++;
+        if (vecesRepetidas > 0) {
+          return true;
+          break;
         }
       }
-      return false;
     }
-    extrayendoDuplicadosSumadosTABLA() {
-      this.datosTabla.forEach((i: any) => {
-        if (!this.elementoRepite(i.RUBROPRESUPEUSTAL.trim())) {
-          this.sinDuplicadosTABLA.push(i);
-        }
-      })
-    }
-    elementoRepiteTABLA(valor: any) {
-      let vecesRepetidas = 0;
-      for (let i of this.sinDuplicadosTABLA) {
-        if (i.RUBROPRESUPEUSTAL.trim() == valor) {
-          vecesRepetidas++;
-          if (vecesRepetidas > 0) {
-            return true;
-            break;
-          }
+    return false;
+  }
+  extrayendoDuplicadosSumadosTABLA() {
+    this.datosTabla.forEach((i: any) => {
+      if (!this.elementoRepite(i.RUBROPRESUPEUSTAL.trim())) {
+        this.sinDuplicadosTABLA.push(i);
+      }
+    })
+  }
+  elementoRepiteTABLA(valor: any) {
+    let vecesRepetidas = 0;
+    for (let i of this.sinDuplicadosTABLA) {
+      if (i.RUBROPRESUPEUSTAL.trim() == valor) {
+        vecesRepetidas++;
+        if (vecesRepetidas > 0) {
+          return true;
+          break;
         }
       }
-      return false;
     }
-    ejecutarSegundoResumen() {
-      for (let index = 0; index <= this.informacion.length; index++) {
-        let x = this.datosTabla.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == this.informacion[index].CODIGO.trim())
-        x.forEach((element: any) => {
-          element.CPC = this.informacion[index].CPC
-          element.TERCEROS = this.informacion[index].TERCEROS
-          element.FUENTESDEFINANCIACION = this.informacion[index].FUENTESDEFINANCIACION
-          element.POLITICAPUBLICA = this.informacion[index].POLITICAPUBLICA
-          this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
-          if (index == this.informacion.length - 1) {
-            this.ejecutarModeloDeResumidos(this.contadormodelo)
-          }
-        });
-      }
-
-    }
-    ejecutarModeloDeResumidos(contadorValor: any) {
-      const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
-        acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] || 0;
-        return acc;
-      }, {});
-      const duplicados = this.datosTabla.filter((codigo: any) => {
-        return busqueda[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)];
+    return false;
+  }
+  ejecutarSegundoResumen() {
+    for (let index = 0; index <= this.informacion.length; index++) {
+      let x = this.datosTabla.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == this.informacion[index].CODIGO.trim())
+      x.forEach((element: any) => {
+        // element.CPC = this.informacion[index].CPC
+        element.TERCEROS = this.informacion[index].TERCEROS
+        element.FUENTESDEFINANCIACION = this.informacion[index].FUENTESDEFINANCIACION
+        element.POLITICAPUBLICA = this.informacion[index].POLITICAPUBLICA
+        this.elementosUnificados = this.datosTabla.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
+        if (index == this.informacion.length - 1) {
+          this.ejecutarModeloDeResumidos(this.contadormodelo)
+        }
       });
-      let unicos: any = [];
-      for (var i = 0; i < duplicados.length; i++) {
-        const elemento = duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor);
-        if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor))) {
-          unicos.push(elemento);
-          this.unicosmodelo = unicos
-        }
-      }
-      if (contadorValor == 1) {
-        console.log('nada')
-      } else {
-        let x = unicos.filter((element: any) => element.length == contadorValor)
-        unicos = x
-        this.unicosmodelo = x
-      }
-      let arreglosDuplicados: any = []
-      unicos.forEach((element: any) => {
-        const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor) == element)
-        arreglosDuplicados.push(arreglosSeparados)
-      })
-      let element1
-      let element2
-      for (let index = 0; index < arreglosDuplicados.length; index++) {
-        element1 = arreglosDuplicados[index].length;
-        element2 = arreglosDuplicados[index]
-        let x = 0
-        let y = 0
-        let w = 0
-        let p = 0
-        for (let i = 0; i < element1; i++) {
-          const element = element2[i]
-          // REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-          if (p == 0) {
-            if (element.POREJECUTAR == undefined) {
-              p = 0
-            } else {
-              p = element.POREJECUTAR
-            }
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-          } else {
-            if (element.POREJECUTAR == undefined || element.POREJECUTAR == null) {
-              p = p + 0
-            } else {
-              p = p + element.POREJECUTAR
-              localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-            }
-          }
-          if (w == 0) {
-            if (element.PRESUPUESTODEFINITIVO == undefined) {
-              w = 0
-            } else {
-              w = element.PRESUPUESTODEFINITIVO
-            }
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-          } else {
-            if (element.PRESUPUESTODEFINITIVO == undefined || element.PRESUPUESTODEFINITIVO == null) {
-              w = w + 0
-            } else {
-              w = w + element.PRESUPUESTODEFINITIVO
-              localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-            }
-          }
-          if (y == 0) {
-            if (element.RECAUDO == undefined) {
-              y = 0
-            } else {
-              y = element.RECAUDO
-            }
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-          } else {
-            if (element.RECAUDO == undefined || element.RECAUDO == null) {
-              y = y + 0
-            } else {
-              y = y + element.RECAUDO
-              localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-            }
-          }
-          if (x == 0) {
-            if (element.APROPIACIONINICIAL == undefined) {
-              x = 0
-            } else {
-              x = element.APROPIACIONINICIAL
-            }
-            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-          } else {
-            if (element.APROPIACIONINICIAL == undefined || null) {
-              x = x + 0
-            } else {
-              x = x + element.APROPIACIONINICIAL
-              localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
-            }
-            this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p })
-          }
-        }
-      }
-      if (this.contadormodelo <= 9) {
-        this.contadormodelo = this.contadormodelo - 1
-      } else {
-        this.contadormodelo = 9
-      }
-
-      this.extrayendoDuplicadosSumadosMODELO()
-    }
-    extrayendoDuplicadosSumadosMODELO() {
-      let arraydeDuplicados: any = []
-      this.unicosmodelo.forEach((element: any) => {
-        let x: any = localStorage.getItem(element)
-        x = JSON.parse(x)
-        arraydeDuplicados = [...arraydeDuplicados, x]
-        localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
-      });
-      for (let index = 0; index < arraydeDuplicados.length; index++) {
-        let x = this.modeloInformacion.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo)
-        x.forEach((element: any) => {
-          element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
-          element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
-          element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
-          element.POREJECUTAR = arraydeDuplicados[index].ejecutar
-          this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
-        });
-      }
-      this.elementosUnificados.forEach((element: any) => {
-        element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
-      });
-      this.datosTabla.forEach((element: any) => {
-        element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
-      });
-      if (this.contadormodelo == 0) {
-        const mergedArray = this.datosTabla.concat(this.elementosUnificados);
-        mergedArray.sort((a: any, b: any) => {
-          const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
-          const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
-
-          for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
-            const aCodePart = aCodeArray[i] || 0;
-            const bCodePart = bCodeArray[i] || 0;
-            if (aCodePart !== bCodePart) {
-              return aCodePart - bCodePart;
-            }
-          }
-          return 0;
-        }); // ordenar los objetos por código
-        this.datosTabla = mergedArray
-        this.actualizarTabla()
-      } else {
-        this.ejecutarModeloDeResumidos(this.contadormodelo)
-      }
-
-    }
-
-    actualizarTabla() {
-      this.datosTabla.forEach((element: any) => {
-        element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
-      });
-      this.formatearNumeros()
-    }
-    formatearNumeros(): any[] {
-      for (const objeto of this.datosTabla) {
-        if(objeto.APROPIACIONINICIAL == null || undefined){
-          objeto.APROPIACIONINICIAL = 0
-        } else{
-          objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
-        }
-        if(objeto.PRESUPUESTODEFINITIVO == null || undefined){
-          objeto.PRESUPUESTODEFINITIVO = 0
-        } else{
-          objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
-        }
-        if(objeto.RECAUDO == null || undefined){
-          objeto.RECAUDO = 0
-        } else{
-          objeto.RECAUDO = formatNumber(objeto.RECAUDO, 'en-US');
-        }
-        if(objeto.POREJECUTAR == null || undefined){
-          objeto.POREJECUTAR = 0
-        } else{
-          objeto.POREJECUTAR = formatNumber(objeto.POREJECUTAR, 'en-US');
-        }
-      }
-    
-      return this.datosTabla;
     }
 
   }
+  ejecutarModeloDeResumidos(contadorValor: any) {
+    const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
+      acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] || 0;
+      return acc;
+    }, {});
+    const duplicados = this.datosTabla.filter((codigo: any) => {
+      return busqueda[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)];
+    });
+    let unicos: any = [];
+    for (var i = 0; i < duplicados.length; i++) {
+      const elemento = duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor);
+      if (!unicos.includes(duplicados[i].RUBROPRESUPEUSTAL.trim().slice(0, contadorValor))) {
+        unicos.push(elemento);
+        if(this.contadormodelo == 6){
+          unicos.push("1.1.02","1.2.01","1.2.05", "1.2.08", "1.2.10","1.2.13")
+        }
+        if(this.contadormodelo == 9){
+          unicos.push("1.2.13.01","1.2.10.02","1.2.08.02", "1.2.08.01", "1.2.05.02", "1.2.01.02", "1.1.02.06","1.1.02.05", "1.1.02.03", "1.1.02.02", "1.1.02.01")
+        }
+        if(this.contadormodelo == 13){
+          unicos.push("1.1.02.03.001","1.1.02.02.116","1.1.02.01.001", "1.1.02.05.001", "1.1.02.05.001", "1.1.02.05.002", "1.1.02.06.006","1.2.01.02.001", "1.2.08.01.003")
+        }
+        if(this.contadormodelo == 16){
+          unicos.push("1.1.02.01.001.01","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02")
+        }
+        this.unicosmodelo = unicos
+        console.log(this.contadormodelo)
+        console.log(this.unicosmodelo)
+      }
+    }
+    if (contadorValor == 1) {
+      console.log('nada')
+    } else {
+      let x = unicos.filter((element: any) => element.length == contadorValor)
+      unicos = x
+      this.unicosmodelo = x
+    }
+    let arreglosDuplicados: any = []
+    unicos.forEach((element: any) => {
+      const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor) == element.trim())
+      arreglosDuplicados.push(arreglosSeparados)
+    })
+    let element1
+    let element2
+    for (let index = 0; index < arreglosDuplicados.length; index++) {
+      element1 = arreglosDuplicados[index].length;
+      element2 = arreglosDuplicados[index]
+      let x = 0
+      let y = 0
+      let w = 0
+      let p = 0
+      for (let i = 0; i < element1; i++) {
+        const element = element2[i]
+        // REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+        if (p == 0) {
+          if (element.POREJECUTAR == undefined) {
+            p = 0
+          } else {
+            p = element.POREJECUTAR
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.POREJECUTAR == undefined || element.POREJECUTAR == null) {
+            p = p + 0
+          } else {
+            p = p + element.POREJECUTAR
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+        }
+        if (w == 0) {
+          if (element.PRESUPUESTODEFINITIVO == undefined) {
+            w = 0
+          } else {
+            w = element.PRESUPUESTODEFINITIVO
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.PRESUPUESTODEFINITIVO == undefined || element.PRESUPUESTODEFINITIVO == null) {
+            w = w + 0
+          } else {
+            w = w + element.PRESUPUESTODEFINITIVO
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+        }
+        if (y == 0) {
+          if (element.RECAUDO == undefined) {
+            y = 0
+          } else {
+            y = element.RECAUDO
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.RECAUDO == undefined || element.RECAUDO == null) {
+            y = y + 0
+          } else {
+            y = y + element.RECAUDO
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+        }
+        if (x == 0) {
+          if (element.APROPIACIONINICIAL == undefined) {
+            x = 0
+          } else {
+            x = element.APROPIACIONINICIAL
+          }
+          localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+        } else {
+          if (element.APROPIACIONINICIAL == undefined || null) {
+            x = x + 0
+          } else {
+            x = x + element.APROPIACIONINICIAL
+            localStorage.setItem(element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p }))
+          }
+          this.datosDuplicados.push({ codigo: element.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor), recaudoMODELO: y, valor: x, definitivo: w, ejecutar: p })
+        }
+      }
+    }
+
+      this.contadormodelo = this.contadormodelo - 1
+    
+
+    this.extrayendoDuplicadosSumadosMODELO()
+  }
+  extrayendoDuplicadosSumadosMODELO() {
+    let arraydeDuplicados: any = []
+    this.unicosmodelo.forEach((element: any) => {
+      let x: any = localStorage.getItem(element)
+      x = JSON.parse(x)
+      arraydeDuplicados = [...arraydeDuplicados, x]
+      localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
+    });
+    for (let index = 0; index < arraydeDuplicados.length; index++) {
+      let x = this.modeloInformacion.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo)
+      x.forEach((element: any) => {
+        element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
+        element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
+        element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
+        element.POREJECUTAR = arraydeDuplicados[index].ejecutar
+        this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
+      });
+    }
+    this.elementosUnificados.forEach((element: any) => {
+      element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
+    });
+    this.datosTabla.forEach((element: any) => {
+      element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
+    });
+    if (this.contadormodelo == 0) {
+      const mergedArray = this.datosTabla.concat(this.elementosUnificados);
+      mergedArray.sort((a: any, b: any) => {
+        const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
+        const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
+
+        for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
+          const aCodePart = aCodeArray[i] || 0;
+          const bCodePart = bCodeArray[i] || 0;
+          if (aCodePart !== bCodePart) {
+            return aCodePart - bCodePart;
+          }
+        }
+        return 0;
+      }); // ordenar los objetos por código
+      this.datosTabla = mergedArray
+      this.actualizarTabla()
+    } else {
+      this.ejecutarModeloDeResumidos(this.contadormodelo)
+    }
+
+  }
+
+  actualizarTabla() {
+    this.datosTabla.forEach((element: any) => {
+      element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
+    });
+    this.formatearNumeros()
+  }
+  formatearNumeros(): any[] {
+    for (const objeto of this.datosTabla) {
+      if (objeto.APROPIACIONINICIAL == null || undefined) {
+        objeto.APROPIACIONINICIAL = 0
+      } else {
+        objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
+      }
+      if (objeto.PRESUPUESTODEFINITIVO == null || undefined) {
+        objeto.PRESUPUESTODEFINITIVO = 0
+      } else {
+        objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
+      }
+      if (objeto.RECAUDO == null || undefined) {
+        objeto.RECAUDO = 0
+      } else {
+        objeto.RECAUDO = formatNumber(objeto.RECAUDO, 'en-US');
+      }
+      if (objeto.POREJECUTAR == null || undefined) {
+        objeto.POREJECUTAR = 0
+      } else {
+        objeto.POREJECUTAR = formatNumber(objeto.POREJECUTAR, 'en-US');
+      }
+    }
+
+    return this.datosTabla;
+  }
+
+  ejecutarProgramacion(tipoReporte: any) {
+    this.mostrarReporte = tipoReporte
+  }
+
+}
