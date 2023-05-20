@@ -1,7 +1,43 @@
 <router-outlet></router-outlet>
-<h2>AJUSTES A TABLAS DE INGRESOS Y EGRESOS</h2>
-<p class="lead">No Plugins <b>Revision de Codigos y Resumen de cuentas</b></p>
+<nav class="navbar navbar-light  justify-content-between mb-3 bg-light p-3">
+  <a class="navbar-brand" href="#">
+    <img src="assets\img\logo.png" width="40" height="20" class="d-inline-block align-top" alt="">
+  </a>
+  <h2 style="color:black">Herramienta excel Ingresos</h2>
+</nav>
 
+<ng-template [ngIf]="cargandoPaginaSpinner === 0" [ngIfElse]="loading">
+  <div class="container text-center" style="margin-top: 300px;">
+    <div class="row">
+      <div class="col-12">
+<div class="spinner-grow text-primary" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-secondary" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-success" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-danger" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-warning" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-info" role="status">
+  <span class="sr-only"></span>
+</div>
+<div class="spinner-grow text-dark" role="status">
+  <span class="sr-only"></span>
+</div>    
+<p>Cargando Datos....</p>
+</div>
+</div>
+</div>
+</ng-template>
+
+<ng-template #loading>
 <!-- Upload  -->
 <ng-template [ngIf]="validartabla !== 1">
 <div class="container">
@@ -52,7 +88,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-12 mt-5 text-center mb-3"> 
+    <div class="col-12 mt-5 text-center mb-2"> 
       <div class="row">
         <div class="col-4">
           <button (click)="exportexcel()" class="btn btn-outline-success" type="button">Exportar a Excel</button>
@@ -75,17 +111,17 @@
       <table id="excel-table" class="table table-bordered border border-3 table-hover">
         <thead>
         <tr>
-          <th class="columnas">FUENTE PRESUPUESTAL</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
+          <th class="columnas " >FUENTE PRESUPUESTAL</th>
+          <th class="columnas" >CODIGO</th>
           <th class="columnas">CONCEPTO</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">APROPIACION INICIAL</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">RECAUDO</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">PRESUPUESTO DEFINITIVO</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">EJECUTAR</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">CPC</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">FUENTES DE FINANCIACION</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">TERCEROS</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">POLITICA PUBLICA</th>
+          <th class="columnas" style="background-color: rgba(208, 44, 44, 0.566);">APROPIACION INICIAL</th>
+          <th class="columnas" style="background-color: rgba(219, 0, 253, 0.389);">RECAUDO</th>
+          <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">PRESUPUESTO DEFINITIVO</th>
+          <th class="columnas" >EJECUTAR</th>
+          <th class="columnas" >CPC</th>
+          <th class="columnas" >FUENTES DE FINANCIACION</th>
+          <th class="columnas" >TERCEROS</th>
+          <th class="columnas" >POLITICA PUBLICA</th>
         </tr>
         </thead>
         <tbody>
@@ -93,9 +129,9 @@
           <td class="columnas">{{item.CONCEPTOPRESUPUESTAL}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
           <td class="columnas">{{item.CONCEPTO}}</td>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.APROPIACIONINICIAL}}</td>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RECAUDO}}</td>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.PRESUPUESTODEFINITIVO}}</td>
+          <td class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">{{item.APROPIACIONINICIAL}}</td>
+          <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
+          <td class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">{{item.PRESUPUESTODEFINITIVO}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.POREJECUTAR}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.FUENTESDEFINANCIACION}}</td>
@@ -116,8 +152,8 @@
           <th class="columnas"></th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
           <th class="columnas">CONCEPTO</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">APROPIACION INICIAL</th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">PRESUPUESTO DEFINITIVO</th>
+          <th class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">APROPIACION INICIAL</th>
+          <th class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">PRESUPUESTO DEFINITIVO</th>
         </tr>
         </thead>
         <tbody>
@@ -125,8 +161,8 @@
           <td class="columnas">D</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
           <td class="columnas">{{item.CONCEPTO}}</td>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.APROPIACIONINICIAL}}</td>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.PRESUPUESTODEFINITIVO}}</td>
+          <td class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">{{item.APROPIACIONINICIAL}}</td>
+          <td class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">{{item.PRESUPUESTODEFINITIVO}}</td>
         </tr>
         </tbody>
       </table>
@@ -146,10 +182,10 @@
           <th class="columnas"></th>
           <th class="columnas"></th>
           <th class="columnas"></th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">RECAUDO</th>
+          <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
           <th class="columnas"></th>
           <th class="columnas"></th>
-          <th class="columnas" style="background-color: rgb(155, 155, 229);">RECAUDO</th>
+          <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
         </tr>
         </thead>
         <tbody>
@@ -161,10 +197,10 @@
           <th class="columnas">1</th>
           <th class="columnas">0</th>
           <th class="columnas">0</th>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RECAUDO}}</td>
+          <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
           <th class="columnas">0</th>
           <th class="columnas">0</th>
-          <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RECAUDO}}</td>
+          <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
         </tr>
         </tbody>
       </table>
@@ -174,3 +210,4 @@
   
 </div>
 </div>
+</ng-template>

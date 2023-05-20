@@ -14,6 +14,7 @@ import * as XLSX from 'xlsx'
 export class AppComponent implements OnInit {
   title = 'herramientaExcel';
   validartabla = 0
+  cargandoPaginaSpinner:any = ''
   mostrarReporte: any = ''
   mostrarBoton = 0
   contadormodelo = 16
@@ -1796,6 +1797,7 @@ export class AppComponent implements OnInit {
   }
 
   fileUpload(event: any) {
+    this.cargandoPaginaSpinner = 0
     const selectedFile = event.target.files[0];
     const fileReader = new FileReader();
     fileReader.readAsBinaryString(selectedFile)
@@ -1806,6 +1808,7 @@ export class AppComponent implements OnInit {
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
         this.convertedJson = JSON.stringify(data, undefined, 4)
         this.datosTabla = data
+        this.cargandoPaginaSpinner = 1
       })
       setTimeout(() => {
         this.corregirCodigos();
@@ -1859,7 +1862,7 @@ export class AppComponent implements OnInit {
       // Recorremos solo la columna B y definimos las celdas como texto
       const sheetData: any = worksheet['!ref']; // Obtenemos la referencia de todas las celdas
       const range = XLSX.utils.decode_range(sheetData);
-      const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+      const anchoColumnas = [{ wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 25 }, { wch: 10}, { wch: 10 }, { wch: 25 }];
        worksheet['!cols'] = anchoColumnas;
       for (let R = range.s.r; R <= range.e.r; ++R) {
         const cellAddress = XLSX.utils.encode_cell({ r: R, c: 1 }); // Columna B: c = 1
@@ -1892,7 +1895,7 @@ export class AppComponent implements OnInit {
 
  // Configurar el ancho de las columnas
  if (hoja) {
-   const anchoColumnas = [{ wch: 40 }, { wch: 20 }, { wch: 50 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+   const anchoColumnas = [{ wch: 20 }, { wch: 20 }, { wch: 40 }, { wch: 25 }, { wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
    hoja['!cols'] = anchoColumnas;
  } else {
    console.error('La hoja de Excel es undefined.');
