@@ -177,6 +177,7 @@
         <tr>
           <th class="columnas"></th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
+          <th class="columnas">CONCEPTO</th>
           <th class="columnas" style="background-color: rgb(155, 155, 229);">CPC</th>
           <th class="columnas">FUENTE PRESUPUESTAL</th>
           <th class="columnas"></th>
@@ -192,6 +193,7 @@
         <tr *ngFor="let item of datosTabla">
           <td class="columnas">D</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
+          <td class="columnas">{{item.CONCEPTO}}</td>
           <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
           <td class="columnas">{{item.CONCEPTOPRESUPUESTAL}}</td>
           <th class="columnas">1</th>
