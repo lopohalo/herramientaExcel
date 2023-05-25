@@ -1856,26 +1856,30 @@ export class AppComponent implements OnInit {
 
   exportexcel() {
     if(this.mostrarReporte == 'Ejecucion'){
-      let element = document.getElementById('excel-table');
-      const worksheet: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-  
-      // Recorremos solo la columna B y definimos las celdas como texto
-      const sheetData: any = worksheet['!ref']; // Obtenemos la referencia de todas las celdas
-      const range = XLSX.utils.decode_range(sheetData);
-      const anchoColumnas = [{ wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 20 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 25 }, { wch: 10}, { wch: 10 }, { wch: 25 }];
-       worksheet['!cols'] = anchoColumnas;
-      for (let R = range.s.r; R <= range.e.r; ++R) {
-        const cellAddress = XLSX.utils.encode_cell({ r: R, c: 1 }); // Columna B: c = 1
-        const cell = worksheet[cellAddress];
-        cell.t = 's'; // Definimos el tipo de celda como texto (string)
-      }
-  
-      
-  
-      const book: XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(book, worksheet, 'Sheet1');
-  
-      XLSX.writeFile(book, this.fileName);
+     // Obtener el elemento de la tabla
+const tabla:any = document.getElementById('excel-table');
+
+// Obtener los datos de la tabla
+const tablaData:any = this.getTablaData2(tabla);
+
+// Crear una hoja de cálculo y establecer los datos de la tabla
+const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(tablaData);
+
+// Recorrer solo la columna B y definir las celdas como texto
+const sheetData: any = worksheet['!ref']; // Obtener la referencia de todas las celdas
+const range = XLSX.utils.decode_range(sheetData);
+
+for (let R = range.s.r; R <= range.e.r; ++R) {
+  const cellAddress = XLSX.utils.encode_cell({ r: R, c: 1 }); // Columna B: c = 1
+  const cell = worksheet[cellAddress];
+  cell.t = 's'; // Definir el tipo de celda como texto (string)
+}
+
+XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+// Guardar el archivo de Excel
+XLSX.writeFile(workbook, this.fileName);
     }else{
  // Obtener la tabla
  const tabla: any = document.getElementById('excel-table');
@@ -1984,6 +1988,26 @@ export class AppComponent implements OnInit {
     }
    
   }
+  getTablaData2(tabla: HTMLElement): any[][] {
+  // Obtener las filas de la tabla
+  const filas = Array.from(tabla.querySelectorAll('tr'));
+
+  // Obtener los encabezados de columna
+  const encabezados = filas[0]?.querySelectorAll('th');
+
+  // Obtener los datos de la tabla en un arreglo de arreglos
+  const datos = filas.map((fila) =>
+    Array.from(fila.querySelectorAll('td, th')).map((celda) => celda.textContent)
+  );
+
+  // Agregar los encabezados de columna al inicio del arreglo de arreglos
+  // if (encabezados) {
+  //   datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
+  // }
+
+  return datos;
+  }
+  
 
   getTablaData(tabla: HTMLElement): any[][] {
     // Obtener las filas de la tabla
