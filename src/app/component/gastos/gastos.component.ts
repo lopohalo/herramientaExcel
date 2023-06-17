@@ -498,6 +498,12 @@ XLSX.writeFile(workbook, this.fileName);
   }
 
   ejecutarResumenIngresos() {
+    this.datosTabla.forEach((element:any) => {
+      element.FUENTESDEFINANCIACION = '1.2.1.0.00'
+      element.SITUACIONDEFONDOS = 'c'
+      element.POLITICAPUBLICA = '0'
+      element.TERCERO = '1'
+    });
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
       acc[codigo.CODIGOPRESUPUESTAL.trim()] = ++acc[codigo.CODIGOPRESUPUESTAL.trim()] || 0;
       return acc;
@@ -634,10 +640,6 @@ XLSX.writeFile(workbook, this.fileName);
         element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
         element.EJECUTADOCOMOOBLIGACION = arraydeDuplicados[index].EJECUTADOCOMOOBLIGACION
         element.COMPROMETIDO = arraydeDuplicados[index].COMPROMETIDO
-        element.FUENTESDEFINANCIACION = '1.2.1.0.00'
-        element.SITUACIONDEFONDOS = 'c'
-        element.POLITICAPUBLICA = '0'
-        element.TERCERO = '1'
         this.elementosUnificados = this.datosTabla.map((element1: any) => element1.CODIGOPRESUPUESTAL.trim() == element.CODIGOPRESUPUESTAL.trim() ? element : element1)
       });
 
