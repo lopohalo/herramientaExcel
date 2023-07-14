@@ -279,8 +279,39 @@ export class GastosComponent {
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01.005 ",
         "CONCEPTO": "OTROS ACTIVOS FIJOS "
-    }
-
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.1.01.01.001.08",
+      "CONCEPTO": "OPRESTACIONES SOCIALES"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.1.01.01.002",
+      "CONCEPTO": "FACTORES SALARIALES ESPECIALES"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.1.01.01.002.12",
+      "CONCEPTO": "PRIMA DE ANTIGÃœEDAD"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.1.02.01.001.08",
+      "CONCEPTO": "PRESTACIONES SOCIALES"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.3.13.01",
+      "CONCEPTO": "FALLOS NACIONALES"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.5",
+      "CONCEPTO": "GASTOS DE COMERCIALIZACION Y PRODUCCION"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.5.01",
+      "CONCEPTO": "MATERIALES Y SUMINISTROS"
+    },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.5.02",
+      "CONCEPTO": "ADQUISICION DE SERVICIOS"
+    },
 ]
 
   fileUpload(event: any) {
@@ -676,16 +707,19 @@ XLSX.writeFile(workbook, this.fileName);
       if (!unicos.includes(duplicados[i].CODIGOPRESUPUESTAL.trim().slice(0, contadorValor))) {
         unicos.push(elemento);
         if(this.contadormodelo == 5){
-          unicos.push("2.1.7")
+          unicos.push("2.1.7","2.1.5")
         }
         if(this.contadormodelo == 8){
-          unicos.push("2.1.1.01","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01")
+          unicos.push("2.1.5.02","2.1.5.01","2.1.1.01","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01")
         }
         if(this.contadormodelo == 11){
-          unicos.push("2.1.1.01.01","2.1.1.01.02","2.1.1.01.03", "2.1.1.02.01", "2.1.1.02.02", "2.1.1.02.03", "2.1.2.02.01", "2.1.2.02.02", "2.1.2.02.03", "2.1.3.04.05", "2.1.3.07.02", "2.3.2.01.01")
+          unicos.push("2.1.3.13.01","2.1.1.01.01","2.1.1.01.02","2.1.1.01.03", "2.1.1.02.01", "2.1.1.02.02", "2.1.1.02.03", "2.1.2.02.01", "2.1.2.02.02", "2.1.2.02.03", "2.1.3.04.05", "2.1.3.07.02", "2.3.2.01.01")
         }
         if(this.contadormodelo == 15){
-          unicos.push("2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
+          unicos.push("2.1.1.01.01.002","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
+        }
+        if(this.contadormodelo == 18){
+          unicos.push("2.1.1.02.01.001.08", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
         }
         this.unicosmodelo = unicos
       }
@@ -816,19 +850,28 @@ XLSX.writeFile(workbook, this.fileName);
     });
     if (this.contadormodelo == 0) {
       const mergedArray = this.datosTabla.concat(this.elementosUnificados);
-      mergedArray.sort((a: any, b: any) => {
-        const aCodeArray: any = a.CODIGOPRESUPUESTAL.split('.');
-        const bCodeArray: any = b.CODIGOPRESUPUESTAL.split('.');
+  mergedArray.sort((a: any, b: any) => {
+    const aCodeArray: any = a.CODIGOPRESUPUESTAL.split('.');
+    const bCodeArray: any = b.CODIGOPRESUPUESTAL.split('.');
 
-        for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
-          const aCodePart = aCodeArray[i] || 0;
-          const bCodePart = bCodeArray[i] || 0;
-          if (aCodePart !== bCodePart) {
-            return aCodePart - bCodePart;
-          }
-        }
-        return 0;
-      }); // ordenar los objetos por código
+    const maxLength = Math.max(aCodeArray.length, bCodeArray.length);
+    for (let i = 0; i < maxLength; i++) {
+      const aCodePart = parseInt(aCodeArray[i]) || 0;
+      const bCodePart = parseInt(bCodeArray[i]) || 0;
+      
+      if (aCodePart !== bCodePart) {
+        return aCodePart - bCodePart;
+      }
+    }
+    
+    if (aCodeArray.length < bCodeArray.length) {
+      return -1; // a viene antes que b
+    } else if (aCodeArray.length > bCodeArray.length) {
+      return 1; // b viene antes que a
+    } else {
+      return 0; // ambos códigos son iguales
+    }
+  });
       this.datosTabla = mergedArray
       this.actualizarTabla()
     } else {

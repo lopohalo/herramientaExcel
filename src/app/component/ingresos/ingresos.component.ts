@@ -18,7 +18,7 @@ export class IngresosComponent {
   cargandoPaginaSpinner:any = ''
   mostrarReporte: any = ''
   mostrarBoton = 0
-  contadormodelo = 16
+  contadormodelo = 25
   convertedJson!: string;
   fileName = 'tabla.xlsx';
   ejecucion = 0
@@ -827,6 +827,19 @@ export class IngresosComponent {
     {
       RUBROPRESUPEUSTAL: "1.2.13.01 ",
       CONCEPTO: "REINTEGROS "
+    },
+    {
+      RUBROPRESUPEUSTAL: "1.1.02.02.116.01",
+      CONCEPTO: "Servicios de educacion superior terciaria"
+    },
+    {
+      RUBROPRESUPEUSTAL: "1.1.02.02.116.01.01",
+      CONCEPTO: "NIVEL PREGRADO"
+    }
+    ,
+    {
+      RUBROPRESUPEUSTAL: "1.1.02.02.116.01.02",
+      CONCEPTO: "NIVEL POSGRADO"
     }
   ]
   equivalenciaINGRESO = [
@@ -1808,7 +1821,6 @@ export class IngresosComponent {
       workbook.SheetNames.forEach(sheet => {
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
         this.convertedJson = JSON.stringify(data, undefined, 4)
-        console.log(this.convertedJson)
         this.datosTabla = data
         this.cargandoPaginaSpinner = 1
       })
@@ -2235,8 +2247,12 @@ XLSX.writeFile(workbook, this.fileName);
           unicos.push("1.1.02.03.001","1.1.02.02.116","1.1.02.01.001", "1.1.02.05.001", "1.1.02.05.001", "1.1.02.05.002", "1.1.02.06.006","1.2.01.02.001", "1.2.08.01.003")
         }
         if(this.contadormodelo == 16){
-          unicos.push("1.1.02.01.001.01","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02")
+          unicos.push("1.1.02.01.001.01","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02","1.1.02.02.116.01")
         }
+        if(this.contadormodelo == 19){
+          unicos.push("1.1.02.02.116.01.01", "1.1.02.02.116.01.02")
+        }
+
         this.unicosmodelo = unicos
         console.log(this.contadormodelo)
         console.log(this.unicosmodelo)
@@ -2361,19 +2377,28 @@ XLSX.writeFile(workbook, this.fileName);
     });
     if (this.contadormodelo == 0) {
       const mergedArray = this.datosTabla.concat(this.elementosUnificados);
-      mergedArray.sort((a: any, b: any) => {
-        const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
-        const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
+  mergedArray.sort((a: any, b: any) => {
+    const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
+    const bCodeArray: any = b.RUBROPRESUPEUSTAL.split('.');
 
-        for (let i = 0; i < Math.max(aCodeArray.length, bCodeArray.length); i++) {
-          const aCodePart = aCodeArray[i] || 0;
-          const bCodePart = bCodeArray[i] || 0;
-          if (aCodePart !== bCodePart) {
-            return aCodePart - bCodePart;
-          }
-        }
-        return 0;
-      }); // ordenar los objetos por código
+    const maxLength = Math.max(aCodeArray.length, bCodeArray.length);
+    for (let i = 0; i < maxLength; i++) {
+      const aCodePart = parseInt(aCodeArray[i]) || 0;
+      const bCodePart = parseInt(bCodeArray[i]) || 0;
+      
+      if (aCodePart !== bCodePart) {
+        return aCodePart - bCodePart;
+      }
+    }
+    
+    if (aCodeArray.length < bCodeArray.length) {
+      return -1; // a viene antes que b
+    } else if (aCodeArray.length > bCodeArray.length) {
+      return 1; // b viene antes que a
+    } else {
+      return 0; // ambos códigos son iguales
+    }
+  });
       this.datosTabla = mergedArray
       this.actualizarTabla()
     } else {
