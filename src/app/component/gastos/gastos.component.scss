@@ -19,6 +19,21 @@ h2 {
   color: $theme;
   margin-bottom: 0;
 }
+.button-table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.button-table td {
+  padding: 10px;
+  text-align: center;
+}
+
+.button-table button {
+  width: 100%;
+}
+
 p {
   font-family: "Roboto", sans-serif;
   font-size: 18px;

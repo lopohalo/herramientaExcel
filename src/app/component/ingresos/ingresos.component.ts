@@ -7,13 +7,17 @@ import {
   from '@angular/common';
 import * as numeral from 'numeral';
 import * as XLSX from 'xlsx'
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss']
 })
-export class IngresosComponent {
+export class IngresosComponent implements OnInit {
+  datosRepetidosCuidoReport:any
   title = 'herramientaExcel';
+  baseInformes:any
+  titulo:any = ''
   validartabla = 0
   cargandoPaginaSpinner:any = ''
   mostrarReporte: any = ''
@@ -450,7 +454,7 @@ export class IngresosComponent {
       POLITICAPUBLICA: "NO APLICA "
     },
     {
-      CODIGO: "1.1.02.06.009 ",
+      CODIGO: "1.1.02.06.009",
       CPC: "0",
       FUENTESDEFINANCIACION: "  ",
       TERCEROS: "  ",
@@ -769,6 +773,10 @@ export class IngresosComponent {
       CONCEPTO: "TRANSFERENCIAS DE OTRAS ENTIDADES DEL GOBIERNO GENERAL ",
     },
     {
+      RUBROPRESUPEUSTAL: "1.1.02.06.009",
+      CONCEPTO: "Recursos del Sistema de Seguridad Social Integral"
+    },
+    {
       RUBROPRESUPEUSTAL: "1.1.02.06.009.02 ",
       CONCEPTO: "SISTEMA GENERAL DE PENSIONES ",
     },
@@ -840,6 +848,14 @@ export class IngresosComponent {
     {
       RUBROPRESUPEUSTAL: "1.1.02.02.116.01.02",
       CONCEPTO: "NIVEL POSGRADO"
+    },
+    {
+      RUBROPRESUPEUSTAL: "1.2.01.02.001.03",
+      CONCEPTO: "Disposición de Otros Activos Fijos"
+    },
+    {
+      RUBROPRESUPEUSTAL: "1.1.02.06.006.06",
+      CONCEPTO: "Otras unidades de gobierno"
     }
   ]
   equivalenciaINGRESO = [
@@ -1802,14 +1818,251 @@ export class IngresosComponent {
     {
       RUBROPRESUPEUSTAL: "1.2.13.02.01           ",
       CONCEPTO: "Ingresos Vigencias Anteriores"
-    }
+    },
+    {
+      RUBROPRESUPEUSTAL: "1.1.02.06.006.06            ",
+      CONCEPTO: "Ingresos Vigencias Anteriores"
+    },
   ]
-
+  modeloParaReporteIngreso = [
+    {
+        "CODIGO": "1 "
+    },
+    {
+        "CODIGO": "1.1 "
+    },
+    {
+        "CODIGO": "1.1.02 "
+    },
+    {
+        "CODIGO": "1.1.02.01 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001.01 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001.01.01 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001.01.02 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001.01.03 "
+    },
+    {
+        "CODIGO": "1.1.02.01.001.01.05 "
+    },
+    {
+        "CODIGO": "1.1.02.02 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.01 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.01.01 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.01.02 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.01.03 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.01.04 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.02 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.02.01 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.02.02 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.02.03 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.01.02.04 "
+    },
+    {
+        "CODIGO": "1.1.02.02.116.02 "
+    },
+    {
+        "CODIGO": "1.1.02.03 "
+    },
+    {
+        "CODIGO": "1.1.02.03.001 "
+    },
+    {
+        "CODIGO": "1.1.02.03.001.05 "
+    },
+    {
+        "CODIGO": "1.1.02.05 "
+    },
+    {
+        "CODIGO": "1.1.02.05.001 "
+    },
+    {
+        "CODIGO": "1.1.02.05.001.08 "
+    },
+    {
+        "CODIGO": "1.1.02.05.001.09 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.00 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.02 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.03 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.06 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.07 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.08 "
+    },
+    {
+        "CODIGO": "1.1.02.05.002.09 "
+    },
+    {
+        "CODIGO": "1.1.02.06 "
+    },
+    {
+        "CODIGO": "1.1.02.06.006 "
+    },
+    {
+        "CODIGO": "1.1.02.06.006.01 "
+    },
+    {
+        "CODIGO": "1.1.02.06.006.02 "
+    },
+    {
+        "CODIGO": "1.1.02.06.006.06 "
+    },
+    {
+        "CODIGO": "1.1.02.06.006.07 "
+    },
+    {
+        "CODIGO": "1.1.02.06.009 "
+    },
+    {
+        "CODIGO": "1.1.02.06.009.02 "
+    },
+    {
+        "CODIGO": "1.1.02.06.009.02.02 "
+    },
+    {
+        "CODIGO": "1.1.02.06.009.02.03 "
+    },
+    {
+        "CODIGO": "1.2 "
+    },
+    {
+        "CODIGO": "1.2.01 "
+    },
+    {
+        "CODIGO": "1.2.01.02 "
+    },
+    {
+        "CODIGO": "1.2.01.02.001 "
+    },
+    {
+        "CODIGO": "1.2.01.02.001.03 "
+    },
+    {
+        "CODIGO": "1.2.01.02.001.03.02 "
+    },
+    {
+        "CODIGO": "1.2.05 "
+    },
+    {
+        "CODIGO": "1.2.05.02 "
+    },
+    {
+        "CODIGO": "1.2.05.05 "
+    },
+    {
+        "CODIGO": "1.2.08 "
+    },
+    {
+        "CODIGO": "1.2.08.01 "
+    },
+    {
+        "CODIGO": "1.2.08.01.003 "
+    },
+    {
+        "CODIGO": "1.2.08.01.003.01 "
+    },
+    {
+        "CODIGO": "1.2.08.02 "
+    },
+    {
+        "CODIGO": "1.2.10 "
+    },
+    {
+        "CODIGO": "1.2.10.02 "
+    },
+    {
+        "CODIGO": "1.2.13 "
+    },
+    {
+        "CODIGO": "1.2.13.01 "
+    },
+    {
+        "CODIGO": "1.2.13.02 "
+    }
+]
+constructor(private router: Router) { }
 
   ngOnInit(): void {
-
+    if(localStorage.getItem('ruta')){
+      this.titulo = localStorage.getItem('ruta')
+    }else{
+      if(this.titulo == ''){
+        this.router.navigate(['/'])
+       }
+    }
+  }
+  irAIngresos() {
+    this.titulo = 'ingresos'
+    this.router.navigate(['/ingresos']);
   }
 
+  irAGastos() {
+    localStorage.setItem('ruta','gastos')
+    this.titulo = 'gastos'
+    this.router.navigate(['/gastos']);
+  }
+
+  irAReservar() {
+    this.titulo = 'reservas'
+    localStorage.setItem('ruta','reservas')
+    this.router.navigate(['/gastos']);
+  }
+
+  irACuentasPorPagar() {
+    this.titulo = 'Cuentas por pagar'
+    localStorage.setItem('ruta','cuentas')
+    this.router.navigate(['/gastos']);
+  }
   fileUpload(event: any) {
     this.cargandoPaginaSpinner = 0
     const selectedFile = event.target.files[0];
@@ -1824,11 +2077,11 @@ export class IngresosComponent {
         this.datosTabla = data
         this.cargandoPaginaSpinner = 1
       })
+      console.log(this.datosTabla)
       setTimeout(() => {
         this.corregirCodigos();
       }, 500);
       this.validartabla = 1
-      console.log(this.datosTabla)
     }
   }
 
@@ -1869,7 +2122,7 @@ export class IngresosComponent {
   }
 
   exportexcel() {
-    if(this.mostrarReporte == 'Ejecucion'){
+    if(this.mostrarReporte == 'Ejecucion' || this.mostrarReporte == 'ReporteEjecucion'){
      // Obtener el elemento de la tabla
 const tabla:any = document.getElementById('excel-table');
 
@@ -1905,11 +2158,11 @@ XLSX.writeFile(workbook, this.fileName);
  const hoja: any = XLSX.utils.aoa_to_sheet(datos);
 
  // Configurar el formato de la columna B como texto
- const range = XLSX.utils.decode_range(hoja['!ref']);
- for (let i = range.s.r + 1; i <= range.e.r; i++) {
-   const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
-   celda.z = '@';
- }
+//  const range = XLSX.utils.decode_range(hoja['!ref']);
+//  for (let i = range.s.r + 1; i <= range.e.r; i++) {
+//    const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
+//    celda.z = '@';
+//  }
 
  // Configurar el ancho de las columnas
  if (hoja) {
@@ -1948,44 +2201,7 @@ XLSX.writeFile(workbook, this.fileName);
          right: { style: 'thin', color: { auto: 1 } },
        },
      };
-     switch (j) {
-       case 0:
-         hoja[ref].s.fill = { fgColor: { rgb: 'C6EFCE' } };
-         break;
-       case 1:
-         hoja[ref].s.fill = { fgColor: { rgb: 'FFC7CE' } };
-         break;
-       case 2:
-         hoja[ref].s.fill = { fgColor: { rgb: 'FFEB9C' } };
-         break;
-       case 3:
-         hoja[ref].s.fill = { fgColor: { rgb: 'B4A7D6' } };
-         break;
-       case 4:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-         break;
-       case 5:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-         break;
-       case 6:
-         hoja[ref].s.fill = { fgColor: { rgb: 'CECEF6' } };
-         break;
-       case 7:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F6CECE' } };
-         break;
-       case 8:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 9:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 10:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 11:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-     }
+   
    }
  }
  // Crear un libro de Excel y agregar la hoja
@@ -2003,45 +2219,86 @@ XLSX.writeFile(workbook, this.fileName);
    
   }
   getTablaData2(tabla: HTMLElement): any[][] {
-  // Obtener las filas de la tabla
+     // Obtener las filas de la tabla
   const filas = Array.from(tabla.querySelectorAll('tr'));
 
   // Obtener los encabezados de columna
-  const encabezados = filas[0]?.querySelectorAll('th');
+  const encabezados = filas.shift()?.querySelectorAll('th');
 
+  
   // Obtener los datos de la tabla en un arreglo de arreglos
   const datos = filas.map((fila) =>
-    Array.from(fila.querySelectorAll('td, th')).map((celda) => celda.textContent)
+    Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+      // Parse numerical values for columns other than columns B (index 1) and H (index 7)
+      if(this.mostrarReporte == 'Ejecucion'){
+      if (index !== 1 && index !== 4) {
+        const textContent = celda.textContent;
+        const numericValue = textContent !== null ? parseFloat(textContent) : null;
+        return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+      } else {
+        return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
+      }
+
+  }else{
+if(this.mostrarReporte == 'ReporteEjecucion'){
+  if (index !== 1 && index !== 3 && index !== 2 && index !== 4) {
+    const textContent = celda.textContent;
+    const numericValue = textContent !== null ? parseFloat(textContent) : null;
+    return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+  } else {
+    return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
+  }
+}else{
+  if (index !== 1 && index !== 0) {
+    const textContent = celda.textContent;
+    const numericValue = textContent !== null ? parseFloat(textContent) : null;
+    return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+  } else {
+    return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
+  }
+}
+  }
+    })
   );
 
+
+
   // Agregar los encabezados de columna al inicio del arreglo de arreglos
-  // if (encabezados) {
-  //   datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
-  // }
+  if (encabezados) {
+    datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
+  }
 
   return datos;
   }
-  
-
   getTablaData(tabla: HTMLElement): any[][] {
-    // Obtener las filas de la tabla
-    const filas = Array.from(tabla.querySelectorAll('tr'));
+   // Obtener las filas de la tabla
+  const filas = Array.from(tabla.querySelectorAll('tr'));
 
-    // Obtener los encabezados de columna
-    const encabezados = filas.shift()?.querySelectorAll('th');
+  // Obtener los encabezados de columna
+  const encabezados = filas.shift()?.querySelectorAll('th');
 
-    // Obtener los datos de la tabla en un arreglo de arreglos
-    const datos = filas.map((fila) =>
-      Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
-    );
+  // Obtener los datos de la tabla en un arreglo de arreglos
+  const datos = filas.map((fila) =>
+    Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+      // Parse numerical values for columns other than column B (index 1)
+      if (index !== 1) {
+        const textContent = celda.textContent;
+        const numericValue = textContent !== null ? parseFloat(textContent) : null;
+        return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+      } else {
+        return celda.textContent; // Keep column B (index 1) as textContent
+      }
+    })
+  );
 
-    // Agregar los encabezados de columna al inicio del arreglo de arreglos
-    if (encabezados) {
-      datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
-    }
-
-    return datos;
+  // Agregar los encabezados de columna al inicio del arreglo de arreglos
+  if (encabezados) {
+    datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
   }
+
+  return datos;
+  }
+
 
 
 
@@ -2224,7 +2481,6 @@ XLSX.writeFile(workbook, this.fileName);
 
   }
   ejecutarModeloDeResumidos(contadorValor: any) {
-    debugger
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
       acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] = ++acc[codigo.RUBROPRESUPEUSTAL.trim().slice(0, contadorValor)] || 0;
       return acc;
@@ -2244,22 +2500,19 @@ XLSX.writeFile(workbook, this.fileName);
           unicos.push("1.2.13.01","1.2.10.02","1.2.08.02", "1.2.08.01", "1.2.05.02", "1.2.01.02", "1.1.02.06","1.1.02.05", "1.1.02.03", "1.1.02.02", "1.1.02.01")
         }
         if(this.contadormodelo == 13){
-          unicos.push("1.1.02.03.001","1.1.02.02.116","1.1.02.01.001", "1.1.02.05.001", "1.1.02.05.001", "1.1.02.05.002", "1.1.02.06.006","1.2.01.02.001", "1.2.08.01.003")
+          unicos.push("1.1.02.03.001","1.1.02.02.116","1.1.02.01.001", "1.1.02.05.001", "1.1.02.05.001", "1.1.02.05.002", "1.1.02.06.006","1.2.01.02.001", "1.2.08.01.003","1.1.02.06.009")
         }
         if(this.contadormodelo == 16){
-          unicos.push("1.1.02.01.001.01","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02","1.1.02.02.116.01")
+          unicos.push("1.1.02.01.001.01","1.1.02.06.006.06","1.2.01.02.001.03","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02","1.1.02.02.116.01", "1.1.02.06.006.06")
         }
         if(this.contadormodelo == 19){
           unicos.push("1.1.02.02.116.01.01", "1.1.02.02.116.01.02")
         }
-
         this.unicosmodelo = unicos
-        console.log(this.contadormodelo)
-        console.log(this.unicosmodelo)
       }
+      
     }
     if (contadorValor == 1) {
-      console.log('nada')
     } else {
       let x = unicos.filter((element: any) => element.length == contadorValor)
       unicos = x
@@ -2359,8 +2612,11 @@ XLSX.writeFile(workbook, this.fileName);
       arraydeDuplicados = [...arraydeDuplicados, x]
       localStorage.setItem('duplicadosIngresos', JSON.stringify(arraydeDuplicados))
     });
+    console.log(arraydeDuplicados)
     for (let index = 0; index < arraydeDuplicados.length; index++) {
+      console.log(this.modeloInformacion)
       let x = this.modeloInformacion.filter((element: any) => element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo)
+      console.log(x)
       x.forEach((element: any) => {
         element.APROPIACIONINICIAL = arraydeDuplicados[index].valor
         element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
@@ -2376,6 +2632,10 @@ XLSX.writeFile(workbook, this.fileName);
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
     });
     if (this.contadormodelo == 0) {
+      this.modeloInformacion.forEach((element:any) => {
+        //  let x =  this.datosTabla.filter((element1:any) => element1.RUBROPRESUPEUSTAL !== element.RUBROPRESUPEUSTAL.trim())
+        this.datosTabla = this.datosTabla.filter((element1:any) => element1.RUBROPRESUPEUSTAL != element.RUBROPRESUPEUSTAL.trim())
+        });
       const mergedArray = this.datosTabla.concat(this.elementosUnificados);
   mergedArray.sort((a: any, b: any) => {
     const aCodeArray: any = a.RUBROPRESUPEUSTAL.split('.');
@@ -2400,6 +2660,7 @@ XLSX.writeFile(workbook, this.fileName);
     }
   });
       this.datosTabla = mergedArray
+      this.baseInformes = mergedArray
       this.actualizarTabla()
     } else {
       this.ejecutarModeloDeResumidos(this.contadormodelo)
@@ -2411,38 +2672,56 @@ XLSX.writeFile(workbook, this.fileName);
     this.datosTabla.forEach((element: any) => {
       element.RUBROPRESUPEUSTAL = element.RUBROPRESUPEUSTAL.trim()
     });
-    this.formatearNumeros()
+    // this.formatearNumeros()
   }
-  formatearNumeros(): any[] {
-    for (const objeto of this.datosTabla) {
-      if (objeto.APROPIACIONINICIAL == null || undefined) {
-        objeto.APROPIACIONINICIAL = 0
-      } else {
-        objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
-      }
-      if (objeto.PRESUPUESTODEFINITIVO == null || undefined) {
-        objeto.PRESUPUESTODEFINITIVO = 0
-      } else {
-        objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
-      }
-      if (objeto.RECAUDO == null || undefined) {
-        objeto.RECAUDO = 0
-      } else {
-        objeto.RECAUDO = formatNumber(objeto.RECAUDO, 'en-US');
-      }
-      if (objeto.POREJECUTAR == null || undefined) {
-        objeto.POREJECUTAR = 0
-      } else {
-        objeto.POREJECUTAR = formatNumber(objeto.POREJECUTAR, 'en-US');
-      }
-    }
+  // formatearNumeros(): any[] {
+  //   for (const objeto of this.datosTabla) {
+  //     if (objeto.APROPIACIONINICIAL == null || undefined) {
+  //       objeto.APROPIACIONINICIAL = 0
+  //     } else {
+  //       objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
+  //     }
+  //     if (objeto.PRESUPUESTODEFINITIVO == null || undefined) {
+  //       objeto.PRESUPUESTODEFINITIVO = 0
+  //     } else {
+  //       objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
+  //     }
+  //     if (objeto.RECAUDO == null || undefined) {
+  //       objeto.RECAUDO = 0
+  //     } else {
+  //       objeto.RECAUDO = formatNumber(objeto.RECAUDO, 'en-US');
+  //     }
+  //     if (objeto.POREJECUTAR == null || undefined) {
+  //       objeto.POREJECUTAR = 0
+  //     } else {
+  //       objeto.POREJECUTAR = formatNumber(objeto.POREJECUTAR, 'en-US');
+  //     }
+  //   }
 
-    return this.datosTabla;
-  }
+  //   return this.datosTabla;
+  // }
 
   ejecutarProgramacion(tipoReporte: any) {
     this.mostrarReporte = tipoReporte
+    this.datosTabla = this.baseInformes
+    console.log(this.datosTabla)
+    this.mostrarReporteEstructura()
   }
+  mostrarReporteEstructura(){
+
+  }
+  ejecutarREPORTEProgramacion(tipoReporte:any){
+    let x:any = []
+    this.modeloParaReporteIngreso.forEach(element => {
+      let y = this.datosTabla.filter((codigo:any) => codigo.RUBROPRESUPEUSTAL == element.CODIGO.trim())
+      x.push(y[0])
+     });
+     this.datosTabla = x
+     console.log(this.datosTabla)
+     this.mostrarReporte = tipoReporte
+  }
+
+  
 
 }
 

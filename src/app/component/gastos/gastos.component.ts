@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { elementAt, filter } from 'rxjs';
 import {
   formatNumber
@@ -6,19 +6,24 @@ import {
   from '@angular/common';
 import * as numeral from 'numeral';
 import * as XLSX from 'xlsx'
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gastos',
   templateUrl: './gastos.component.html',
   styleUrls: ['./gastos.component.scss']
 })
-export class GastosComponent {
+export class GastosComponent implements OnInit {
   title = 'herramientaExcel';
   validartabla = 0
+  rutaVerificacionBotones:any =''
+  contadorPrimerArreglo = 0
+  baseInformes:any
   cargandoPaginaSpinner:any = ''
+  arregloGrande = []
   mostrarReporte: any = ''
   mostrarBoton = 0
-  contadormodelo = 15
+  contadormodelo = 19
   convertedJson!: string;
   fileName = 'tabla.xlsx';
   ejecucion = 0
@@ -27,141 +32,273 @@ export class GastosComponent {
   sinDuplicados: any = []
   sinDuplicadosTABLA: any = []
   unicosmodelo = []
+  titulo:any = ''
   elementosUnificados: any
   modeloInformacion = [
     
     {
         "CODIGOPRESUPUESTAL": "2",
-        "CONCEPTO": "GASTOS "
+        "CONCEPTO": "GASTOS ",
+        "APROPIACIONINICIAL" : "0",
+        "PAGOS" : "0",
+        "PRESUPUESTODEFINITIVO" : "0",
+        "EJECUTADOCOMOOBLIGACION" :"0",
+        "COMPROMETIDO" : "0",
+        "OBLIGACIONES" : "0"
     },
 ,
 
     {
         "CODIGOPRESUPUESTAL": "2.1",
-        "CONCEPTO": "FUNCIONAMIENTO "
+        "CONCEPTO": "FUNCIONAMIENTO ",
+          "APROPIACIONINICIAL" : "0",
+        "PAGOS" : "0",
+        "PRESUPUESTODEFINITIVO" : "0",
+        "EJECUTADOCOMOOBLIGACION" :"0",
+        "COMPROMETIDO" : "0",
+        "OBLIGACIONES" : "0"
     }
 ,
 
     {
         "CODIGOPRESUPUESTAL": "2.1.1",
-        "CONCEPTO": "GASTOS DE PERSONAL "
+        "CONCEPTO": "GASTOS DE PERSONAL ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01 ",
-        "CONCEPTO": "PLANTA DE PERSONAL PERMANENTE "
+        "CONCEPTO": "PLANTA DE PERSONAL PERMANENTE ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01.01 ",
-        "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO "
+        "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01.01.001 ",
-        "CONCEPTO": "FACTORES SALARIALES COMUNES "
+        "CONCEPTO": "FACTORES SALARIALES COMUNES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01.02 ",
-        "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA "
+        "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01.03 ",
-        "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL "
+        "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.01.03.001 ",
-        "CONCEPTO": "PRESTACIONES SOCIALES "
+        "CONCEPTO": "PRESTACIONES SOCIALES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02 ",
-        "CONCEPTO": "PERSONAL SUPERNUMERARIO Y PLANTA TEMPORAL "
+        "CONCEPTO": "PERSONAL SUPERNUMERARIO Y PLANTA TEMPORAL ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02.01 ",
-        "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO "
+        "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02.01.001 ",
-        "CONCEPTO": "FACTORES SALARIALES COMUNES "
+        "CONCEPTO": "FACTORES SALARIALES COMUNES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02.02 ",
-        "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA "
+        "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02.03 ",
-        "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL "
+        "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.1.02.03.001 ",
-        "CONCEPTO": "PRESTACIONES SOCIALES "
+        "CONCEPTO": "PRESTACIONES SOCIALES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.2 ",
-        "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS "
+        "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.2.02 ",
-        "CONCEPTO": "ADQUISICIONES DIFERENTES DE ACTIVOS "
+        "CONCEPTO": "ADQUISICIONES DIFERENTES DE ACTIVOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.2.02.01 ",
-        "CONCEPTO": "MATERIALES Y SUMINISTROS "
+        "CONCEPTO": "MATERIALES Y SUMINISTROS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
+,
+{
+  "CODIGOPRESUPUESTAL": "2.1.2.02.01.003 ",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+}
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.2.02.02 ",
-        "CONCEPTO": "ADQUISICION DE SERVICIOS "
+        "CONCEPTO": "ADQUISICION DE SERVICIOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.2.02.03 ",
-        "CONCEPTO": "GASTOS IMPREVISTOS "
+        "CONCEPTO": "GASTOS IMPREVISTOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
@@ -173,146 +310,1033 @@ export class GastosComponent {
 
     {
         "CODIGOPRESUPUESTAL": "2.1.3.04 ",
-        "CONCEPTO": "A ORGANIZACIONES NACIONALES "
+        "CONCEPTO": "A ORGANIZACIONES NACIONALES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.3.04.05 ",
-        "CONCEPTO": "A OTRAS ORGANIZACIONES NACIONALES "
+        "CONCEPTO": "A OTRAS ORGANIZACIONES NACIONALES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.3.07 ",
-        "CONCEPTO": "PRESTACIONES PARA CUBRIR RIESGOS SOCIALES "
+        "CONCEPTO": "PRESTACIONES PARA CUBRIR RIESGOS SOCIALES ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.3.07.02 ",
-        "CONCEPTO": "PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO "
+        "CONCEPTO": "PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.7 ",
-        "CONCEPTO": "DISMINUCION DE PASIVOS "
+        "CONCEPTO": "DISMINUCION DE PASIVOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.7.01 ",
-        "CONCEPTO": "CESANTIAS "
+        "CONCEPTO": "CESANTIAS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.1.8 ",
-        "CONCEPTO": "GASTOS POR TRIBUTOS, TASAS, CONTRIBUCIONES, MULTAS, SANCIONES E INTERESES DE MORA "
+        "CONCEPTO": "GASTOS POR TRIBUTOS, TASAS, CONTRIBUCIONES, MULTAS, SANCIONES E INTERESES DE MORA ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.1.8.01 ",
-        "CONCEPTO": "IMPUESTOS "
+        "CONCEPTO": "IMPUESTOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.3 ",
-        "CONCEPTO": "INVERSION "
+        "CONCEPTO": "INVERSION ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.3.2 ",
-        "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS "
+        "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01 ",
-        "CONCEPTO": "ADQUISICION DE ACTIVOS NO FINANCIEROS "
+        "CONCEPTO": "ADQUISICION DE ACTIVOS NO FINANCIEROS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01 ",
-        "CONCEPTO": "ACTIVOS FIJOS "
+        "CONCEPTO": "ACTIVOS FIJOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01.001 ",
-        "CONCEPTO": "EDIFICACIONES Y ESTRUCTURAS "
+        "CONCEPTO": "EDIFICACIONES Y ESTRUCTURAS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01.003 ",
-        "CONCEPTO": "MAQUINARIA Y EQUIPO "
+        "CONCEPTO": "MAQUINARIA Y EQUIPO ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
    
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01.004 ",
-        "CONCEPTO": "ACTIVOS FIJOS NO CLASIFICADOS COMO MAQUINARIA Y EQUIPO "
+        "CONCEPTO": "ACTIVOS FIJOS NO CLASIFICADOS COMO MAQUINARIA Y EQUIPO ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     }
 ,
 
     
     {
         "CODIGOPRESUPUESTAL": "2.3.2.01.01.005 ",
-        "CONCEPTO": "OTROS ACTIVOS FIJOS "
+        "CONCEPTO": "OTROS ACTIVOS FIJOS ",
+        "APROPIACIONINICIAL" : "0",
+      "PAGOS" : "0",
+      "PRESUPUESTODEFINITIVO" : "0",
+      "EJECUTADOCOMOOBLIGACION" :"0",
+      "COMPROMETIDO" : "0",
+      "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.1.01.01.001.08",
-      "CONCEPTO": "OPRESTACIONES SOCIALES"
+      "CONCEPTO": "OPRESTACIONES SOCIALES",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.1.01.01.002",
-      "CONCEPTO": "FACTORES SALARIALES ESPECIALES"
+      "CONCEPTO": "FACTORES SALARIALES ESPECIALES",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.1.01.01.002.12",
-      "CONCEPTO": "PRIMA DE ANTIGÃœEDAD"
+      "CONCEPTO": "PRIMA DE ANTIGÃœEDAD",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.1.02.01.001.08",
-      "CONCEPTO": "PRESTACIONES SOCIALES"
+      "CONCEPTO": "PRESTACIONES SOCIALES",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.3.13.01",
-      "CONCEPTO": "FALLOS NACIONALES"
+      "CONCEPTO": "FALLOS NACIONALES",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.5",
-      "CONCEPTO": "GASTOS DE COMERCIALIZACION Y PRODUCCION"
+      "CONCEPTO": "GASTOS DE COMERCIALIZACION Y PRODUCCION",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.5.01",
-      "CONCEPTO": "MATERIALES Y SUMINISTROS"
+      "CONCEPTO": "MATERIALES Y SUMINISTROS",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
     {
       "CODIGOPRESUPUESTAL": "2.1.5.02",
-      "CONCEPTO": "ADQUISICION DE SERVICIOS"
+      "CONCEPTO": "ADQUISICION DE SERVICIOS",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
     },
+    {
+      "CODIGOPRESUPUESTAL": "2.1.3.07.02.001 ",
+      "CONCEPTO": "",
+      "APROPIACIONINICIAL" : "0",
+    "PAGOS" : "0",
+    "PRESUPUESTODEFINITIVO" : "0",
+    "EJECUTADOCOMOOBLIGACION" :"0",
+    "COMPROMETIDO" : "0",
+    "OBLIGACIONES" : "0"
+  },
+  {
+    "CODIGOPRESUPUESTAL": "2.1.1.01.01.001.04",
+    "CONCEPTO": "",
+    "APROPIACIONINICIAL" : "0",
+  "PAGOS" : "0",
+  "PRESUPUESTODEFINITIVO" : "0",
+  "EJECUTADOCOMOOBLIGACION" :"0",
+  "COMPROMETIDO" : "0",
+  "OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.3.07.02.010",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.3.08",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.3.13",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.8.04",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.3.07.02.002",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.99",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
 ]
+
+  codigosModeloReporte = [
+    {
+        "CODIGO": "2 "
+    },
+    {
+        "CODIGO": "2.1 "
+    },
+    {
+        "CODIGO": "2.1.1 "
+    },
+    {
+        "CODIGO": "2.1.1.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.02 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.02 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.05 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.05 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.06 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.06 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.07 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.07 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.02 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.02 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.09 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.09 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.002 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.002.12 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.002.12.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.01.002.12.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.001 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.001 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.002 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.002 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.003 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.003 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.005 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.005 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.006 "
+    },
+    {
+        "CODIGO": "2.1.1.01.02.006 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.020 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.020 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.083 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.083 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.097 "
+    },
+    {
+        "CODIGO": "2.1.1.01.03.097 "
+    },
+    {
+        "CODIGO": "2.1.1.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.04 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.05 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.05 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.06 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.06 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.07 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.07 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.08 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.08.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.08.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.08.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.08.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.001 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.001 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.002 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.002 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.003 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.003 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.005 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.005 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.006 "
+    },
+    {
+        "CODIGO": "2.1.1.02.02.006 "
+    },
+    {
+        "CODIGO": "2.1.1.02.03 "
+    },
+    {
+        "CODIGO": "2.1.1.02.03.001 "
+    },
+    {
+        "CODIGO": "2.1.1.02.03.001.01 "
+    },
+    {
+        "CODIGO": "2.1.1.02.03.001.01 "
+    },
+    {
+        "CODIGO": "2.1.2 "
+    },
+    {
+        "CODIGO": "2.1.2.02 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.000 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.000 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.002 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.002 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.003 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.003 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.004 "
+    },
+    {
+        "CODIGO": "2.1.2.02.01.004 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.005 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.005 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.006 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.006 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.007 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.007 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.008 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.008 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.009 "
+    },
+    {
+        "CODIGO": "2.1.2.02.02.009 "
+    },
+    {
+        "CODIGO": "2.1.3 "
+    },
+    {
+        "CODIGO": "2.1.3.04 "
+    },
+    {
+        "CODIGO": "2.1.3.04.05 "
+    },
+    {
+        "CODIGO": "2.1.3.04.05.002 "
+    },
+    {
+        "CODIGO": "2.1.3.04.05.002 "
+    },
+    {
+        "CODIGO": "2.1.3.07 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.001 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.001.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.001.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.002 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.002.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.002.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.003 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.003.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.003.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.010 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.010.01 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.010.01 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.010.02 "
+    },
+    {
+        "CODIGO": "2.1.3.07.02.010.02 "
+    },
+    {
+        "CODIGO": "2.1.3.08 "
+    },
+    {
+        "CODIGO": "2.1.3.08.02 "
+    },
+    {
+        "CODIGO": "2.1.3.08.02 "
+    },
+    {
+        "CODIGO": "2.1.3.13 "
+    },
+    {
+        "CODIGO": "2.1.3.13.01 "
+    },
+    {
+        "CODIGO": "2.1.3.13.01.001 "
+    },
+    {
+        "CODIGO": "2.1.3.13.01.001 "
+    },
+    {
+        "CODIGO": "2.1.5 "
+    },
+    {
+        "CODIGO": "2.1.5.01 "
+    },
+    {
+        "CODIGO": "2.1.5.01.00 "
+    },
+    {
+        "CODIGO": "2.1.5.01.00 "
+    },
+    {
+        "CODIGO": "2.1.5.01.02 "
+    },
+    {
+        "CODIGO": "2.1.5.01.02 "
+    },
+    {
+        "CODIGO": "2.1.5.01.03 "
+    },
+    {
+        "CODIGO": "2.1.5.01.03 "
+    },
+    {
+        "CODIGO": "2.1.5.01.04 "
+    },
+    {
+        "CODIGO": "2.1.5.01.04 "
+    },
+    {
+        "CODIGO": "2.1.5.02 "
+    },
+    {
+        "CODIGO": "2.1.5.02.05 "
+    },
+    {
+        "CODIGO": "2.1.5.02.05 "
+    },
+    {
+        "CODIGO": "2.1.5.02.06 "
+    },
+    {
+        "CODIGO": "2.1.5.02.06 "
+    },
+    {
+        "CODIGO": "2.1.5.02.07 "
+    },
+    {
+        "CODIGO": "2.1.5.02.07 "
+    },
+    {
+        "CODIGO": "2.1.5.02.08 "
+    },
+    {
+        "CODIGO": "2.1.5.02.08 "
+    },
+    {
+        "CODIGO": "2.1.5.02.09 "
+    },
+    {
+        "CODIGO": "2.1.5.02.09 "
+    },
+    {
+        "CODIGO": "2.1.7 "
+    },
+    {
+        "CODIGO": "2.1.7.01 "
+    },
+    {
+        "CODIGO": "2.1.7.01.01 "
+    },
+    {
+        "CODIGO": "2.1.7.01.01 "
+    },
+    {
+        "CODIGO": "2.1.8 "
+    },
+    {
+        "CODIGO": "2.1.8.01 "
+    },
+    {
+        "CODIGO": "2.1.8.01.51 "
+    },
+    {
+        "CODIGO": "2.1.8.01.51 "
+    },
+    {
+        "CODIGO": "2.1.8.01.52 "
+    },
+    {
+        "CODIGO": "2.1.8.01.52 "
+    },
+    {
+        "CODIGO": "2.1.8.01.53 "
+    },
+    {
+        "CODIGO": "2.1.8.01.53 "
+    },
+    {
+        "CODIGO": "2.1.8.03 "
+    },
+    {
+        "CODIGO": "2.1.8.03 "
+    },
+    {
+        "CODIGO": "2.1.8.04 "
+    },
+    {
+        "CODIGO": "2.1.8.04.01 "
+    },
+    {
+        "CODIGO": "2.1.8.04.01 "
+    }
+]
+codigoModeloReporteReservas = 
+[
+    {
+        "CODIGO": "2"
+    },
+    {
+        "CODIGO": "2.1"
+    },
+    {
+        "CODIGO": "2.1.1"
+    },
+    {
+        "CODIGO": "2.1.1.01"
+    },
+    {
+        "CODIGO": "2.1.1.01.01"
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001"
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.06"
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08"
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.01"
+    },
+    {
+        "CODIGO": "2.1.1.01.01.001.08.02"
+    },
+    {
+        "CODIGO": "2.1.1.01.02"
+    },
+    {
+        "CODIGO": "2.1.1.01.02.003"
+    },
+    {
+        "CODIGO": "2.1.1.01.03"
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001"
+    },
+    {
+        "CODIGO": "2.1.1.01.03.001.01"
+    },
+    {
+        "CODIGO": "2.1.1.01.03.020"
+    },
+    {
+        "CODIGO": "2.1.1.02"
+    },
+    {
+        "CODIGO": "2.1.1.02.01"
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001"
+    },
+    {
+        "CODIGO": "2.1.1.02.01.001.07"
+    },
+    {
+        "CODIGO": "2.1.2"
+    },
+    {
+        "CODIGO": "2.1.2.02"
+    },
+    {
+        "CODIGO": "2.1.2.02.01"
+    },
+    {
+        "CODIGO": "2.1.2.02.01.003"
+    },
+    {
+        "CODIGO": "2.1.2.02.02"
+    },
+    {
+        "CODIGO": "2.1.2.02.02.006"
+    },
+    {
+        "CODIGO": "2.1.2.02.02.007"
+    },
+    {
+        "CODIGO": "2.1.2.02.02.008"
+    },
+    {
+        "CODIGO": "2.1.2.02.02.009"
+    },
+    {
+        "CODIGO": "2.1.5"
+    },
+    {
+        "CODIGO": "2.1.5.01"
+    },
+    {
+        "CODIGO": "2.1.5.01.03"
+    },
+    {
+        "CODIGO": "2.1.5.02"
+    },
+    {
+        "CODIGO": "2.1.5.02.06"
+    },
+    {
+        "CODIGO": "2.1.5.02.08"
+    },
+    {
+        "CODIGO": "2.1.5.02.09"
+    },
+    {
+        "CODIGO": "2.1.7"
+    },
+    {
+        "CODIGO": "2.1.7.01"
+    },
+    {
+        "CODIGO": "2.1.7.01.01"
+    },
+    {
+        "CODIGO": "2.99"
+    }
+]
+constructor(private router: Router) { }
+
+ngOnInit(): void {
+  if(localStorage.getItem('ruta')){
+    this.titulo = localStorage.getItem('ruta')
+  }else{
+    if(this.titulo == ''){
+      this.router.navigate(['/'])
+     }
+  }
+ 
+}
 
   fileUpload(event: any) {
     this.cargandoPaginaSpinner = 0
@@ -356,7 +1380,7 @@ export class GastosComponent {
 
   }
   exportexcel() {
-    if(this.mostrarReporte == 'Ejecucion'){
+    if(this.mostrarReporte == 'Ejecucion' || this.mostrarReporte == 'ReporteEjecucion'){
      // Obtener el elemento de la tabla
 const tabla:any = document.getElementById('excel-table');
 
@@ -392,11 +1416,11 @@ XLSX.writeFile(workbook, this.fileName);
  const hoja: any = XLSX.utils.aoa_to_sheet(datos);
 
  // Configurar el formato de la columna B como texto
- const range = XLSX.utils.decode_range(hoja['!ref']);
- for (let i = range.s.r + 1; i <= range.e.r; i++) {
-   const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
-   celda.z = '@';
- }
+//  const range = XLSX.utils.decode_range(hoja['!ref']);
+//  for (let i = range.s.r + 1; i <= range.e.r; i++) {
+//    const celda = hoja[XLSX.utils.encode_cell({ r: i, c: 1 })];
+//    celda.z = '@';
+//  }
 
  // Configurar el ancho de las columnas
  if (hoja) {
@@ -435,44 +1459,7 @@ XLSX.writeFile(workbook, this.fileName);
          right: { style: 'thin', color: { auto: 1 } },
        },
      };
-     switch (j) {
-       case 0:
-         hoja[ref].s.fill = { fgColor: { rgb: 'C6EFCE' } };
-         break;
-       case 1:
-         hoja[ref].s.fill = { fgColor: { rgb: 'FFC7CE' } };
-         break;
-       case 2:
-         hoja[ref].s.fill = { fgColor: { rgb: 'FFEB9C' } };
-         break;
-       case 3:
-         hoja[ref].s.fill = { fgColor: { rgb: 'B4A7D6' } };
-         break;
-       case 4:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-         break;
-       case 5:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F9CB9C' } };
-         break;
-       case 6:
-         hoja[ref].s.fill = { fgColor: { rgb: 'CECEF6' } };
-         break;
-       case 7:
-         hoja[ref].s.fill = { fgColor: { rgb: 'F6CECE' } };
-         break;
-       case 8:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 9:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 10:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-       case 11:
-         hoja[ref].s.fill = { fgColor: { rgb: 'E6B8AF' } };
-         break;
-     }
+   
    }
  }
  // Crear un libro de Excel y agregar la hoja
@@ -490,42 +1477,60 @@ XLSX.writeFile(workbook, this.fileName);
    
   }
   getTablaData2(tabla: HTMLElement): any[][] {
-  // Obtener las filas de la tabla
+     // Obtener las filas de la tabla
   const filas = Array.from(tabla.querySelectorAll('tr'));
 
   // Obtener los encabezados de columna
-  const encabezados = filas[0]?.querySelectorAll('th');
+  const encabezados = filas.shift()?.querySelectorAll('th');
 
   // Obtener los datos de la tabla en un arreglo de arreglos
   const datos = filas.map((fila) =>
-    Array.from(fila.querySelectorAll('td, th')).map((celda) => celda.textContent)
+    Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+      // Parse numerical values for columns other than columns B (index 1) and H (index 7)
+      if (index !== 1 && index !== 6) {
+        const textContent = celda.textContent;
+        const numericValue = textContent !== null ? parseFloat(textContent) : null;
+        return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+      } else {
+        return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
+      }
+    })
   );
 
   // Agregar los encabezados de columna al inicio del arreglo de arreglos
-  // if (encabezados) {
-  //   datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
-  // }
+  if (encabezados) {
+    datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
+  }
 
   return datos;
   }
   getTablaData(tabla: HTMLElement): any[][] {
-    // Obtener las filas de la tabla
-    const filas = Array.from(tabla.querySelectorAll('tr'));
+   // Obtener las filas de la tabla
+  const filas = Array.from(tabla.querySelectorAll('tr'));
 
-    // Obtener los encabezados de columna
-    const encabezados = filas.shift()?.querySelectorAll('th');
+  // Obtener los encabezados de columna
+  const encabezados = filas.shift()?.querySelectorAll('th');
 
-    // Obtener los datos de la tabla en un arreglo de arreglos
-    const datos = filas.map((fila) =>
-      Array.from(fila.querySelectorAll('td')).map((celda) => celda.innerText)
-    );
+  // Obtener los datos de la tabla en un arreglo de arreglos
+  const datos = filas.map((fila) =>
+    Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+      // Parse numerical values for columns other than column B (index 1)
+      if (index !== 1) {
+        const textContent = celda.textContent;
+        const numericValue = textContent !== null ? parseFloat(textContent) : null;
+        return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+      } else {
+        return celda.textContent; // Keep column B (index 1) as textContent
+      }
+    })
+  );
 
-    // Agregar los encabezados de columna al inicio del arreglo de arreglos
-    if (encabezados) {
-      datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.innerText));
-    }
+  // Agregar los encabezados de columna al inicio del arreglo de arreglos
+  if (encabezados) {
+    datos.unshift(Array.from(encabezados).map((encabezado) => encabezado.textContent));
+  }
 
-    return datos;
+  return datos;
   }
 
   ejecutarResumenIngresos() {
@@ -566,6 +1571,7 @@ XLSX.writeFile(workbook, this.fileName);
       let w = 0
       let p = 0
       let c = 0
+      let o = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
         if (p == 0) {
@@ -581,18 +1587,31 @@ XLSX.writeFile(workbook, this.fileName);
           localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
           this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
         }
+        if (o == 0) {
+          if (element.OBLIGACIONES == undefined) {
+            o = 0
+          } else {
+            o = element.OBLIGACIONES
+          }
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o})
+        } else {
+          o = o + element.OBLIGACIONES
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c ,OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
+        }
         if (w == 0) {
           if (element.PRESUPUESTODEFINITIVO == undefined) {
             w = 0
           } else {
             w = element.PRESUPUESTODEFINITIVO
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o })
         } else {
           w = w + element.PRESUPUESTODEFINITIVO
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c})
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o})
         }
         if (y == 0) {
           if (element.PAGOS == undefined) {
@@ -600,12 +1619,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             y = element.PAGOS
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o })
         } else {
           y = y + element.PAGOS
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
         }
         if (c == 0) {
           if (element.COMPROMETIDO == undefined) {
@@ -613,12 +1632,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             c = element.COMPROMETIDO
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o })
         } else {
           c = c + element.COMPROMETIDO
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         }
         if (x == 0) {
           if (element.APROPIACIONINICIAL == undefined) {
@@ -626,12 +1645,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             x = element.APROPIACIONINICIAL
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c,OBLIGACIONES: o })
         } else {
           x = x + element.APROPIACIONINICIAL
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c,OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c,OBLIGACIONES: o })
         }
       }
     }
@@ -671,6 +1690,7 @@ XLSX.writeFile(workbook, this.fileName);
         element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
         element.EJECUTADOCOMOOBLIGACION = arraydeDuplicados[index].EJECUTADOCOMOOBLIGACION
         element.COMPROMETIDO = arraydeDuplicados[index].COMPROMETIDO
+        element.OBLIGACIONES = arraydeDuplicados[index].OBLIGACIONES
         this.elementosUnificados = this.datosTabla.map((element1: any) => element1.CODIGOPRESUPUESTAL.trim() == element.CODIGOPRESUPUESTAL.trim() ? element : element1)
       });
 
@@ -707,19 +1727,19 @@ XLSX.writeFile(workbook, this.fileName);
       if (!unicos.includes(duplicados[i].CODIGOPRESUPUESTAL.trim().slice(0, contadorValor))) {
         unicos.push(elemento);
         if(this.contadormodelo == 5){
-          unicos.push("2.1.7","2.1.5")
+          unicos.push("2.1.7","2.1.5","2.99")
         }
         if(this.contadormodelo == 8){
-          unicos.push("2.1.5.02","2.1.5.01","2.1.1.01","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01")
+          unicos.push("2.1.5.02","2.1.3.13","2.1.8.04","2.1.5.01","2.1.1.01","2.1.3.08","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01")
         }
         if(this.contadormodelo == 11){
           unicos.push("2.1.3.13.01","2.1.1.01.01","2.1.1.01.02","2.1.1.01.03", "2.1.1.02.01", "2.1.1.02.02", "2.1.1.02.03", "2.1.2.02.01", "2.1.2.02.02", "2.1.2.02.03", "2.1.3.04.05", "2.1.3.07.02", "2.3.2.01.01")
         }
         if(this.contadormodelo == 15){
-          unicos.push("2.1.1.01.01.002","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
+          unicos.push("2.1.1.01.01.002","2.1.2.02.01.003","2.1.3.07.02.001","2.1.3.07.02.002","2.1.3.07.02.010","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
         }
         if(this.contadormodelo == 18){
-          unicos.push("2.1.1.02.01.001.08", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
+          unicos.push("2.1.1.02.01.001.08", "2.1.1.01.01.001.04", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
         }
         this.unicosmodelo = unicos
       }
@@ -732,9 +1752,20 @@ XLSX.writeFile(workbook, this.fileName);
       this.unicosmodelo = x
     }
     let arreglosDuplicados: any = []
+    if(this.contadorPrimerArreglo == 0){
+      this.contadorPrimerArreglo = 1
+    this.arregloGrande = this.datosTabla 
+    }
+  
+    let x = 0
+    this.datosTabla.forEach((element:any) => {
+     x = x + element.APROPIACIONINICIAL
+   
+    });
     unicos.forEach((element: any) => {
-      const arreglosSeparados = this.datosTabla.filter((campo: any) => campo.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor) == element.trim())
+      const arreglosSeparados = this.arregloGrande.filter((campo: any) => campo.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor) == element.trim())
       arreglosDuplicados.push(arreglosSeparados)
+
     })
     let element1
     let element2
@@ -746,20 +1777,34 @@ XLSX.writeFile(workbook, this.fileName);
       let w = 0
       let p = 0
       let c = 0
+      let o = 0
       for (let i = 0; i < element1; i++) {
         const element = element2[i]
+        if (o == 0) {
+          if (element.OBLIGACIONES == undefined) {
+            o = 0
+          } else {
+            o = element.OBLIGACIONES
+          }
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o})
+        } else {
+          o = o + element.OBLIGACIONES
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim(), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c ,OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim(), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
+        }
         if (p == 0) {
           if (element.EJECUTADOCOMOOBLIGACION == undefined) {
             p = 0
           } else {
             p = element.EJECUTADOCOMOOBLIGACION
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         } else {
           p = p + element.EJECUTADOCOMOOBLIGACION
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
         }
         if (w == 0) {
           if (element.PRESUPUESTODEFINITIVO == undefined) {
@@ -767,12 +1812,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             w = element.PRESUPUESTODEFINITIVO
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         } else {
           w = w + element.PRESUPUESTODEFINITIVO
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c})
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o})
         }
         if (y == 0) {
           if (element.PAGOS == undefined) {
@@ -780,12 +1825,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             y = element.PAGOS
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         } else {
           y = y + element.PAGOS
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         }
         if (c == 0) {
           if (element.COMPROMETIDO == undefined) {
@@ -793,12 +1838,12 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             c = element.COMPROMETIDO
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
         } else {
           c = c + element.COMPROMETIDO
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o }))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c, OBLIGACIONES: o })
         }
         if (x == 0) {
           if (element.APROPIACIONINICIAL == undefined) {
@@ -806,12 +1851,13 @@ XLSX.writeFile(workbook, this.fileName);
           } else {
             x = element.APROPIACIONINICIAL
           }
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c }))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), PAGOS: y, valor: x, definitivo: w, EJECUTADOCOMOOBLIGACION: p, COMPROMETIDO: c , OBLIGACIONES: o})
         } else {
+        
           x = x + element.APROPIACIONINICIAL
-          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c}))
-          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c })
+          localStorage.setItem(element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor), JSON.stringify({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),  valor: x, definitivo: w , PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c, OBLIGACIONES: o}))
+          this.datosDuplicados.push({ codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),   valor: x, definitivo: w, PAGOS: y, EJECUTADOCOMOOBLIGACION: p , COMPROMETIDO: c , OBLIGACIONES: o})
         }
       }
     }
@@ -839,9 +1885,14 @@ XLSX.writeFile(workbook, this.fileName);
         element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
         element.EJECUTADOCOMOOBLIGACION = arraydeDuplicados[index].EJECUTADOCOMOOBLIGACION
         element.COMPROMETIDO = arraydeDuplicados[index].COMPROMETIDO
+        element.OBLIGACIONES = arraydeDuplicados[index].OBLIGACIONES
         this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.CODIGOPRESUPUESTAL == element.CODIGOPRESUPUESTAL ? element : element1)
       });
     }
+    this.modeloInformacion.forEach((element:any) => {
+      //  let x =  this.datosTabla.filter((element1:any) => element1.RUBROPRESUPEUSTAL !== element.RUBROPRESUPEUSTAL.trim())
+      this.datosTabla = this.datosTabla.filter((element1:any) => element1.CODIGOPRESUPUESTAL != element.CODIGOPRESUPUESTAL.trim())
+      });
     this.elementosUnificados.forEach((element: any) => {
       element.CODIGOPRESUPUESTAL = element.CODIGOPRESUPUESTAL.trim()
     });
@@ -873,7 +1924,17 @@ XLSX.writeFile(workbook, this.fileName);
     }
   });
       this.datosTabla = mergedArray
-      this.actualizarTabla()
+      this.baseInformes = mergedArray
+      this.datosTabla.forEach((element:any) => {
+        console.log(element.APROPIACIONINICIAL, element.PRESUPUESTODEFINITIVO, element.PAGOS)
+         if(element.APROPIACIONINICIAL == 0 && element.PRESUPUESTODEFINITIVO == 0 && element.PAGOS == 0 && element.OBLIGACIONES == 0){
+          this.datosTabla =   this.datosTabla.filter((x:any) => x.CODIGOPRESUPUESTAL !== element.CODIGOPRESUPUESTAL.trim())
+       
+         }
+      });
+      if(localStorage.getItem('gastos')){
+        this.actualizarTabla()
+      }
     } else {
       this.ejecutarModeloDeResumidos(this.contadormodelo)
     }
@@ -891,47 +1952,93 @@ XLSX.writeFile(workbook, this.fileName);
       }
     Promise.resolve().then(() => {
       console.log('hola')
-      this.formatearNumeros();
+      // this.formatearNumeros();
     });
   }
-  formatearNumeros(): any[] {
-    for (const objeto of this.datosTabla) {
-      if (objeto.APROPIACIONINICIAL == null || objeto.APROPIACIONINICIAL == undefined) {
-        objeto.APROPIACIONINICIAL = 0
-      } else {
-        objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
-      }
-      if (objeto.PAGOS == null || objeto.PAGOS ==  undefined) {
-        objeto.PAGOS = 0
-      } else {
-        objeto.PAGOS = formatNumber(objeto.PAGOS, 'en-US');
-      }
-      if (objeto.PRESUPUESTODEFINITIVO == null || objeto.PRESUPUESTODEFINITIVO ==  undefined) {
-        objeto.PRESUPUESTODEFINITIVO = 0
-      } else {
-        objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
-      }
-      if (objeto.EJECUTADOCOMOOBLIGACION == null ||  objeto.EJECUTADOCOMOOBLIGACION ==  undefined) {
-        objeto.EJECUTADOCOMOOBLIGACION = 0
-      } else {
-        objeto.EJECUTADOCOMOOBLIGACION = formatNumber(objeto.EJECUTADOCOMOOBLIGACION, 'en-US');
-      }
-      if (objeto.COMPROMETIDO == null || objeto.COMPROMETIDO ==  undefined) {
-        objeto.COMPROMETIDO = 0
-      } else {
-        objeto.COMPROMETIDO = formatNumber(objeto.COMPROMETIDO, 'en-US');
-      }
-      if (objeto.COMPROMISO == null || objeto.COMPROMISO == undefined) {
-        objeto.COMPROMISO = 0
-      } else {
-        objeto.COMPROMISO = formatNumber(objeto.COMPROMISO, 'en-US');
-      }
-    }
+  // formatearNumeros(): any[] {
+  //   for (const objeto of this.datosTabla) {
+  //     if (objeto.APROPIACIONINICIAL == null || objeto.APROPIACIONINICIAL == undefined) {
+  //       objeto.APROPIACIONINICIAL = 0
+  //     } else {
+  //       objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
+  //     }
+  //     if (objeto.PAGOS == null || objeto.PAGOS ==  undefined) {
+  //       objeto.PAGOS = 0
+  //     } else {
+  //       objeto.PAGOS = formatNumber(objeto.PAGOS, 'en-US');
+  //     }
+  //     if (objeto.PRESUPUESTODEFINITIVO == null || objeto.PRESUPUESTODEFINITIVO ==  undefined) {
+  //       objeto.PRESUPUESTODEFINITIVO = 0
+  //     } else {
+  //       objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
+  //     }
+  //     if (objeto.EJECUTADOCOMOOBLIGACION == null ||  objeto.EJECUTADOCOMOOBLIGACION ==  undefined) {
+  //       objeto.EJECUTADOCOMOOBLIGACION = 0
+  //     } else {
+  //       objeto.EJECUTADOCOMOOBLIGACION = formatNumber(objeto.EJECUTADOCOMOOBLIGACION, 'en-US');
+  //     }
+  //     if (objeto.COMPROMETIDO == null || objeto.COMPROMETIDO ==  undefined) {
+  //       objeto.COMPROMETIDO = 0
+  //     } else {
+  //       objeto.COMPROMETIDO = formatNumber(objeto.COMPROMETIDO, 'en-US');
+  //     }
+  //     if (objeto.COMPROMISO == null || objeto.COMPROMISO == undefined) {
+  //       objeto.COMPROMISO = 0
+  //     } else {
+  //       objeto.COMPROMISO = formatNumber(objeto.COMPROMISO, 'en-US');
+  //     }
+  //   }
 
-    return this.datosTabla;
-  }
+  //   return this.datosTabla;
+  // }
   ejecutarProgramacion(tipoReporte: any) {
     this.mostrarReporte = tipoReporte
+    this.datosTabla = this.baseInformes
+  }
+  ejecutarREPORTEProgramacion(tipoReporte:any){
+    this.datosTabla = this.baseInformes
+    let x:any = []
+    if(this.titulo == "reservas"){
+      console.log('holaaaaa')
+      this.codigoModeloReporteReservas.forEach(element => {
+        let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+        x.push(y[0])
+       });
+       console.log(x)
+    }else{
+      this.codigosModeloReporte.forEach(element => {
+        let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+        x.push(y[0])
+       });
+       console.log(x)
+    }
+     this.datosTabla = x
+     this.mostrarReporte = tipoReporte
+  }
+ 
+
+  irAIngresos() {
+    localStorage.setItem('ruta','ingresos')
+    this.titulo = 'ingresos'
+    this.router.navigate(['/ingresos']);
+  }
+
+  irAGastos() {
+    localStorage.setItem('ruta','gastos')
+    this.titulo = 'gastos'
+    this.router.navigate(['/gastos']);
+  }
+
+  irAReservar() {
+    this.titulo = 'reservas'
+    localStorage.setItem('ruta','reservas')
+    this.router.navigate(['/gastos']);
+  }
+
+  irACuentasPorPagar() {
+    this.titulo = 'Cuentas por pagar'
+    localStorage.setItem('ruta','cuentas')
+    this.router.navigate(['/gastos']);
   }
 
 }

@@ -1,254 +1,123 @@
-[
-    
+
+    [
         {
-            "CODIGOPRESUPUESTAL": "2 ",
-            "CONCEPTO": "GASTOS "
+            "CODIGO": 2
         },
-    ,
-    
         {
-            "CODIGOPRESUPUESTAL": "2.1 ",
-            "CONCEPTO": "FUNCIONAMIENTO "
-        }
-    ,
-    
+            "CODIGO": "2.1"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1 ",
-            "CONCEPTO": "GASTOS DE PERSONAL "
-        }
-    ,
-    
+            "CODIGO": "2.1.1"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01 ",
-            "CONCEPTO": "PLANTA DE PERSONAL PERMANENTE "
-        }
-    ,
-    
+            "CODIGO": "2.1.1.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01.01 ",
-            "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.01.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01.01.001 ",
-            "CONCEPTO": "FACTORES SALARIALES COMUNES "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.01.01.001"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01.02 ",
-            "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.01.001.06"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01.03 ",
-            "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.01.001.08"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.01.03.001 ",
-            "CONCEPTO": "PRESTACIONES SOCIALES "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.01.001.08.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02 ",
-            "CONCEPTO": "PERSONAL SUPERNUMERARIO Y PLANTA TEMPORAL "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.01.01.001.08.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02.01 ",
-            "CONCEPTO": "FACTORES CONSTITUTIVOS DE SALARIO "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02.01.001 ",
-            "CONCEPTO": "FACTORES SALARIALES COMUNES "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.01.02.003"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02.02 ",
-            "CONCEPTO": "CONTRIBUCIONES INHERENTES A LA NOMINA "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.03"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02.03 ",
-            "CONCEPTO": "REMUNERACIONES NO CONSTITUTIVAS DE FACTOR SALARIAL "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.03.001"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.1.02.03.001 ",
-            "CONCEPTO": "PRESTACIONES SOCIALES "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.1.01.03.001.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.2 ",
-            "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.01.03.020"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.2.02 ",
-            "CONCEPTO": "ADQUISICIONES DIFERENTES DE ACTIVOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.2.02.01 ",
-            "CONCEPTO": "MATERIALES Y SUMINISTROS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.02.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.2.02.02 ",
-            "CONCEPTO": "ADQUISICION DE SERVICIOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.1.02.01.001"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.2.02.03 ",
-            "CONCEPTO": "GASTOS IMPREVISTOS "
-        }
-    ,
-    
+            "CODIGO": "2.1.1.02.01.001.07"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.3 ",
-            "CONCEPTO": "TRANSFERENCIAS CORRIENTES "
-        }
-    ,
-    
+            "CODIGO": "2.1.2"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.3.04 ",
-            "CONCEPTO": "A ORGANIZACIONES NACIONALES "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.2.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.3.04.05 ",
-            "CONCEPTO": "A OTRAS ORGANIZACIONES NACIONALES "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.3.07 ",
-            "CONCEPTO": "PRESTACIONES PARA CUBRIR RIESGOS SOCIALES "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.01.003"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.3.07.02 ",
-            "CONCEPTO": "PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.7 ",
-            "CONCEPTO": "DISMINUCION DE PASIVOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.02.006"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.7.01 ",
-            "CONCEPTO": "CESANTIAS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.02.007"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.8 ",
-            "CONCEPTO": "GASTOS POR TRIBUTOS, TASAS, CONTRIBUCIONES, MULTAS, SANCIONES E INTERESES DE MORA "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.2.02.02.008"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.1.8.01 ",
-            "CONCEPTO": "IMPUESTOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.2.02.02.009"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3 ",
-            "CONCEPTO": "INVERSION "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.5"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2 ",
-            "CONCEPTO": "ADQUISICION DE BIENES Y SERVICIOS "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.5.01"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01 ",
-            "CONCEPTO": "ADQUISICION DE ACTIVOS NO FINANCIEROS "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.5.01.03"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01.01 ",
-            "CONCEPTO": "ACTIVOS FIJOS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.5.02"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01.01.001 ",
-            "CONCEPTO": "EDIFICACIONES Y ESTRUCTURAS "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.5.02.06"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01.01.003 ",
-            "CONCEPTO": "MAQUINARIA Y EQUIPO "
-        }
-    ,
-    
-       
+            "CODIGO": "2.1.5.02.08"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01.01.004 ",
-            "CONCEPTO": "ACTIVOS FIJOS NO CLASIFICADOS COMO MAQUINARIA Y EQUIPO "
-        }
-    ,
-    
-        
+            "CODIGO": "2.1.5.02.09"
+        },
         {
-            "CODIGOPRESUPUESTAL": "2.3.2.01.01.005 ",
-            "CONCEPTO": "OTROS ACTIVOS FIJOS "
+            "CODIGO": "2.1.7"
+        },
+        {
+            "CODIGO": "2.1.7.01"
+        },
+        {
+            "CODIGO": "2.1.7.01.01"
+        },
+        {
+            "CODIGO": "2.99"
         }
-    
     ]

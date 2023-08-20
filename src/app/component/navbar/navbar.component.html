@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">HERRAMIENTA</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,4 +15,24 @@
         </ul>
       </div>
     </div>
-  </nav>
+  </nav> -->
+
+  <div class="menu">
+    <h6 style="color:black">Herramienta excel {{titulo}}</h6>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" (click)="irAIngresos()">ir a ingresos</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="irAGastos()">ir a gastos</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="irAReservar()">ir a reservas</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" (click)="irACuentasPorPagar()">ir a cuentas por pagar</a>
+      </li>
+    </ul>
+  </div>
+  
+  
