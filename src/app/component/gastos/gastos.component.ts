@@ -304,7 +304,13 @@ export class GastosComponent implements OnInit {
 
     {
         "CODIGOPRESUPUESTAL": "2.1.3 ",
-        "CONCEPTO": "TRANSFERENCIAS CORRIENTES "
+        "CONCEPTO": "TRANSFERENCIAS CORRIENTES ",
+        "APROPIACIONINICIAL" : "0",
+        "PAGOS" : "0",
+        "PRESUPUESTODEFINITIVO" : "0",
+        "EJECUTADOCOMOOBLIGACION" :"0",
+        "COMPROMETIDO" : "0",
+        "OBLIGACIONES" : "0"
     }
 ,
 
@@ -665,6 +671,156 @@ export class GastosComponent implements OnInit {
 },
 {
   "CODIGOPRESUPUESTAL": "2.99",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.1",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.1.01",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.1.01.01",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.1.01.01.001",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.1.01.01.001.07",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.003.03.01",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.003.02",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.003.03.01",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.003.06",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.02",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.02.01",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.02.02",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.005.02",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.005.02.03",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.005.02.03.01",
   "CONCEPTO": "",
   "APROPIACIONINICIAL" : "0",
 "PAGOS" : "0",
@@ -1325,6 +1481,179 @@ codigoModeloReporteReservas =
         "CODIGO": "2.99"
     }
 ]
+codigosModeloReporteCuentas = [
+  {
+      "codigo": "2"
+  },
+  {
+      "codigo": "2.1"
+  },
+  {
+      "codigo": "2.1.1"
+  },
+  {
+      "codigo": "2.1.1.01"
+  },
+  {
+      "codigo": "2.1.1.01.01"
+  },
+  {
+      "codigo": "2.1.1.01.01.001"
+  },
+  {
+      "codigo": "2.1.1.01.01.001.07"
+  },
+  {
+      "codigo": "2.1.1.01.02"
+  },
+  {
+      "codigo": "2.1.1.01.02.002"
+  },
+  {
+      "codigo": "2.1.2"
+  },
+  {
+      "codigo": "2.1.2.02"
+  },
+  {
+      "codigo": "2.1.2.02.01"
+  },
+  {
+      "codigo": "2.1.2.02.01.002"
+  },
+  {
+      "codigo": "2.1.2.02.01.003"
+  },
+  {
+      "codigo": "2.1.2.02.02"
+  },
+  {
+      "codigo": "2.1.2.02.02.006"
+  },
+  {
+      "codigo": "2.1.2.02.02.007"
+  },
+  {
+      "codigo": "2.1.2.02.02.008"
+  },
+  {
+      "codigo": "2.1.2.02.02.009"
+  },
+  {
+      "codigo": "2.1.3"
+  },
+  {
+      "codigo": "2.1.3.07"
+  },
+  {
+      "codigo": "2.1.3.07.02"
+  },
+  {
+      "codigo": "2.1.3.07.02.010"
+  },
+  {
+      "codigo": "2.1.3.07.02.010.01"
+  },
+  {
+      "codigo": "2.1.5"
+  },
+  {
+      "codigo": "2.1.5.02"
+  },
+  {
+      "codigo": "2.1.5.02.08"
+  },
+  {
+      "codigo": "2.3"
+  },
+  {
+      "codigo": "2.3.1"
+  },
+  {
+      "codigo": "2.3.1.01"
+  },
+  {
+      "codigo": "2.3.1.01.01"
+  },
+  {
+      "codigo": "2.3.1.01.01.001"
+  },
+  {
+      "codigo": "2.3.1.01.01.001.07"
+  },
+  {
+      "codigo": "2.3.2"
+  },
+  {
+      "codigo": "2.3.2.01"
+  },
+  {
+      "codigo": "2.3.2.01.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.003"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.02.08"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.06"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.06.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03.01.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.05"
+  },
+  {
+      "codigo": "2.3.2.02"
+  },
+  {
+      "codigo": "2.3.2.02.01"
+  },
+  {
+      "codigo": "2.3.2.02.01.003"
+  },
+  {
+      "codigo": "2.3.2.02.02"
+  },
+  {
+      "codigo": "2.3.2.02.02.007"
+  },
+  {
+      "codigo": "2.3.2.02.02.009"
+  },
+  {
+      "codigo": "2.3.2.02.02.010"
+  }
+]
 constructor(private router: Router) { }
 
 ngOnInit(): void {
@@ -1727,19 +2056,19 @@ XLSX.writeFile(workbook, this.fileName);
       if (!unicos.includes(duplicados[i].CODIGOPRESUPUESTAL.trim().slice(0, contadorValor))) {
         unicos.push(elemento);
         if(this.contadormodelo == 5){
-          unicos.push("2.1.7","2.1.5","2.99")
+          unicos.push("2.1.7","2.1.5","2.99","2.3.1","2.1.3")
         }
         if(this.contadormodelo == 8){
-          unicos.push("2.1.5.02","2.1.3.13","2.1.8.04","2.1.5.01","2.1.1.01","2.1.3.08","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01")
+          unicos.push("2.1.5.02","2.1.3.13","2.1.8.04","2.1.5.01","2.1.1.01","2.1.3.08","2.1.1.02","2.1.2.02", "2.1.3.04", "2.1.3.07","2.1.7.01", "2.1.8.01", "2.3.2.01", "2.3.1.01")
         }
         if(this.contadormodelo == 11){
-          unicos.push("2.1.3.13.01","2.1.1.01.01","2.1.1.01.02","2.1.1.01.03", "2.1.1.02.01", "2.1.1.02.02", "2.1.1.02.03", "2.1.2.02.01", "2.1.2.02.02", "2.1.2.02.03", "2.1.3.04.05", "2.1.3.07.02", "2.3.2.01.01")
+          unicos.push("2.1.3.13.01","2.3.2.02.02","2.3.2.02.01","2.3.2.02","2.3.1.01.01","2.1.1.01.01","2.1.1.01.02","2.1.1.01.03", "2.1.1.02.01", "2.1.1.02.02", "2.1.1.02.03", "2.1.2.02.01", "2.1.2.02.02", "2.1.2.02.03", "2.1.3.04.05", "2.1.3.07.02", "2.3.2.01.01")
         }
         if(this.contadormodelo == 15){
-          unicos.push("2.1.1.01.01.002","2.1.2.02.01.003","2.1.3.07.02.001","2.1.3.07.02.002","2.1.3.07.02.010","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
+          unicos.push("2.1.1.01.01.002","2.3.1.01.01.001","2.1.2.02.01.003","2.1.3.07.02.001","2.1.3.07.02.002","2.1.3.07.02.010","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
         }
         if(this.contadormodelo == 18){
-          unicos.push("2.1.1.02.01.001.08", "2.1.1.01.01.001.04", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
+          unicos.push("2.1.1.02.01.001.08","2.3.2.01.01.005.02.03.01","2.3.2.01.01.005.02.03","2.3.2.01.01.005.02","2.3.2.01.01.003.06","2.3.2.01.01.003.03.01","2.3.2.01.01.003.02","2.3.2.01.01.003.03.01","2.3.1.01.01.001.07", "2.1.1.01.01.001.04", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
         }
         this.unicosmodelo = unicos
       }
@@ -1925,14 +2254,7 @@ XLSX.writeFile(workbook, this.fileName);
   });
       this.datosTabla = mergedArray
       this.baseInformes = mergedArray
-      this.datosTabla.forEach((element:any) => {
-        console.log(element.APROPIACIONINICIAL, element.PRESUPUESTODEFINITIVO, element.PAGOS)
-         if(element.APROPIACIONINICIAL == 0 && element.PRESUPUESTODEFINITIVO == 0 && element.PAGOS == 0 && element.OBLIGACIONES == 0){
-          this.datosTabla =   this.datosTabla.filter((x:any) => x.CODIGOPRESUPUESTAL !== element.CODIGOPRESUPUESTAL.trim())
-       
-         }
-      });
-      if(localStorage.getItem('gastos')){
+      if(this.titulo == 'gastos'){
         this.actualizarTabla()
       }
     } else {
@@ -1940,7 +2262,23 @@ XLSX.writeFile(workbook, this.fileName);
     }
 
   }
-
+limpiarTabla(){
+  this.datosTabla.forEach((element:any) => {
+    console.log(element.APROPIACIONINICIAL, element.PRESUPUESTODEFINITIVO, element.PAGOS)
+    if(this.titulo == 'pagos'){
+      if(element.APROPIACIONINICIAL == 0 && element.PRESUPUESTODEFINITIVO == 0 && element.PAGOS == 0 && element.OBLIGACIONES == 0){
+        this.datosTabla =   this.datosTabla.filter((x:any) => x.CODIGOPRESUPUESTAL !== element.CODIGOPRESUPUESTAL.trim())
+     
+       }
+    }
+    if(this.titulo == 'reservas' || this.titulo == 'cuentas'){
+      if(element.APROPIACIONINICIAL == 0 && element.PRESUPUESTODEFINITIVO == 0 && element.PAGOS == 0){
+        this.datosTabla =   this.datosTabla.filter((x:any) => x.CODIGOPRESUPUESTAL !== element.CODIGOPRESUPUESTAL.trim())
+       }
+    }
+     
+  });
+}
   actualizarTabla() {
       for (let index = 0; index < this.datosTabla.length; index++) {
         if (this.datosTabla[index]) {
@@ -1998,22 +2336,32 @@ XLSX.writeFile(workbook, this.fileName);
   ejecutarREPORTEProgramacion(tipoReporte:any){
     this.datosTabla = this.baseInformes
     let x:any = []
-    if(this.titulo == "reservas"){
-      console.log('holaaaaa')
-      this.codigoModeloReporteReservas.forEach(element => {
-        let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+    if(this.titulo == 'cuentas'){
+      this.codigosModeloReporteCuentas.forEach(element => {
+        let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.codigo)
         x.push(y[0])
+        console.log(x)
        });
-       console.log(x)
+       console.log(this.datosTabla)
     }else{
-      this.codigosModeloReporte.forEach(element => {
-        let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
-        x.push(y[0])
-       });
-       console.log(x)
+      if(this.titulo == "reservas"){
+        this.codigoModeloReporteReservas.forEach(element => {
+          let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+          x.push(y[0])
+         });
+         console.log(x)
+      }else{
+        this.codigosModeloReporte.forEach(element => {
+          let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+          x.push(y[0])
+         });
+         console.log(x)
+      }
     }
+
      this.datosTabla = x
      this.mostrarReporte = tipoReporte
+     this.limpiarTabla()
   }
  
 
@@ -2036,7 +2384,7 @@ XLSX.writeFile(workbook, this.fileName);
   }
 
   irACuentasPorPagar() {
-    this.titulo = 'Cuentas por pagar'
+    this.titulo = 'cuentas'
     localStorage.setItem('ruta','cuentas')
     this.router.navigate(['/gastos']);
   }
