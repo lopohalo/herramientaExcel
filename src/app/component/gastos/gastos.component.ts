@@ -829,6 +829,46 @@ export class GastosComponent implements OnInit {
 "COMPROMETIDO" : "0",
 "OBLIGACIONES" : "0"
 },
+{
+  "CODIGOPRESUPUESTAL": "2.1.1.01.01.001.06",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.1.1.02.01.001.07",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.001.02",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
+{
+  "CODIGOPRESUPUESTAL": "2.3.2.01.01.001.02.07",
+  "CONCEPTO": "",
+  "APROPIACIONINICIAL" : "0",
+"PAGOS" : "0",
+"PRESUPUESTODEFINITIVO" : "0",
+"EJECUTADOCOMOOBLIGACION" :"0",
+"COMPROMETIDO" : "0",
+"OBLIGACIONES" : "0"
+},
 ]
 
   codigosModeloReporte = [
@@ -1481,6 +1521,209 @@ codigoModeloReporteReservas =
         "CODIGO": "2.99"
     }
 ]
+codigoModeloEjecReservas = [
+  {
+      "codigo": 2
+  },
+  {
+      "codigo": "2.1"
+  },
+  {
+      "codigo": "2.1.1"
+  },
+  {
+      "codigo": "2.1.1.01"
+  },
+  {
+      "codigo": "2.1.1.01.01"
+  },
+  {
+      "codigo": "2.1.1.01.01.001"
+  },
+  {
+      "codigo": "2.1.1.01.01.001.06"
+  },
+  {
+      "codigo": "2.1.1.01.01.001.08"
+  },
+  {
+      "codigo": "2.1.1.01.01.001.08.01"
+  },
+  {
+      "codigo": "2.1.1.01.01.001.08.02"
+  },
+  {
+      "codigo": "2.1.1.01.02"
+  },
+  {
+      "codigo": "2.1.1.01.02.003"
+  },
+  {
+      "codigo": "2.1.1.01.03"
+  },
+  {
+      "codigo": "2.1.1.01.03.001"
+  },
+  {
+      "codigo": "2.1.1.01.03.001.01"
+  },
+  {
+      "codigo": "2.1.1.01.03.020"
+  },
+  {
+      "codigo": "2.1.1.02"
+  },
+  {
+      "codigo": "2.1.1.02.01"
+  },
+  {
+      "codigo": "2.1.1.02.01.001"
+  },
+  {
+      "codigo": "2.1.1.02.01.001.07"
+  },
+  {
+      "codigo": "2.1.2"
+  },
+  {
+      "codigo": "2.1.2.02"
+  },
+  {
+      "codigo": "2.1.2.02.01"
+  },
+  {
+      "codigo": "2.1.2.02.01.003"
+  },
+  {
+      "codigo": "2.1.2.02.02"
+  },
+  {
+      "codigo": "2.1.2.02.02.006"
+  },
+  {
+      "codigo": "2.1.2.02.02.007"
+  },
+  {
+      "codigo": "2.1.2.02.02.008"
+  },
+  {
+      "codigo": "2.1.2.02.02.009"
+  },
+  {
+      "codigo": "2.1.5"
+  },
+  {
+      "codigo": "2.1.5.01"
+  },
+  {
+      "codigo": "2.1.5.01.03"
+  },
+  {
+      "codigo": "2.1.5.02"
+  },
+  {
+      "codigo": "2.1.5.02.06"
+  },
+  {
+      "codigo": "2.1.5.02.08"
+  },
+  {
+      "codigo": "2.1.5.02.09"
+  },
+  {
+      "codigo": "2.1.7"
+  },
+  {
+      "codigo": "2.1.7.01"
+  },
+  {
+      "codigo": "2.1.7.01.01"
+  },
+  {
+      "codigo": "2.3"
+  },
+  {
+      "codigo": "2.3.2"
+  },
+  {
+      "codigo": "2.3.2.01"
+  },
+  {
+      "codigo": "2.3.2.01.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.001"
+  },
+  {
+      "codigo": "2.3.2.01.01.001.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.001.02.07"
+  },
+  {
+      "codigo": "2.3.2.01.01.003"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.03.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.06"
+  },
+  {
+      "codigo": "2.3.2.01.01.003.06.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03.01.01"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.03.01.02"
+  },
+  {
+      "codigo": "2.3.2.01.01.005.02.05"
+  },
+  {
+      "codigo": "2.3.2.02"
+  },
+  {
+      "codigo": "2.3.2.02.01"
+  },
+  {
+      "codigo": "2.3.2.02.01.003"
+  },
+  {
+      "codigo": "2.3.2.02.01.004"
+  },
+  {
+      "codigo": "2.3.2.02.02"
+  },
+  {
+      "codigo": "2.3.2.02.02.007"
+  },
+  {
+      "codigo": "2.3.2.02.02.008"
+  },
+  {
+      "codigo": "2.3.2.02.02.009"
+  }
+]
 codigosModeloReporteCuentas = [
   {
       "codigo": "2"
@@ -2068,7 +2311,7 @@ XLSX.writeFile(workbook, this.fileName);
           unicos.push("2.1.1.01.01.002","2.3.1.01.01.001","2.1.2.02.01.003","2.1.3.07.02.001","2.1.3.07.02.002","2.1.3.07.02.010","2.1.1.01.01.001","2.1.1.01.03.001","2.1.1.02.01.001", "2.1.1.02.03.001", "2.3.2.01.01.001", "2.3.2.01.01.003", "2.3.2.01.01.004","2.3.2.01.01.005")
         }
         if(this.contadormodelo == 18){
-          unicos.push("2.1.1.02.01.001.08","2.3.2.01.01.005.02.03.01","2.3.2.01.01.005.02.03","2.3.2.01.01.005.02","2.3.2.01.01.003.06","2.3.2.01.01.003.03.01","2.3.2.01.01.003.02","2.3.2.01.01.003.03.01","2.3.1.01.01.001.07", "2.1.1.01.01.001.04", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
+          unicos.push("2.1.1.02.01.001.08","2.3.2.01.01.001.02.07","2.3.2.01.01.001.02","2.1.1.02.01.001.07","2.1.1.01.01.001.06","2.3.2.01.01.005.02.03.01","2.3.2.01.01.005.02.03","2.3.2.01.01.005.02","2.3.2.01.01.003.06","2.3.2.01.01.003.03.01","2.3.2.01.01.003.02","2.3.2.01.01.003.03.01","2.3.1.01.01.001.07", "2.1.1.01.01.001.04", "2.1.1.01.01.002.12", "2.1.1.01.01.001.08")
         }
         this.unicosmodelo = unicos
       }
@@ -2334,6 +2577,7 @@ limpiarTabla(){
     this.datosTabla = this.baseInformes
   }
   ejecutarREPORTEProgramacion(tipoReporte:any){
+    console.log(tipoReporte)
     this.datosTabla = this.baseInformes
     let x:any = []
     if(this.titulo == 'cuentas'){
@@ -2344,19 +2588,28 @@ limpiarTabla(){
        });
        console.log(this.datosTabla)
     }else{
-      if(this.titulo == "reservas"){
-        this.codigoModeloReporteReservas.forEach(element => {
-          let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+      if(this.titulo == "reservas" && tipoReporte == 'ReporteEjecucion'){
+        this.codigoModeloEjecReservas.forEach(element => {
+          let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.codigo)
           x.push(y[0])
          });
          console.log(x)
       }else{
-        this.codigosModeloReporte.forEach(element => {
-          let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
-          x.push(y[0])
-         });
-         console.log(x)
+        if(this.titulo == "reservas" && tipoReporte == 'ReporteProgramacion'){
+          this.codigoModeloReporteReservas.forEach(element => {
+            let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+            x.push(y[0])
+           });
+           console.log(x)
+        }else{
+          this.codigosModeloReporte.forEach(element => {
+            let y = this.datosTabla.filter((codigo:any) => codigo.CODIGOPRESUPUESTAL == element.CODIGO.trim())
+            x.push(y[0])
+           });
+           console.log(x)
+        }
       }
+    
     }
 
      this.datosTabla = x

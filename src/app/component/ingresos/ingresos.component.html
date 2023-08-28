@@ -149,37 +149,37 @@
             </div>
           </div>
           <ng-template [ngIf]="mostrarReporte == ''">
-          <div class="col-12">
-            <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
+          <div class="col-12 text-center">
+            <div style="max-height: 500px; overflow-x: auto; overflow-y: auto; text-align: center;">
             <table id="excel-table" class="table table-bordered border border-3 table-hover">
               <thead>
               <tr>
-                <th class="columnas " >FUENTE PRESUPUESTAL</th>
-                <th class="columnas" >CODIGO</th>
-                <th class="columnas">CONCEPTO</th>
-                <th class="columnas" style="background-color: rgba(208, 44, 44, 0.566);">APROPIACION INICIAL</th>
-                <th class="columnas" style="background-color: rgba(219, 0, 253, 0.389);">RECAUDO</th>
+                <th class="columnas " style="background-color: rgba(0, 202, 253, 0.684);">FUENTE PRESUPUESTAL</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);" >CODIGO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CONCEPTO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">APROPIACION INICIAL</th>
+                <th class="columnas" style="background-color:rgba(0, 202, 253, 0.684);">RECAUDO</th>
                 <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">PRESUPUESTO DEFINITIVO</th>
-                <th class="columnas" >EJECUTAR</th>
-                <th class="columnas" >CPC</th>
-                <th class="columnas" >FUENTES DE FINANCIACION</th>
-                <th class="columnas" >TERCEROS</th>
-                <th class="columnas" >POLITICA PUBLICA</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">EJECUTAR</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CPC</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">FUENTES DE FINANCIACION</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">TERCEROS</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">POLITICA PUBLICA</th>
               </tr>
               </thead>
               <tbody>
               <tr *ngFor="let item of datosTabla">
-                <td class="columnas">{{item.CONCEPTOPRESUPUESTAL}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CONCEPTOPRESUPUESTAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);text-align: start !important;">{{item.RUBROPRESUPEUSTAL}}</td>
                 <td class="columnas">{{item.CONCEPTO}}</td>
-                <td class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">{{item.APROPIACIONINICIAL}}</td>
-                <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
-                <td class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">{{item.PRESUPUESTODEFINITIVO}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.POREJECUTAR}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.FUENTESDEFINANCIACION}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.TERCEROS}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.POLITICAPUBLICA}}</td>
+                <td class="columnas" style="background-color:  rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                <td class="columnas" style="background-color:  rgb(212, 212, 224);">{{item.RECAUDO}}</td>
+                <td class="columnas" style="background-color:  rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.POREJECUTAR}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);" >{{item.CPC}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.FUENTESDEFINANCIACION}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.TERCEROS}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.POLITICAPUBLICA}}</td>
               </tr>
               </tbody>
             </table>
@@ -187,25 +187,25 @@
           </div>
         </ng-template>
         <ng-template [ngIf]="mostrarReporte == 'Programacion'">
-          <div class="col-12">
+          <div class="col-12 text-center">
             <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
             <table id="excel-table" class="table table-bordered border border-3 table-hover">
               <thead>
               <tr>
                 <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CODIGO</th>
                 <th class="columnas">CONCEPTO</th>
-                <th class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">APROPIACION INICIAL</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">APROPIACION INICIAL</th>
                 <th class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">PRESUPUESTO DEFINITIVO</th>
               </tr>
               </thead>
               <tbody>
               <tr *ngFor="let item of datosTabla">
                 <td class="columnas">D</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
+                <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.RUBROPRESUPEUSTAL}}</td>
                 <td class="columnas">{{item.CONCEPTO}}</td>
-                <td class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">{{item.APROPIACIONINICIAL}}</td>
-                <td class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">{{item.PRESUPUESTODEFINITIVO}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
               </tr>
               </tbody>
             </table>
@@ -213,39 +213,39 @@
           </div>
         </ng-template>
         <ng-template [ngIf]="mostrarReporte == 'Ejecucion'">
-          <div class="col-12">
+          <div class="col-12 text-center">
             <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
             <table id="excel-table" class="table table-bordered border border-3 table-hover">
               <thead>
               <tr>
                 <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CODIGO</th>
                 <th class="columnas">CONCEPTO</th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CPC</th>
-                <th class="columnas">FUENTE PRESUPUESTAL</th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CPC</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">FUENTE PRESUPUESTAL</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">RECAUDO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">RECAUDO</th>
               </tr>
               </thead>
               <tbody>
               <tr *ngFor="let item of datosTabla">
                 <td class="columnas">D</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
+                <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.RUBROPRESUPEUSTAL}}</td>
                 <td class="columnas">{{item.CONCEPTO}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
-                <td class="columnas">{{item.CONCEPTOPRESUPUESTAL}}</td>
-                <th class="columnas">1</th>
-                <th class="columnas">0</th>
-                <th class="columnas">0</th>
-                <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
-                <th class="columnas">0</th>
-                <th class="columnas">0</th>
-                <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CONCEPTOPRESUPUESTAL}}</td>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">1</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.RECAUDO}}</td>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.RECAUDO}}</td>
               </tr>
               </tbody>
             </table>
@@ -253,23 +253,23 @@
           </div>
         </ng-template>
         <ng-template [ngIf]="mostrarReporte == 'ReporteProgramacion'">
-          <div class="col-12">
+          <div class="col-12 text-center">
             <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
             <table id="excel-table" class="table table-bordered border border-3 table-hover">
               <thead>
               <tr>
                 <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
-                <th class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">APROPIACION INICIAL</th>
-                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">PRESUPUESTO DEFINITIVO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CODIGO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">APROPIACION INICIAL</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">PRESUPUESTO DEFINITIVO</th>
               </tr>
               </thead>
               <tbody>
               <tr *ngFor="let item of datosTabla">
                 <td class="columnas">D</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
-                <td class="columnas" style="background-color: rgba(216, 31, 31, 0.627);">{{item.APROPIACIONINICIAL}}</td>
-                <td class="columnas" style="background-color: rgba(0, 202, 253, 0.614);">{{item.PRESUPUESTODEFINITIVO}}</td>
+                <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.RUBROPRESUPEUSTAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
               </tr>
               </tbody>
             </table>
@@ -277,37 +277,37 @@
           </div>
         </ng-template>
         <ng-template [ngIf]="mostrarReporte == 'ReporteEjecucion'">
-          <div class="col-12">
+          <div class="col-12 text-center">
             <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
             <table id="excel-table" class="table table-bordered border border-3 table-hover">
               <thead>
               <tr>
                 <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CODIGO</th>
-                <th class="columnas" style="background-color: rgb(155, 155, 229);">CPC</th>
-                <th class="columnas">FUENTE PRESUPUESTAL</th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
-                <th class="columnas"></th>
-                <th class="columnas"></th>
-                <th class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">RECAUDO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CODIGO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">CPC</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">FUENTE PRESUPUESTAL</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">RECAUDO</th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);"></th>
+                <th class="columnas" style="background-color: rgba(0, 202, 253, 0.684);">RECAUDO</th>
               </tr>
               </thead>
               <tbody>
               <tr *ngFor="let item of datosTabla">
                 <td class="columnas">D</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.RUBROPRESUPEUSTAL}}</td>
-                <td class="columnas" style="background-color: rgb(155, 155, 229);">{{item.CPC}}</td>
+                <td class="columnas text-start" style="background-color: rgb(212, 212, 224)">{{item.RUBROPRESUPEUSTAL}}</td>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
                 <td class="columnas">{{item.CONCEPTOPRESUPUESTAL}}</td>
-                <th class="columnas">1</th>
-                <th class="columnas">0</th>
-                <th class="columnas">0</th>
-                <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
-                <th class="columnas">0</th>
-                <th class="columnas">0</th>
-                <td class="columnas" style="background-color: rgba(219, 0, 253, 0.538);">{{item.RECAUDO}}</td>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">1</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.RECAUDO}}</td>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <th class="columnas" style="background-color: rgb(212, 212, 224);">0</th>
+                <td class="columnas" style="background-color: rgb(212, 212, 224);">"{{item.RECAUDO}}</td>
               </tr>
               </tbody>
             </table>

@@ -1,11 +1,5 @@
 
 import { Component, OnInit } from '@angular/core';
-import { elementAt, filter } from 'rxjs';
-import {
-  formatNumber
-}
-  from '@angular/common';
-import * as numeral from 'numeral';
 import * as XLSX from 'xlsx'
 import { Router } from '@angular/router';
 @Component({

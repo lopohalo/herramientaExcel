@@ -11,6 +11,7 @@ import { NavbarComponent } from './component/navbar/navbar.component';
 import { IngresosComponent } from './component/ingresos/ingresos.component';
 import { GastosComponent } from './component/gastos/gastos.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,

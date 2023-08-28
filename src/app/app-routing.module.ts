@@ -12,6 +12,7 @@ const routes: Routes = [
     {path: "gastos", component: GastosComponent},
     {path: "", component: NavbarComponent},
 
+
 ]
 
 @NgModule({
