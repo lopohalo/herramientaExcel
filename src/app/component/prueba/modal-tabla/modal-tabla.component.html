@@ -1,0 +1,112 @@
+<div>
+  <div class="container">
+    <div class="row">
+      <div class="col-12" style="text-align: center;" *ngIf="accion2 === 'nuevos'">
+        <h1 class="mt-4">Codigos nuevos</h1>
+        <span class="mt-4">!por favor seleccione los codigos!</span>
+      </div>
+      <div class="col-12" style="text-align: center;" *ngIf="accion2 === 'corrientes'">
+        <h1 class="mt-4">Codigos corrientes y no corrientes</h1>
+        <span class="mt-4">!por favor verifique la informacion!</span>
+      </div>
+    </div>
+  </div>
+  <div style="min-width: 130px; text-align: right">
+    <ng-container>
+      <button
+        *ngIf="seleccionados.length > 0"
+        mat-icon-button
+        (click)="openDialog()"
+        matTooltip="editar"
+      >
+        <mat-icon class="icono">edit</mat-icon>
+      </button>
+    </ng-container>
+  </div>
+  
+  
+  <table
+  #tabla
+    mat-table
+    [dataSource]="dataTareasPaginated"
+    matSort
+    (matSortChange)="onSort($event)"
+  >
+  
+  <ng-container matColumnDef="tipo">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox  (change)="toggleAllSelection()">
+      </mat-checkbox>
+    </th>
+    <td mat-cell *matCellDef="let row">
+      <mat-checkbox [checked]="row.tipo" (change)="seleccionadosTabla(row)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
+    <ng-container matColumnDef="codigo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>codigo</th>
+      <td mat-cell *matCellDef="let row">{{ row.codigo }}</td>
+    </ng-container>
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+      <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+    </ng-container>
+    <ng-container matColumnDef="saldoAnterior">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>saldo anterior</th>
+      <td mat-cell *matCellDef="let row">{{ row.saldoAnterior }}</td>
+    </ng-container>
+  
+    <ng-container matColumnDef="credito">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Credito</th>
+      <td mat-cell *matCellDef="let row">{{ row.credito }}</td>
+    </ng-container>
+  
+    <ng-container matColumnDef="debito">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Debito</th>
+      <td mat-cell *matCellDef="let row">{{ row.debito }}</td>
+    </ng-container>
+  
+    <ng-container matColumnDef="nuevoSaldo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nuevo saldo</th>
+      <td mat-cell *matCellDef="let row">{{ row.nuevoSaldo }}</td>
+    </ng-container>
+    <ng-container matColumnDef="tipoSaldoAnterior">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo anterior</th>
+      <td mat-cell *matCellDef="let row">{{ row.tipoSaldoAnterior }}</td>
+    </ng-container>
+    <ng-container matColumnDef="tipoSaldoNuevo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo nuevo</th>
+      <td mat-cell *matCellDef="let row">{{ row.tipoSaldoNuevo }}</td>
+    </ng-container>
+    
+  
+  
+    <ng-container matColumnDef="corriente">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Corriente</th>
+      <td mat-cell *matCellDef="let row">{{ row.corriente }}</td>
+    </ng-container>
+    <ng-container matColumnDef="noCorriente">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>No corriente</th>
+      <td mat-cell *matCellDef="let row">{{ row.noCorriente }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"    [ngClass]="rowColors[row.codigo]"></tr>
+  </table>
+  
+  <mat-paginator
+    (page)="onPageChange($event)"
+    [length]="datosTabla.length"
+    [pageSize]="dataTareasPaginated.length"
+    [pageSizeOptions]="[100, 200, 400, 1000]"
+    firstPageLabel="a"
+    itemsPerPageLabel="g"
+    lastPageLabel="h"
+    nextPageLabel="k"
+    previousPageLabel="o"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>
+<div style="text-align: center;">
+  <button (click)="aceptar()">Aceptar</button>
+</div>
+

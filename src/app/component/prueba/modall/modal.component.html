@@ -1,0 +1,70 @@
+<div style="padding: 40px" *ngIf="!mostrarCorrientesyNoCorrientes">
+  <h6>Cambio de propiedades</h6>
+
+  <mat-form-field>
+    <mat-label>Cuenta corriente:</mat-label>
+    <mat-select [(ngModel)]="cuentaCorriente">
+      <mat-option value="si">Si</mat-option>
+      <mat-option value="no">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Cuenta corriente y no corriente:</mat-label>
+    <mat-select [(ngModel)]="cuentaCorrienteNoCorriente">
+      <mat-option value="si">Si</mat-option>
+      <mat-option value="no">No</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-6">
+        <button mat-icon-button color="danger" (click)="onCancel()">
+          Cancelar
+        </button>
+      </div>
+      <div class="col-6">
+        <button mat-icon-button color="primary" (click)="onAccept()">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  style="padding: 40px; overflow-y: scroll; height: 100vh"
+  *ngIf="mostrarCorrientesyNoCorrientes"
+>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <h6>Cuentas corrientes y no corrientes</h6>
+        <span>!Favor colocar valor CORRIENTE!</span>
+      </div>
+      <div class="col-4 mb-3" *ngFor="let item of data.data; let i = index">
+        <mat-card class="p-3 text-center">
+          <mat-card-title class="mb-2">{{ item.nombre }}</mat-card-title>
+          <mat-card-subtitle class="mb-2">{{ item.codigo }}</mat-card-subtitle>
+          <mat-card-subtitle class="mb-2"
+            >NUEVO SALDO: ${{ item.nuevoSaldo }}</mat-card-subtitle
+          >
+          <mat-form-field class="mb-2">
+            <input
+              matInput
+              type="number"
+              (ngModelChange)="checkValorCorriente($event, item.nuevoSaldo)"
+              placeholder="Valor corriente"
+              [(ngModel)]="valorCorriente[i]"
+            />
+          </mat-form-field>
+        </mat-card>
+      </div>
+      <div class="col-12">
+        <button mat-button class="bg-success" (click)="verificarCorriente()">
+          Terminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

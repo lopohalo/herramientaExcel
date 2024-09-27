@@ -1,0 +1,262 @@
+<div class="container" style="margin: 0px !important;">
+<div class="row">
+  <div class="col-12 justify-content-center">
+    <nav class="navbar navbar-light  justify-content-between mb-3 bg-light p-3">
+      <a class="navbar-brand" href="#">
+        <img src="assets\img\logo.png" width="40" height="20" class="d-inline-block align-top" alt="">
+      </a>
+      <h2>{{titulo}}</h2>
+    </nav>
+    
+      <ng-template [ngIf]="cargandoPaginaSpinner === 0" [ngIfElse]="loading">
+        <div class="container text-center" style="margin-top: 300px;">
+          <div class="row">
+            <div class="col-12">
+      <div class="spinner-grow text-primary" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-secondary" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-success" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-danger" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-warning" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-info" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <div class="spinner-grow text-dark" role="status">
+        <span class="sr-only"></span>
+      </div>    
+      <p>Cargando Datos....</p>
+      </div>
+      </div>
+      </div>
+      </ng-template>
+      
+      <ng-template #loading>
+      <!-- Upload  -->
+      <ng-template [ngIf]="validartabla !== 1">
+      <div class="container">
+        <div class="row">
+          <div [class]="mostrarTabla ? 'col-8' : 'col-12'">
+            <form id="file-upload-form" class="uploader">
+              <input id="file-upload" type="file" name="fileUpload" (change)="fileUpload($event)" accept=".xls,.xlsx" />
+            
+              <label for="file-upload" id="file-drag">
+                <img id="file-image" src="#" alt="Preview" class="hidden">
+                <div id="start">
+                  <i class="fa fa-download" aria-hidden="true"></i>
+                  <div>Por favor seleccione un archivo xls EXCEL</div>
+                  <div id="notimage" class="hidden">Por favor seleccione un archivo xls EXCEL</div>
+                  <span id="file-upload-btn" class="btn btn-primary">Seleccione el archivo</span>
+                </div>
+                <div id="response" class="hidden">
+                  <div id="messages"></div>
+                  <progress class="progress" id="file-progress" value="0">
+                    <span>0</span>%
+                  </progress>
+                </div>
+              </label>
+            </form>
+          </div>
+          <div class="col-4" *ngIf="mostrarTabla">
+            <button (click)="generarReporteGeneral()" class="btn btn-outline-success" type="button">Generar reporte general</button>
+          </div>
+        </div>
+      </div>
+      </ng-template>
+     
+      
+      <div class="container mt-5"   *ngIf="mostrarTabla">
+        <div class="row" style="justify-content: center;">
+          <div class="col-12 mt-5 text-center mb-2"> 
+            <div class="row">
+
+              <div class="col-4">
+                <button (click)="exportexcel()" class="btn btn-outline-success" type="button">Exportar a Excel</button>
+              </div> 
+             <div class="col-1 bg-success1" (click)="miFuncion('c')">
+               <p style="color: #333; font-weight: bold; text-align: center;">Corriente</p>
+             </div>
+             
+             <div class="col-1 bg-success2" (click)="miFuncion('n')">
+               <p style="color: #333; font-weight: bold; text-align: center;"> No Corriente</p>
+             </div>
+             
+             <!-- <div class="col-1 bg-danger1" (click)="miFuncion('p')">
+               <p style="color: #333; font-weight: bold; text-align: center;">Padres</p>
+             </div> -->
+             
+             <div class="col-1 bg-yellow" (click)="miFuncion('com')">
+               <p style="color: #333; font-weight: bold; text-align: center;">Si/No Corriente</p>
+             </div>
+             <div class="col-1" style="background-color: #e0dcdc;" (click)="miFuncion('d')">
+              <p style="color: #333; font-weight: bold; text-align: center;">por Defecto</p>
+            </div>
+            </div>
+          </div> 
+
+          <div class="col-12 text-center" style="display: none;">
+            <div style="max-height: 500px; overflow-x: auto; overflow-y: auto; text-align: center;">
+            <table           #tabla id="excel-table" class="table table-bordered border border-3 table-hover" *ngIf="datosTabla">
+              <thead>
+                <tr>
+                  <th>codigo</th>
+                  <th>nombre</th>
+                  <th>saldo anterior</th>
+                  <th>debito</th>
+                  <th>credito</th>
+                  <th>saldo actual</th>
+                  <th>tipo de saldo actual</th>
+                  <th>tipo de saldo anterior</th>
+                  <th>Corriente</th>
+                  <th>Corriente/no corriente</th>
+                  <th>es corriente</th>
+                  <th>es no corriente</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let x of datosTabla">
+                  <td>{{ x.codigo }}</td>
+                  <td>{{ x.nombre }}</td>
+                  <td>{{ x.saldoAnterior }}</td>
+                  <td>{{ x.debito }}</td>
+                  <td>{{ x.credito }}</td>
+                  <td>{{ x.nuevoSaldo }}</td>
+                  <td>{{ x.tipoSaldoAnterior }}</td>
+                  <td>{{ x.tipoSaldoNuevo }}</td>
+                  <td>{{ x.tipoDeCuenta }}</td>
+                  <td>{{ x.compartidoTipo }}</td>
+                  <td>{{ x.corriente }}</td>
+                  <td>{{ x.noCorriente }}</td>
+                </tr>
+              </tbody>
+            </table>
+            
+          </div>
+          </div>
+
+          
+          <div   *ngIf="mostrarTabla" class="col-6" style="text-align: start; align-items: start;">
+            <mat-form-field>
+              <mat-label>
+                Filtrado por codigo
+              </mat-label>
+              <input matInput #input (keyup)="applyFilter($event)"  placeholder="Filter">
+            </mat-form-field>
+          </div>
+          <div style="min-width: 130px; text-align: right">
+            <ng-container>
+              <button
+                *ngIf="seleccionados.length > 0"
+                mat-icon-button
+                (click)="openDialog()"
+                matTooltip="editar"
+              >
+                <mat-icon class="icono">edit</mat-icon>
+              </button>
+            </ng-container>
+          </div>
+          
+          <table
+          *ngIf="mostrarTabla"
+            mat-table
+            [dataSource]="dataTareasPaginated"
+            matSort
+            (matSortChange)="onSort($event)"
+          >
+          
+          <!-- <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox  (change)="toggleAllSelection()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox [checked]="row.tipo" (change)="seleccionadosTabla(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container> -->
+            <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>codigo</th>
+              <td mat-cell *matCellDef="let row">{{ row.codigo }}</td>
+            </ng-container>
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+              <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+            </ng-container>
+            <ng-container matColumnDef="saldoAnterior">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>saldo anterior</th>
+              <td mat-cell *matCellDef="let row">{{ row.saldoAnterior }}</td>
+            </ng-container>
+            <ng-container matColumnDef="debito">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Debito</th>
+              <td mat-cell *matCellDef="let row">{{ row.debito }}</td>
+            </ng-container>
+          
+            <ng-container matColumnDef="credito">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Credito</th>
+              <td mat-cell *matCellDef="let row">{{ row.credito }}</td>
+            </ng-container>
+          
+          
+            <ng-container matColumnDef="nuevoSaldo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nuevo saldo</th>
+              <td mat-cell *matCellDef="let row">{{ row.nuevoSaldo }}</td>
+            </ng-container>
+            <ng-container matColumnDef="tipoSaldoAnterior">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo anterior</th>
+              <td mat-cell *matCellDef="let row">{{ row.tipoSaldoAnterior }}</td>
+            </ng-container>
+            <ng-container matColumnDef="tipoSaldoNuevo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo nuevo</th>
+              <td mat-cell *matCellDef="let row">{{ row.tipoSaldoNuevo }}</td>
+            </ng-container>
+            
+          
+          
+            <ng-container matColumnDef="tipoDeCuenta">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Corriente</th>
+              <td mat-cell *matCellDef="let row">{{ row.tipoDeCuenta }}</td>
+            </ng-container>
+            <ng-container matColumnDef="compartidoTipo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>No corriente</th>
+              <td mat-cell *matCellDef="let row">{{ row.compartidoTipo }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"    [ngClass]="rowColors[row.codigo]"></tr>
+          </table>
+          
+          <mat-paginator
+          *ngIf="mostrarTabla"
+            (page)="onPageChange($event)"
+            [length]="datosTabla.length"
+            [pageSize]="dataTareasPaginated.length"
+            [pageSizeOptions]="[100, 200, 400, 1000]"
+            firstPageLabel="a"
+            itemsPerPageLabel="g"
+            lastPageLabel="h"
+            nextPageLabel="k"
+            previousPageLabel="o"
+            showFirstLastButtons
+          ></mat-paginator>
+  
+      
+        
+      </div>
+      </div>
+      </ng-template>
+  </div>
+</div>
+</div>
+
+
+<app-modal-tabla-nuevos *ngIf="mostrarNuevos" [datosTabla]="codigosNoexistentes"  (valorEnviado)="recibirValor($event)"></app-modal-tabla-nuevos>
+
+
+

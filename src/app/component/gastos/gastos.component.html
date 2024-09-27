@@ -176,7 +176,7 @@
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.COMPROMISO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.EJECUTADOCOMOOBLIGACION}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.COMPROMETIDO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.OBLIGACIONES}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.EJECUTADOCOMOOBLIGACION}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
                 </tr>
                 </tbody>
@@ -187,30 +187,42 @@
           <ng-template [ngIf]="mostrarReporte == '' && titulo == 'cuentas'">
             <div class="col-12 text-center">
               <div style="max-height: 500px; overflow-x: auto; overflow-y: auto;">
-              <table id="excel-table" class="table table-bordered border border-3 table-hover">
-                <thead>
-                <tr>
-                  <th class="columnas " style="background-color: rgba(247, 1, 1, 0.566);"></th>
-                  <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">CODIGO PRESUPUESTAL</th>
-                  <th class="columnas">CONCEPTO</th>
-                  <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">CPC</th>
-                  <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">APROPIACION INICIAL</th>
-                  <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">PRESUPUESTO DEFINITIVO</th>
-                  <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">EJECUTADOS</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let item of datosTabla">
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">D</td>
-                  <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.CODIGOPRESUPUESTAL}}</td>
-                  <td class="columnas">{{item.CONCEPTO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
-                </tr>
-                </tbody>
-              </table>
+                <table id="excel-table" class="table table-bordered border border-3 table-hover">
+                  <thead>
+                  <tr>
+                    <th class="columnas"  style="background-color: rgba(247, 1, 1, 0.566);"></th>
+                    <th class="columnas text-start">CODIGO</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">VIGENIA DEL GASTO </th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">SECCION PRESUPUESTAL </th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">SECTOR EDUCACION </th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">CPC</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">FUENTES DE FINANCIACION</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">POLITICA PUBLICA</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">TERCERO</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);"></th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">COMPROMISOS</th>
+                    <th class="columnas" style="background-color: rgba(247, 1, 1, 0.566);">OBLIGACIONES</th>
+                    <th class="columnas"  style="background-color: rgba(247, 1, 1, 0.566);">PAGOS</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let item of datosTabla">
+                    <td class="columnas">D</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CODIGOPRESUPUESTAL}}</td>
+                    <td class="columnas">3</td>
+                    <td class="columnas">1.0</td>
+                    <td class="columnas">22</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.FUENTESDEFINANCIACION}}</td>
+                    <td class="columnas">{{item.SITUACIONDEFONDOS}}</td>
+                    <td class="columnas">{{item.POLITICAPUBLICA}}</td>
+                    <td class="columnas">{{item.TERCERO}}</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                    <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
+                  </tr>
+                  </tbody>
+                </table>
             </div>
             </div>
           </ng-template>
@@ -278,7 +290,7 @@
                   <td class="columnas">{{item.POLITICAPUBLICA}}</td>
                   <td class="columnas">{{item.TERCERO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.COMPROMISO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.OBLIGACIONES}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.EJECUTADOCOMOOBLIGACION}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
                 </tr>
                 </tbody>
@@ -313,7 +325,7 @@
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">D</td>
                   <td class="columnas text-start">{{item.CODIGOPRESUPUESTAL}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CONCEPTO}}</td>
-                  <td class="columnas">1</td>
+                  <td class="columnas">2</td>
                   <td class="columnas">1.0</td>
                   <td class="columnas">22</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
@@ -321,8 +333,8 @@
                   <td class="columnas">{{item.SITUACIONDEFONDOS}}</td>
                   <td class="columnas">{{item.POLITICAPUBLICA}}</td>
                   <td class="columnas">{{item.TERCERO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
                 </tr>
                 </tbody>
@@ -357,7 +369,7 @@
                   <td class="columnas">D</td>
                   <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.CODIGOPRESUPUESTAL}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CONCEPTO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">1</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">3</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">1.0</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">22</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
@@ -367,7 +379,7 @@
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.TERCERO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
                 </tr>
                 </tbody>
               </table>
@@ -440,7 +452,7 @@
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.POLITICAPUBLICA}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.TERCERO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.COMPROMISO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.OBLIGACIONES}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.EJECUTADOCOMOOBLIGACION}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
                 </tr>
                 </tbody>
@@ -473,7 +485,7 @@
                 <tr *ngFor="let item of datosTabla">
                   <td class="columnas">D</td>
                   <td class="columnas text-start">{{item.CODIGOPRESUPUESTAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">1</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">2</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">1.0</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">22</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
@@ -481,8 +493,8 @@
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.SITUACIONDEFONDOS}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.POLITICAPUBLICA}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.TERCERO}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PRESUPUESTODEFINITIVO}}</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.PAGOS}}</td>
                 </tr>
                 </tbody>
@@ -515,7 +527,7 @@
                 <tr *ngFor="let item of datosTabla">
                   <td class="columnas">D</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CODIGOPRESUPUESTAL}}</td>
-                  <td class="columnas">1</td>
+                  <td class="columnas">3</td>
                   <td class="columnas">1.0</td>
                   <td class="columnas">22</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.CPC}}</td>
@@ -551,7 +563,7 @@
                 <tr *ngFor="let item of datosTabla">
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">D</td>
                   <td class="columnas text-start" style="background-color: rgb(212, 212, 224);">{{item.CODIGOPRESUPUESTAL}}</td>
-                  <td class="columnas" style="background-color: rgb(212, 212, 224);">1</td>
+                  <td class="columnas" style="background-color: rgb(212, 212, 224);">2</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">1.0</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">22</td>
                   <td class="columnas" style="background-color: rgb(212, 212, 224);">{{item.APROPIACIONINICIAL}}</td>

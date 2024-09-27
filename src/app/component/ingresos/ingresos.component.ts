@@ -331,7 +331,7 @@ export class IngresosComponent implements OnInit {
     {
       CODIGO: "1.1.02.05.001.08",
       CPC: "83115",
-      FUENTESDEFINANCIACION: "INGRESOS CORRIENTES DE LIBRE DESTINACION ",
+      FUENTESDEFINANCIACION: "1.2.1.0.00",
       TERCEROS: "NO APLICA ",
       POLITICAPUBLICA: "NO APLICA "
     },
@@ -2246,7 +2246,7 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
   if (index !== 1 && index !== 0) {
     const textContent = celda.textContent;
     const numericValue = textContent !== null ? parseFloat(textContent) : null;
-    return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+    return numericValue !== null && !isNaN(numericValue) ? textContent : textContent;
   } else {
     return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
   }
@@ -2275,12 +2275,22 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
   const datos = filas.map((fila) =>
     Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
       // Parse numerical values for columns other than column B (index 1)
-      if (index !== 1) {
-        const textContent = celda.textContent;
-        const numericValue = textContent !== null ? parseFloat(textContent) : null;
-        return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
-      } else {
-        return celda.textContent; // Keep column B (index 1) as textContent
+      if(this.mostrarReporte == 'ReporteProgramacion'){
+        if (index !== 1) {
+          const textContent = celda.textContent;
+          const numericValue = textContent !== null ? parseFloat(textContent) : null;
+          return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+        } else {
+          return celda.textContent; // Keep column B (index 1) as textContent
+        }
+      }else{
+        if (index !== 1) {
+          const textContent = celda.textContent;
+          const numericValue = textContent !== null ? parseFloat(textContent) : null;
+          return numericValue !== null && !isNaN(numericValue) ? numericValue : textContent;
+        } else {
+          return celda.textContent; // Keep column B (index 1) as textContent
+        }
       }
     })
   );
@@ -2497,7 +2507,7 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
           unicos.push("1.1.02.03.001","1.1.02.02.116","1.1.02.01.001", "1.1.02.05.001", "1.1.02.05.001", "1.1.02.05.002", "1.1.02.06.006","1.2.01.02.001", "1.2.08.01.003","1.1.02.06.009")
         }
         if(this.contadormodelo == 16){
-          unicos.push("1.1.02.01.001.01","1.1.02.06.006.06","1.2.01.02.001.03","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02","1.1.02.02.116.01", "1.1.02.06.006.06")
+          unicos.push("1.1.02.01.001.01","1.1.02.06.006.06","1.2.08.01.003.01","1.2.01.02.001.03","1.1.02.05.001.08","1.1.02.05.001.09", "1.1.02.05.002.03", "1.1.02.06.009.02","1.1.02.02.116.01", "1.1.02.06.006.06")
         }
         if(this.contadormodelo == 19){
           unicos.push("1.1.02.02.116.01.01", "1.1.02.02.116.01.02")
@@ -2616,6 +2626,12 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
         element.RECAUDO = arraydeDuplicados[index].recaudoMODELO
         element.PRESUPUESTODEFINITIVO = arraydeDuplicados[index].definitivo
         element.POREJECUTAR = arraydeDuplicados[index].ejecutar
+        element.CPC = 0
+        if(element.RUBROPRESUPEUSTAL == "1.1.02.05.001.08" || element.RUBROPRESUPEUSTAL == "1.1.02.05.001.09" || element.RUBROPRESUPEUSTAL == "1.1.02.05.002.03" || element.RUBROPRESUPEUSTAL == "1.1.02.06.006.06" || element.RUBROPRESUPEUSTAL == "1.2.10.02" || element.RUBROPRESUPEUSTAL == "1.2.05.02" || element.RUBROPRESUPEUSTAL == "1.2.08.02" || element.RUBROPRESUPEUSTAL == "1.2.13.01"){
+          element.CONCEPTOPRESUPUESTAL = "1.2.1.0.00"
+        }else{
+          element.CONCEPTOPRESUPUESTAL = 0
+        }
         this.elementosUnificados = this.modeloInformacion.map((element1: any) => element1.RUBROPRESUPEUSTAL == element.RUBROPRESUPEUSTAL ? element : element1)
       });
     }
@@ -2654,7 +2670,7 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
     }
   });
       this.datosTabla = mergedArray
-      this.baseInformes = mergedArray
+      this.baseInformes = mergedArray    
       this.actualizarTabla()
     } else {
       this.ejecutarModeloDeResumidos(this.contadormodelo)
@@ -2705,12 +2721,53 @@ if(this.mostrarReporte == 'ReporteEjecucion'){
 
   }
   ejecutarREPORTEProgramacion(tipoReporte:any){
+    this.datosTabla.forEach((element:any) => {
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.001.08"){
+        element.CPC = "83115"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.001.09"){
+        element.CPC = "92512"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.02"){
+        element.CPC = "211101"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.00"){
+        element.CPC = "112201"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.03"){
+        element.CPC = "3229906"
+      }
+    })
+    this.baseInformes.forEach((element:any) => {
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.001.08"){
+        element.CPC = "83115"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.001.09"){
+        element.CPC = "92512"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.02"){
+        element.CPC = "211101"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.00"){
+        element.CPC = "112201"
+      }
+      if(element.RUBROPRESUPEUSTAL == "1.1.02.05.002.03"){
+        element.CPC = "3229906"
+      }
+    })
     let x:any = []
     this.modeloParaReporteIngreso.forEach(element => {
       let y = this.datosTabla.filter((codigo:any) => codigo.RUBROPRESUPEUSTAL == element.CODIGO.trim())
       x.push(y[0])
      });
      this.datosTabla = x
+     console.log(this.datosTabla)
+     for (let i = 0; i < this.datosTabla.length; i++) {
+      // Redondea los números 'APROPIACIONINICIAL', 'RECAUDO' y 'PRESUPUESTODEFINITIVO' a dos decimales
+      this.datosTabla[i].APROPIACIONINICIAL = parseFloat(this.datosTabla[i].APROPIACIONINICIAL.toFixed(2));
+      this.datosTabla[i].RECAUDO = parseFloat(this.datosTabla[i].RECAUDO.toFixed(2));
+      this.datosTabla[i].PRESUPUESTODEFINITIVO = parseFloat(this.datosTabla[i].PRESUPUESTODEFINITIVO.toFixed(2));
+  }
      console.log(this.datosTabla)
      this.mostrarReporte = tipoReporte
   }
