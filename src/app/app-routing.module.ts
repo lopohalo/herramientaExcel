@@ -11,7 +11,7 @@ import { PruebaComponent } from './component/prueba/prueba.component';
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: PruebaComponent},
+    {path: "", component: NavbarComponent},
 
 
 ]

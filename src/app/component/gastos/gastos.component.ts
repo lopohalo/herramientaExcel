@@ -22,7 +22,7 @@ export class GastosComponent implements OnInit {
   arregloGrande = [];
   mostrarReporte: any = '';
   mostrarBoton = 0;
-  contadormodelo = 23;
+  contadormodelo = 25;
   convertedJson!: string;
   fileName = 'tabla.xlsx';
   ejecucion = 0;
@@ -96,6 +96,46 @@ export class GastosComponent implements OnInit {
       OBLIGACIONES: '0',
     },
     {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.01 ',
+      CONCEPTO: 'FACTORES SALARIALES COMUNES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.02 ',
+      CONCEPTO: 'FACTORES SALARIALES COMUNES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.05 ',
+      CONCEPTO: 'FACTORES SALARIALES COMUNES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.07 ',
+      CONCEPTO: 'FACTORES SALARIALES COMUNES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
       CODIGOPRESUPUESTAL: '2.1.1.01.02 ',
       CONCEPTO: 'CONTRIBUCIONES INHERENTES A LA NOMINA ',
       APROPIACIONINICIAL: '0',
@@ -118,6 +158,26 @@ export class GastosComponent implements OnInit {
     {
       CODIGOPRESUPUESTAL: '2.1.1.01.03.001 ',
       CONCEPTO: 'PRESTACIONES SOCIALES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.03.020 ',
+      CONCEPTO: 'fondo de ahorro ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.03.083',
+      CONCEPTO: 'auxilio de rodamiento',
       APROPIACIONINICIAL: '0',
       PAGOS: '0',
       PRESUPUESTODEFINITIVO: '0',
@@ -156,6 +216,86 @@ export class GastosComponent implements OnInit {
       OBLIGACIONES: '0',
     },
     {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.01',
+      CONCEPTO: 'sueldo de profesionales',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.02',
+      CONCEPTO: 'sueldo de administrativos',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.03',
+      CONCEPTO: 'sueldo de tecnicos',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.04',
+      CONCEPTO: 'sueldo de operativos',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.05',
+      CONCEPTO: 'sueldo de catedras',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.06',
+      CONCEPTO: 'prima de servicios',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.07',
+      CONCEPTO: 'bonificacion por servicios',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.01.001.08',
+      CONCEPTO: 'prima de navidad',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
       CODIGOPRESUPUESTAL: '2.1.1.02.02 ',
       CONCEPTO: 'CONTRIBUCIONES INHERENTES A LA NOMINA ',
       APROPIACIONINICIAL: '0',
@@ -178,6 +318,16 @@ export class GastosComponent implements OnInit {
     {
       CODIGOPRESUPUESTAL: '2.1.1.02.03.001 ',
       CONCEPTO: 'PRESTACIONES SOCIALES ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.02.03.035 ',
+      CONCEPTO: 'subsidio familiar ',
       APROPIACIONINICIAL: '0',
       PAGOS: '0',
       PRESUPUESTODEFINITIVO: '0',
@@ -216,7 +366,37 @@ export class GastosComponent implements OnInit {
       OBLIGACIONES: '0',
     },
     {
+      CODIGOPRESUPUESTAL: '2.1.2.02.01.000 ',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.01.002 ',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
       CODIGOPRESUPUESTAL: '2.1.2.02.01.003 ',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.01.004 ',
       CONCEPTO: '',
       APROPIACIONINICIAL: '0',
       PAGOS: '0',
@@ -288,6 +468,46 @@ export class GastosComponent implements OnInit {
     {
       CODIGOPRESUPUESTAL: '2.1.3.07.02 ',
       CONCEPTO: 'PRESTACIONES SOCIALES RELACIONADAS CON EL EMPLEO ',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.3.07.02.003 ',
+      CONCEPTO: 'BONOS',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.3.07.02.003.01 ',
+      CONCEPTO: 'BONOS PENSIONALES',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.3.07.02.003.02 ',
+      CONCEPTO: 'BONOS PENSIONALES',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.3.07.02.010.01',
+      CONCEPTO: 'BONOS PENSIONALES',
       APROPIACIONINICIAL: '0',
       PAGOS: '0',
       PRESUPUESTODEFINITIVO: '0',
@@ -886,6 +1106,96 @@ export class GastosComponent implements OnInit {
       COMPROMETIDO: '0',
       OBLIGACIONES: '0',
     },
+    {
+      CODIGOPRESUPUESTAL: '2.3.8.03.02',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.3.8.01.53',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.02.005',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.02.006',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.02.007',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.02.008',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.2.02.02.009',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.08.01',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
+    {
+      CODIGOPRESUPUESTAL: '2.1.1.01.01.001.08.02',
+      CONCEPTO: '',
+      APROPIACIONINICIAL: '0',
+      PAGOS: '0',
+      PRESUPUESTODEFINITIVO: '0',
+      EJECUTADOCOMOOBLIGACION: '0',
+      COMPROMETIDO: '0',
+      OBLIGACIONES: '0',
+    },
   ];
 
   codigosModeloReporte = [
@@ -1001,6 +1311,9 @@ export class GastosComponent implements OnInit {
       CODIGO: '2.1.1.02.01.001.02 ',
     },
     {
+      CODIGO: '2.1.1.02.01.001.03 ',
+    },
+    {
       CODIGO: '2.1.1.02.01.001.04 ',
     },
     {
@@ -1047,6 +1360,9 @@ export class GastosComponent implements OnInit {
     },
     {
       CODIGO: '2.1.1.02.03.001.01 ',
+    },
+    {
+      CODIGO: '2.1.1.02.03.035 ',
     },
     {
       CODIGO: '2.1.2 ',
@@ -1119,6 +1435,9 @@ export class GastosComponent implements OnInit {
     },
     {
       CODIGO: '2.1.3.07.02.003 ',
+    },
+    {
+      CODIGO: '2.1.3.07.02.003.01 ',
     },
     {
       CODIGO: '2.1.3.07.02.003.02 ',
@@ -1333,6 +1652,9 @@ export class GastosComponent implements OnInit {
       CODIGO: '2.1.1.02.01.001.02 ',
     },
     {
+      CODIGO: '2.1.1.02.01.001.03 ',
+    },
+    {
       CODIGO: '2.1.1.02.01.001.04 ',
     },
     {
@@ -1379,6 +1701,9 @@ export class GastosComponent implements OnInit {
     },
     {
       CODIGO: '2.1.1.02.03.001.01 ',
+    },
+    {
+      CODIGO: '2.1.1.02.03.035 ',
     },
     {
       CODIGO: '2.1.2 ',
@@ -1451,6 +1776,9 @@ export class GastosComponent implements OnInit {
     },
     {
       CODIGO: '2.1.3.07.02.003 ',
+    },
+    {
+      CODIGO: '2.1.3.07.02.003.01 ',
     },
     {
       CODIGO: '2.1.3.07.02.003.02 ',
@@ -1719,6 +2047,9 @@ export class GastosComponent implements OnInit {
     {
       CODIGO: '2.3.8.03',
     },
+    {
+      CODIGO: '2.3.8.03.02',
+    }
   ];
   codigoModeloReporteReservas = [
     {
@@ -1791,10 +2122,22 @@ export class GastosComponent implements OnInit {
       CODIGO: '2.1.2.02.01',
     },
     {
+      CODIGO: '2.1.2.02.01.000',
+    },
+    {
+      CODIGO: '2.1.2.02.01.002',
+    },
+    {
       CODIGO: '2.1.2.02.01.003',
     },
     {
+      CODIGO: '2.1.2.02.01.004',
+    },
+    {
       CODIGO: '2.1.2.02.02',
+    },
+    {
+      CODIGO: '2.1.2.02.02.005',
     },
     {
       CODIGO: '2.1.2.02.02.006',
@@ -1913,10 +2256,22 @@ export class GastosComponent implements OnInit {
       codigo: '2.1.2.02.01',
     },
     {
-      codigo: '2.1.2.02.01.003',
+      CODIGO: '2.1.2.02.01.000',
+    },
+    {
+      CODIGO: '2.1.2.02.01.002',
+    },
+    {
+      CODIGO: '2.1.2.02.01.003',
+    },
+    {
+      CODIGO: '2.1.2.02.01.004',
     },
     {
       codigo: '2.1.2.02.02',
+    },
+    {
+      codigo: '2.1.2.02.02.005',
     },
     {
       codigo: '2.1.2.02.02.006',
@@ -2080,10 +2435,22 @@ export class GastosComponent implements OnInit {
       CODIGO: '2.1.2.02.01.002',
     },
     {
+      CODIGO: '2.1.2.02.01.000',
+    },
+    {
+      CODIGO: '2.1.2.02.01.002',
+    },
+    {
       CODIGO: '2.1.2.02.01.003',
     },
     {
+      CODIGO: '2.1.2.02.01.004',
+    },
+    {
       CODIGO: '2.1.2.02.02',
+    },
+    {
+      CODIGO: '2.1.2.02.02.005',
     },
     {
       CODIGO: '2.1.2.02.02.006',
@@ -2111,6 +2478,9 @@ export class GastosComponent implements OnInit {
     },
     {
       CODIGO: '2.1.3.07.02.010.01',
+    },
+    {
+      CODIGO: '2.1.3.07.02.010.02',
     },
     {
       CODIGO: '2.1.5',
@@ -2235,7 +2605,14 @@ export class GastosComponent implements OnInit {
         this.datosTabla = data;
         this.cargandoPaginaSpinner = 1;
       });
-      console.log(this.datosTabla);
+ for (let index = 0; index < this.datosTabla.length; index++) {
+   this.datosTabla[index].APROPIACIONINICIAL = isNaN(this.datosTabla[index].APROPIACIONINICIAL) ? 0 : Number(this.datosTabla[index].APROPIACIONINICIAL);
+   this.datosTabla[index].EJECUTADOCOMOOBLIGACION = isNaN(this.datosTabla[index].EJECUTADOCOMOOBLIGACION) ? 0 : Number(this.datosTabla[index].EJECUTADOCOMOOBLIGACION);
+   this.datosTabla[index].OBLIGACIONES = isNaN(this.datosTabla[index].OBLIGACIONES) ? 0 : Number(this.datosTabla[index].OBLIGACIONES);
+   this.datosTabla[index].PRESUPUESTODEFINITIVO = isNaN(this.datosTabla[index].PRESUPUESTODEFINITIVO) ? 0 : Number(this.datosTabla[index].PRESUPUESTODEFINITIVO);
+   this.datosTabla[index].COMPROMETIDO = isNaN(this.datosTabla[index].COMPROMETIDO) ? 0 : Number(this.datosTabla[index].COMPROMETIDO);
+   this.datosTabla[index].PAGOS = isNaN(this.datosTabla[index].PAGOS) ? 0 : Number(this.datosTabla[index].PAGOS);
+ }
       this.validartabla = 1;
     };
   }
@@ -2385,98 +2762,100 @@ export class GastosComponent implements OnInit {
       }
     }
   }
-  getTablaData2(tabla: HTMLElement): any[][] {
-    // Obtener las filas de la tabla
-    const filas = Array.from(tabla.querySelectorAll('tr'));
+getTablaData2(tabla: HTMLElement): any[][] {
+  // Obtener las filas de la tabla
+  const filas = Array.from(tabla.querySelectorAll('tr'));
 
-    // Obtener los encabezados de columna
-    const encabezados = filas.shift()?.querySelectorAll('th');
+  // Obtener los encabezados de columna
+  const encabezados = filas.shift()?.querySelectorAll('th');
 
-    // Obtener los datos de la tabla en un arreglo de arreglos
-    const datos = filas.map((fila) =>
-      Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
-        // Parse numerical values for columns other than columns B (index 1) and H (index 7)
-        if (this.mostrarReporte == 'ReporteEjecucion') {
-          if (index !== 1 && index !== 6) {
-            const textContent = celda.textContent;
-            const numericValue =
-              textContent !== null ? parseFloat(textContent) : null;
-            return numericValue !== null && !isNaN(numericValue)
-            ? numericValue
-              : textContent;
-          } else {
-            return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
-          }
-        } else {
-          if (index !== 1 && index !== 6) {
-            const textContent = celda.textContent;
-            const numericValue =
-              textContent !== null ? parseFloat(textContent) : null;
-            return numericValue !== null && !isNaN(numericValue)
-              ? numericValue
-              : textContent;
-          } else {
-            return celda.textContent; // Keep columns B (index 1) and H (index 7) as textContent
-          }
-        }
-      })
-    );
-
-    // Agregar los encabezados de columna al inicio del arreglo de arreglos
-    if (encabezados) {
-      datos.unshift(
-        Array.from(encabezados).map((encabezado) => encabezado.textContent)
-      );
-    }
-
-    return datos;
-  }
-  getTablaData(tabla: HTMLElement): any[][] {
-    // Obtener las filas de la tabla
-    const filas = Array.from(tabla.querySelectorAll('tr'));
-
-    // Obtener los encabezados de columna
-    const encabezados = filas.shift()?.querySelectorAll('th');
-
-    // Obtener los datos de la tabla en un arreglo de arreglos
-    const datos = filas.map((fila) =>
-      Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
-        // Parse numerical values for columns other than column B (index 1)
-        if (this.mostrarReporte == 'ReporteProgramacion') {
-          if (index !== 1) {
-            const textContent = celda.textContent;
-            const numericValue =
-              textContent !== null ? parseFloat(textContent) : null;
-            return numericValue !== null && !isNaN(numericValue)
+  // Obtener los datos de la tabla en un arreglo de arreglos
+  const datos = filas.map((fila) =>
+    Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+      // Parse numerical values for columns other than columns B (index 1), D (index 3), F (index 5) and H (index 7)
+      if (this.mostrarReporte == 'ReporteEjecucion') {
+        if (index !== 1 && index !== 3 && index !== 5 && index !== 6) {
+          const textContent = celda.textContent;
+          const numericValue =
+            textContent !== null ? parseFloat(textContent) : null;
+          return numericValue !== null && !isNaN(numericValue)
             ? numericValue
             : textContent;
-          } else {
-            return celda.textContent; // Keep column B (index 1) as textContent
-          }
         } else {
-          if (index !== 1) {
-            const textContent = celda.textContent;
-            const numericValue =
-              textContent !== null ? parseFloat(textContent) : null;
-            return numericValue !== null && !isNaN(numericValue)
-              ? numericValue
-              : textContent;
-          } else {
-            return celda.textContent; // Keep column B (index 1) as textContent
-          }
+          return celda.textContent; // Keep columns B (index 1), F (index 5) and H (index 7) as textContent
         }
-      })
+      } else {
+        if (index !== 1 && index !== 3 && index !== 5 && index !== 6) {
+          const textContent = celda.textContent;
+          const numericValue =
+            textContent !== null ? parseFloat(textContent) : null;
+          return numericValue !== null && !isNaN(numericValue)
+            ? numericValue
+            : textContent;
+        } else {
+          return celda.textContent; // Keep columns B (index 1), F (index 5) and H (index 7) as textContent
+        }
+      }
+    })
+  );
+
+  // Agregar los encabezados de columna al inicio del arreglo de arreglos
+  if (encabezados) {
+    datos.unshift(
+      Array.from(encabezados).map((encabezado) => encabezado.textContent)
     );
-
-    // Agregar los encabezados de columna al inicio del arreglo de arreglos
-    if (encabezados) {
-      datos.unshift(
-        Array.from(encabezados).map((encabezado) => encabezado.textContent)
-      );
-    }
-
-    return datos;
   }
+
+  return datos;
+}
+ getTablaData(tabla: HTMLElement): any[][] {
+   // Obtener las filas de la tabla
+   const filas = Array.from(tabla.querySelectorAll('tr'));
+ 
+   // Obtener los encabezados de columna
+   const encabezados = filas.shift()?.querySelectorAll('th');
+ 
+   // Obtener los datos de la tabla en un arreglo de arreglos
+   const datos = filas.map((fila) =>
+     Array.from(fila.querySelectorAll('td, th')).map((celda, index) => {
+       // Parse numerical values for columns other than column D (index 3)
+       if (this.mostrarReporte == 'ReporteEjecucion') {
+         if (index !== 1 && index !== 3) {
+           const textContent = celda.textContent;
+           const numericValue =
+             textContent !== null ? parseFloat(textContent) : null;
+           return numericValue !== null && !isNaN(numericValue)
+             ? numericValue
+             : textContent;
+         } else {
+           return celda.textContent; // Keep column D (index 3) as textContent
+         }
+       } else {
+         if (index !== 1 && index !== 3) {
+           const textContent = celda.textContent;
+           const numericValue =
+             textContent !== null ? parseFloat(textContent) : null;
+           return numericValue !== null && !isNaN(numericValue)
+             ? numericValue
+             : textContent;
+         } else {
+           return celda.textContent; // Keep column D (index 3) as textContent
+         }
+       }
+     })
+   );
+ 
+   // Agregar los encabezados de columna al inicio del arreglo de arreglos
+   if (encabezados) {
+     datos.unshift(
+       Array.from(encabezados).map((encabezado) => encabezado.textContent)
+     );
+   }
+ 
+   return datos;
+ }
+ 
+
 
   ejecutarResumenIngresos() {
     this.datosTabla.forEach((element: any) => {
@@ -2967,15 +3346,21 @@ export class GastosComponent implements OnInit {
             '2.1.2.02.03',
             '2.1.3.04.05',
             '2.1.3.07.02',
-            '2.3.2.01.01'
+            '2.3.2.01.01',
+            '2.3.8.01.53',
+            '2.3.8.03.02'
           );
         }
         if (this.contadormodelo == 15) {
           unicos.push(
+            '2.1.3.07.02.003',
             '2.1.1.01.01.002',
             '2.3.1.01.01.001',
             '2.1.2.02.02.006',
             '2.1.2.02.01.003',
+            '2.1.2.02.01.004',
+            '2.1.2.02.01.002',
+            '2.1.2.02.01.000',
             '2.1.3.07.02.001',
             '2.1.3.07.02.002',
             '2.1.3.07.02.010',
@@ -2983,14 +3368,36 @@ export class GastosComponent implements OnInit {
             '2.1.1.01.03.001',
             '2.1.1.02.01.001',
             '2.1.1.02.03.001',
+            '2.1.1.02.03.035',
             '2.3.2.01.01.001',
             '2.3.2.01.01.003',
             '2.3.2.01.01.004',
-            '2.3.2.01.01.005'
+            '2.3.2.01.01.005',
+            '2.1.1.01.03.083',
+            '2.1.1.01.03.020',
+            '2.1.2.02.02.005',
+            '2.1.2.02.02.006',
+            '2.1.2.02.02.007',
+            '2.1.2.02.02.008',
+            '2.1.2.02.02.009'
           );
         }
         if (this.contadormodelo == 18) {
           unicos.push(
+            '2.1.3.07.02.003.01',
+            '2.1.1.02.01.001.01',
+            '2.1.3.07.02.003.02',
+            '2.1.1.02.01.001.02',
+            '2.1.1.02.01.001.03',
+            '2.1.1.02.01.001.04',
+            '2.1.1.02.01.001.05',
+            '2.1.1.02.01.001.06',
+            '2.1.1.02.01.001.07',
+            '2.1.1.02.01.001.08',
+            '2.1.1.01.01.001.01',
+            '2.1.1.01.01.001.02',
+            '2.1.1.01.01.001.05',
+            '2.1.1.01.01.001.07',
             '2.1.1.02.01.001.08',
             '2.3.2.01.01.001.02.07',
             '2.3.2.01.01.001.02',
@@ -3012,8 +3419,10 @@ export class GastosComponent implements OnInit {
             '2.3.2.01.01.003.02',
             '2.3.2.01.01.003.03',
             '2.3.2.01.01.003.04',
-            '2.3.2.01.01.003.06',
-
+            '2.1.3.07.02.010.01',
+            '2.1.3.07.02.010.02',
+            '2.1.1.01.01.001.08.01',
+            '2.1.1.01.01.001.08.02'
           );
         }
         this.unicosmodelo = unicos;
@@ -3057,15 +3466,25 @@ export class GastosComponent implements OnInit {
       let o = 0;
       for (let i = 0; i < element1; i++) {
         const element = element2[i];
-        if (o == 0) {
-          if (element.OBLIGACIONES == undefined) {
-            o = 0;
-          } else {
-            o = element.OBLIGACIONES;
-          }
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (o == 0) {
+            if (element.OBLIGACIONES == undefined) {
+              o = 0;
+            } else {
+              o = element.OBLIGACIONES;
+            }
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                valor: x,
+                definitivo: w,
+                PAGOS: y,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               valor: x,
               definitivo: w,
@@ -3073,22 +3492,22 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            valor: x,
-            definitivo: w,
-            PAGOS: y,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          o = o + element.OBLIGACIONES;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim(),
-            JSON.stringify({
+            });
+          } else {
+            o = o + element.OBLIGACIONES;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim(),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim(),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim(),
               PAGOS: y,
               valor: x,
@@ -3096,28 +3515,28 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim(),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
-        if (p == 0) {
-          if (element.EJECUTADOCOMOOBLIGACION == undefined) {
-            p = 0;
-          } else {
-            p = element.EJECUTADOCOMOOBLIGACION;
+            });
           }
-          console.log;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (p == 0) {
+            if (element.EJECUTADOCOMOOBLIGACION == undefined) {
+              p = 0;
+            } else {
+              p = element.EJECUTADOCOMOOBLIGACION;
+            }
+            console.log;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               PAGOS: y,
               valor: x,
@@ -3125,50 +3544,50 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          p = p + element.EJECUTADOCOMOOBLIGACION;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
-              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-              PAGOS: y,
-              valor: x,
-              definitivo: w,
-              EJECUTADOCOMOOBLIGACION: p,
-              COMPROMETIDO: c,
-              OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
-        if (w == 0) {
-          if (element.PRESUPUESTODEFINITIVO == undefined) {
-            w = 0;
+            });
           } else {
-            w = element.PRESUPUESTODEFINITIVO;
+            p = p + element.EJECUTADOCOMOOBLIGACION;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
+              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              PAGOS: y,
+              valor: x,
+              definitivo: w,
+              EJECUTADOCOMOOBLIGACION: p,
+              COMPROMETIDO: c,
+              OBLIGACIONES: o,
+            });
           }
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (w == 0) {
+            if (element.PRESUPUESTODEFINITIVO == undefined) {
+              w = 0;
+            } else {
+              w = element.PRESUPUESTODEFINITIVO;
+            }
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               PAGOS: y,
               valor: x,
@@ -3176,50 +3595,50 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          w = w + element.PRESUPUESTODEFINITIVO;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
-              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-              valor: x,
-              definitivo: w,
-              PAGOS: y,
-              EJECUTADOCOMOOBLIGACION: p,
-              COMPROMETIDO: c,
-              OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            valor: x,
-            definitivo: w,
-            PAGOS: y,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
-        if (y == 0) {
-          if (element.PAGOS == undefined) {
-            y = 0;
+            });
           } else {
-            y = element.PAGOS;
+            w = w + element.PRESUPUESTODEFINITIVO;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                valor: x,
+                definitivo: w,
+                PAGOS: y,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
+              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              valor: x,
+              definitivo: w,
+              PAGOS: y,
+              EJECUTADOCOMOOBLIGACION: p,
+              COMPROMETIDO: c,
+              OBLIGACIONES: o,
+            });
           }
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (y == 0) {
+            if (element.PAGOS == undefined) {
+              y = 0;
+            } else {
+              y = element.PAGOS;
+            }
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               PAGOS: y,
               valor: x,
@@ -3227,50 +3646,50 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          y = y + element.PAGOS;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
-              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-              PAGOS: y,
-              valor: x,
-              definitivo: w,
-              EJECUTADOCOMOOBLIGACION: p,
-              COMPROMETIDO: c,
-              OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
-        if (c == 0) {
-          if (element.COMPROMETIDO == undefined) {
-            c = 0;
+            });
           } else {
-            c = element.COMPROMETIDO;
+            y = y + element.PAGOS;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
+              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              PAGOS: y,
+              valor: x,
+              definitivo: w,
+              EJECUTADOCOMOOBLIGACION: p,
+              COMPROMETIDO: c,
+              OBLIGACIONES: o,
+            });
           }
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (c == 0) {
+            if (element.COMPROMETIDO == undefined) {
+              c = 0;
+            } else {
+              c = element.COMPROMETIDO;
+            }
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               PAGOS: y,
               valor: x,
@@ -3278,50 +3697,50 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          c = c + element.COMPROMETIDO;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
-              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-              PAGOS: y,
-              valor: x,
-              definitivo: w,
-              EJECUTADOCOMOOBLIGACION: p,
-              COMPROMETIDO: c,
-              OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
-        if (x == 0) {
-          if (element.APROPIACIONINICIAL == undefined) {
-            x = 0;
+            });
           } else {
-            x = element.APROPIACIONINICIAL;
+            c = c + element.COMPROMETIDO;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
+              codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              PAGOS: y,
+              valor: x,
+              definitivo: w,
+              EJECUTADOCOMOOBLIGACION: p,
+              COMPROMETIDO: c,
+              OBLIGACIONES: o,
+            });
           }
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+          if (x == 0) {
+            if (element.APROPIACIONINICIAL == undefined) {
+              x = 0;
+            } else {
+              x = element.APROPIACIONINICIAL;
+            }
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                PAGOS: y,
+                valor: x,
+                definitivo: w,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               PAGOS: y,
               valor: x,
@@ -3329,22 +3748,22 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            PAGOS: y,
-            valor: x,
-            definitivo: w,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        } else {
-          x = x + element.APROPIACIONINICIAL;
-          localStorage.setItem(
-            element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            JSON.stringify({
+            });
+          } else {
+            x = x + element.APROPIACIONINICIAL;
+            localStorage.setItem(
+              element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+              JSON.stringify({
+                codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
+                valor: x,
+                definitivo: w,
+                PAGOS: y,
+                EJECUTADOCOMOOBLIGACION: p,
+                COMPROMETIDO: c,
+                OBLIGACIONES: o,
+              })
+            );
+            this.datosDuplicados.push({
               codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
               valor: x,
               definitivo: w,
@@ -3352,18 +3771,9 @@ export class GastosComponent implements OnInit {
               EJECUTADOCOMOOBLIGACION: p,
               COMPROMETIDO: c,
               OBLIGACIONES: o,
-            })
-          );
-          this.datosDuplicados.push({
-            codigo: element.CODIGOPRESUPUESTAL.trim().slice(0, contadorValor),
-            valor: x,
-            definitivo: w,
-            PAGOS: y,
-            EJECUTADOCOMOOBLIGACION: p,
-            COMPROMETIDO: c,
-            OBLIGACIONES: o,
-          });
-        }
+            });
+          }
+      
       }
     }
 
@@ -3535,42 +3945,17 @@ export class GastosComponent implements OnInit {
       // this.formatearNumeros();
     });
   }
-  // formatearNumeros(): any[] {
-  //   for (const objeto of this.datosTabla) {
-  //     if (objeto.APROPIACIONINICIAL == null || objeto.APROPIACIONINICIAL == undefined) {
-  //       objeto.APROPIACIONINICIAL = 0
-  //     } else {
-  //       objeto.APROPIACIONINICIAL = formatNumber(objeto.APROPIACIONINICIAL, 'en-US');
-  //     }
-  //     if (objeto.PAGOS == null || objeto.PAGOS ==  undefined) {
-  //       objeto.PAGOS = 0
-  //     } else {
-  //       objeto.PAGOS = formatNumber(objeto.PAGOS, 'en-US');
-  //     }
-  //     if (objeto.PRESUPUESTODEFINITIVO == null || objeto.PRESUPUESTODEFINITIVO ==  undefined) {
-  //       objeto.PRESUPUESTODEFINITIVO = 0
-  //     } else {
-  //       objeto.PRESUPUESTODEFINITIVO = formatNumber(objeto.PRESUPUESTODEFINITIVO, 'en-US');
-  //     }
-  //     if (objeto.EJECUTADOCOMOOBLIGACION == null ||  objeto.EJECUTADOCOMOOBLIGACION ==  undefined) {
-  //       objeto.EJECUTADOCOMOOBLIGACION = 0
-  //     } else {
-  //       objeto.EJECUTADOCOMOOBLIGACION = formatNumber(objeto.EJECUTADOCOMOOBLIGACION, 'en-US');
-  //     }
-  //     if (objeto.COMPROMETIDO == null || objeto.COMPROMETIDO ==  undefined) {
-  //       objeto.COMPROMETIDO = 0
-  //     } else {
-  //       objeto.COMPROMETIDO = formatNumber(objeto.COMPROMETIDO, 'en-US');
-  //     }
-  //     if (objeto.COMPROMISO == null || objeto.COMPROMISO == undefined) {
-  //       objeto.COMPROMISO = 0
-  //     } else {
-  //       objeto.COMPROMISO = formatNumber(objeto.COMPROMISO, 'en-US');
-  //     }
-  //   }
-
-  //   return this.datosTabla;
-  // }
+// formatearNumeros(): any[] {
+//   for (const objeto of this.datosTabla) {
+//     objeto.APROPIACIONINICIAL = (objeto.APROPIACIONINICIAL != null && objeto.APROPIACIONINICIAL != undefined) ? objeto.APROPIACIONINICIAL.toString().replace(/\./g, ',') + (objeto.APROPIACIONINICIAL % 1 === 0 ? ',0' : '') : '0,00';
+//     objeto.PAGOS = (objeto.PAGOS != null && objeto.PAGOS != undefined) ? objeto.PAGOS.toString().replace(/\./g, ',') + (objeto.PAGOS % 1 === 0 ? ',0' : '') : '0,00';
+//     objeto.PRESUPUESTODEFINITIVO = (objeto.PRESUPUESTODEFINITIVO != null && objeto.PRESUPUESTODEFINITIVO != undefined) ? objeto.PRESUPUESTODEFINITIVO.toString().replace(/\./g, ',') + (objeto.PRESUPUESTODEFINITIVO % 1 === 0 ? ',0' : '') : '0,00';
+//     objeto.EJECUTADOCOMOOBLIGACION = (objeto.EJECUTADOCOMOOBLIGACION != null && objeto.EJECUTADOCOMOOBLIGACION != undefined) ? objeto.EJECUTADOCOMOOBLIGACION.toString().replace(/\./g, ',') + (objeto.EJECUTADOCOMOOBLIGACION % 1 === 0 ? ',0' : '') : '0,00';
+//     objeto.COMPROMETIDO = (objeto.COMPROMETIDO != null && objeto.COMPROMETIDO != undefined) ? objeto.COMPROMETIDO.toString().replace(/\./g, ',') + (objeto.COMPROMETIDO % 1 === 0 ? ',0' : '') : '0,00';
+//     objeto.COMPROMISO = (objeto.COMPROMISO != null && objeto.COMPROMISO != undefined) ? objeto.COMPROMISO.toString().replace(/\./g, ',') + (objeto.COMPROMISO % 1 === 0 ? ',0' : '') : '0,00';
+//   }
+//   return this.datosTabla;
+// }
   ejecutarProgramacion(tipoReporte: any) {
     this.mostrarReporte = tipoReporte;
     this.datosTabla = this.baseInformes;

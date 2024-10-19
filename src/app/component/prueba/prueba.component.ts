@@ -1157,884 +1157,1258 @@ export class PruebaComponent implements OnInit {
       nombre: 'DERECHOS ',
     },
     {
-      codigo: '4 ',
-      nombre: 'INGRESOS ',
+        codigo: "4 ",
+        nombre: "INGRESOS "
     },
     {
-      codigo: '4.3 ',
-      nombre: 'VENTA DE SERVICIOS ',
+        codigo: "4.3 ",
+        nombre: "VENTA DE SERVICIOS "
     },
     {
-      codigo: '4.3.05 ',
-      nombre: 'SERVICIOS EDUCATIVOS ',
+        codigo: "4.3.05 ",
+        nombre: "SERVICIOS EDUCATIVOS "
     },
     {
-      codigo: '4.3.05.14 ',
-      nombre: 'EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL ',
+        codigo: "4.3.05.14 ",
+        nombre: "EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL "
     },
     {
-      codigo: '4.3.05.15 ',
-      nombre: 'EDUCACIÓN FORMAL- SUPERIOR POSTGRADOS ',
+        codigo: "4.3.05.15 ",
+        nombre: "EDUCACIÓN FORMAL- SUPERIOR POSTGRADOS "
     },
     {
-      codigo: '4.3.05.27 ',
-      nombre: 'EDUCACIÓN NO FORMAL - FORMACIÓN EXTENSIVA ',
+        codigo: "4.3.05.27 ",
+        nombre: "EDUCACIÓN NO FORMAL - FORMACIÓN EXTENSIVA "
     },
     {
-      codigo: '4.3.05.50 ',
-      nombre: 'SERVICIOS CONEXOS A LA EDUCACIÓN ',
+        codigo: "4.3.05.50 ",
+        nombre: "SERVICIOS CONEXOS A LA EDUCACIÓN "
     },
     {
-      codigo: '4.3.11 ',
-      nombre: 'ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD ',
+        codigo: "4.3.11 ",
+        nombre: "ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD "
     },
     {
-      codigo: '4.3.11.90 ',
-      nombre:
-        'OTROS INGRESOS POR LA ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD ',
+      codigo: "4.3.11.05 ",
+      nombre: ""
     },
     {
-      codigo: '4.3.95 ',
-      nombre: 'DEVOLUCIONES, REBAJAS Y DESCUENTOS EN VENTA DE SERVICIOS (DB) ',
+        codigo: "4.3.11.90 ",
+        nombre: "OTROS INGRESOS POR LA ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD "
     },
     {
-      codigo: '4.3.95.01 ',
-      nombre: 'SERVICIOS EDUCATIVOS ',
+      codigo: "4.3.90 ",
+      nombre: "SERVICIOS"
+  },
+  {
+    codigo: "4.3.90.07 ",
+    nombre: "PUBLICIDAD"
+},
+    {
+        codigo: "4.3.95 ",
+        nombre: "DEVOLUCIONES, REBAJAS Y DESCUENTOS EN VENTA DE SERVICIOS (DB) "
+    },
+    {
+        codigo: "4.3.95.01 ",
+        nombre: "SERVICIOS EDUCATIVOS "
+    },
+    {
+        codigo: "4.4 ",
+        nombre: "TRANSFERENCIAS "
+    },
+    {
+        codigo: "4.4.13 ",
+        nombre: "SISTEMA GENERAL DE REGALÍAS "
+    },
+    {
+        codigo: "4.4.13.01 ",
+        nombre: "ASIGNACIONES DIRECTAS "
+    },
+    {
+        codigo: "4.4.28 ",
+        nombre: "OTRAS TRANSFERENCIAS "
+    },
+    {
+        codigo: "4.4.28.02 ",
+        nombre: "PARA PROYECTOS DE INVERSIÓN "
+    },
+    {
+        codigo: "4.4.28.03 ",
+        nombre: "PARA GASTOS DE FUNCIONAMIENTO "
     },
     {
-      codigo: '4.4 ',
-      nombre: 'TRANSFERENCIAS ',
+        codigo: "4.8 ",
+        nombre: "OTROS INGRESOS "
     },
     {
-      codigo: '4.4.13 ',
-      nombre: 'SISTEMA GENERAL DE REGALÍAS ',
+      codigo: "4.8.02 ",
+      nombre: "FINANCIEROS "
+  },
+  {
+    codigo: "4.8.02.11 ",
+    nombre: "RENDIM.EFECTIVO INVERS.DE ADMON.DE LIQUID.COSTO AM "
+},
+{
+  codigo: "4.8.02.16 ",
+  nombre: "GCIA.POR VALORAC.INSTRUMENT.DERIV.VR.MCDO.VR.RAZON"
+},
+{
+  codigo: "4.8.02.32 ",
+  nombre: "Rendimientos sobre recursos entregados en administ"
+},
+{
+  codigo: "4.8.02.90 ",
+  nombre: "Otros ingresos financierost"
+},
+    {
+        codigo: "4.8.05 ",
+        nombre: "FINANCIEROS "
     },
     {
-      codigo: '4.4.13.01 ',
-      nombre: 'ASIGNACIONES DIRECTAS ',
+        codigo: "4.8.05.04 ",
+        nombre: "INTERESES DE DEUDORES "
     },
     {
-      codigo: '4.4.28 ',
-      nombre: 'OTRAS TRANSFERENCIAS ',
+        codigo: "4.8.05.07 ",
+        nombre: "RENDIMIENTO POR REAJUSTE MONETARIO "
     },
     {
-      codigo: '4.4.28.02 ',
-      nombre: 'PARA PROYECTOS DE INVERSIÓN ',
+        codigo: "4.8.05.13 ",
+        nombre: "INTERESES DE MORA "
     },
     {
-      codigo: '4.4.28.03 ',
-      nombre: 'PARA GASTOS DE FUNCIONAMIENTO ',
+        codigo: "4.8.05.22 ",
+        nombre: "INTERESES SOBRE DEPÓSITOS EN INSTITUCIONES FINANCIERAS "
     },
     {
-      codigo: '4.8 ',
-      nombre: 'OTROS INGRESOS ',
+        codigo: "4.8.05.35 ",
+        nombre: "RENDIMIENTOS SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN "
     },
     {
-      codigo: '4.8.05 ',
-      nombre: 'FINANCIEROS ',
+        codigo: "4.8.05.90 ",
+        nombre: "OTROS INGRESOS FINANCIEROS "
     },
     {
-      codigo: '4.8.05.04 ',
-      nombre: 'INTERESES DE DEUDORES ',
+        codigo: "4.8.08 ",
+        nombre: "OTROS INGRESOS ORDINARIOS "
     },
     {
-      codigo: '4.8.05.07 ',
-      nombre: 'RENDIMIENTO POR REAJUSTE MONETARIO ',
+        codigo: "4.8.08.02 ",
+        nombre: "VENTA DE PLIEGOS "
     },
     {
-      codigo: '4.8.05.13 ',
-      nombre: 'INTERESES DE MORA ',
+        codigo: "4.8.08.03 ",
+        nombre: "CUOTAS PARTES DE PENSIONES "
     },
     {
-      codigo: '4.8.05.22 ',
-      nombre: 'INTERESES SOBRE DEPÓSITOS EN INSTITUCIONES FINANCIERAS ',
+        codigo: "4.8.08.05 ",
+        nombre: "UTILIDAD EN VENTA DE ACTIVOS "
     },
     {
-      codigo: '4.8.05.35 ',
-      nombre: 'RENDIMIENTOS SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN ',
+        codigo: "4.8.08.06 ",
+        nombre: "PUBLICACIONES "
     },
     {
-      codigo: '4.8.05.90 ',
-      nombre: 'OTROS INGRESOS FINANCIEROS ',
+        codigo: "4.8.08.08 ",
+        nombre: "HONORARIOS "
     },
     {
-      codigo: '4.8.08 ',
-      nombre: 'OTROS INGRESOS ORDINARIOS ',
+        codigo: "4.8.08.17 ",
+        nombre: "ARRENDAMIENTOS "
     },
     {
-      codigo: '4.8.08.02 ',
-      nombre: 'VENTA DE PLIEGOS ',
+        codigo: "4.8.08.19 ",
+        nombre: "DONACIONES "
     },
     {
-      codigo: '4.8.08.03 ',
-      nombre: 'CUOTAS PARTES DE PENSIONES ',
+      codigo: "4.8.08.25 ",
+      nombre: "SOBRANTES "
+  },
+  {
+      codigo: "4.8.08.27 ",
+      nombre: "APROVECHAMIENTOS "
+  },
+    {
+        codigo: "4.8.08.28 ",
+        nombre: "INDEMNIZACIONES"
     },
     {
-      codigo: '4.8.08.05 ',
-      nombre: 'UTILIDAD EN VENTA DE ACTIVOS ',
+      codigo: '4.8.08.90',
+      nombre: 'Otros ingresos diversos',
     },
     {
-      codigo: '4.8.08.06 ',
-      nombre: 'PUBLICACIONES ',
+        codigo: "4.8.10 ",
+        nombre: "EXTRAORDINARIOS "
     },
     {
-      codigo: '4.8.08.08 ',
-      nombre: 'HONORARIOS ',
+        codigo: "4.8.10.07 ",
+        nombre: "SOBRANTES "
     },
     {
-      codigo: '4.8.08.17 ',
-      nombre: 'ARRENDAMIENTOS ',
+        codigo: "4.8.10.08 ",
+        nombre: "RECUPERACIONES "
     },
     {
-      codigo: '4.8.08.19 ',
-      nombre: 'DONACIONES ',
+        codigo: "4.8.10.47 ",
+        nombre: "APROVECHAMIENTOS "
     },
     {
-      codigo: '4.8.08.90 ',
-      nombre: 'OTROS INGRESOS ORDINARIOS ',
+        codigo: "4.8.10.49 ",
+        nombre: "INDEMNIZACIONES "
     },
     {
-      codigo: '4.8.10 ',
-      nombre: 'EXTRAORDINARIOS ',
+        codigo: "4.8.10.90 ",
+        nombre: "OTROS INGRESOS EXTRAORDINARIOS "
     },
     {
-      codigo: '4.8.10.07 ',
-      nombre: 'SOBRANTES ',
+        codigo: "4.8.15 ",
+        nombre: "AJUSTE DE EJERCICIOS ANTERIORES "
     },
     {
-      codigo: '4.8.10.08 ',
-      nombre: 'RECUPERACIONES ',
+        codigo: "4.8.15.57 ",
+        nombre: "TRANSFERENCIAS "
     },
     {
-      codigo: '4.8.10.47 ',
-      nombre: 'APROVECHAMIENTOS ',
+        codigo: "4.8.15.59 ",
+        nombre: "OTROS INGRESOS "
     },
     {
-      codigo: '4.8.10.49 ',
-      nombre: 'INDEMNIZACIONES ',
+        codigo: "5 ",
+        nombre: "GASTOS "
     },
     {
-      codigo: '4.8.10.90 ',
-      nombre: 'OTROS INGRESOS EXTRAORDINARIOS ',
+        codigo: "5.1 ",
+        nombre: "DE ADMINISTRACIÓN "
     },
     {
-      codigo: '4.8.15 ',
-      nombre: 'AJUSTE DE EJERCICIOS ANTERIORES ',
+        codigo: "5.1.01 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '4.8.15.57 ',
-      nombre: 'TRANSFERENCIAS ',
+        codigo: "5.1.01.01 ",
+        nombre: "SUELDOS DEL PERSONAL "
     },
     {
-      codigo: '4.8.15.59 ',
-      nombre: 'OTROS INGRESOS ',
+        codigo: "5.1.01.03 ",
+        nombre: "HORAS EXTRAS Y FESTIVOS "
     },
     {
-      codigo: '5 ',
-      nombre: 'GASTOS ',
+        codigo: "5.1.01.05 ",
+        nombre: "GASTOS DE REPRESENTACIÓN "
     },
     {
-      codigo: '5.1 ',
-      nombre: 'DE ADMINISTRACIÓN ',
+        codigo: "5.1.01.06 ",
+        nombre: "REMUNERACIÓN SERVICIOS TÉCNICOS "
     },
     {
-      codigo: '5.1.01 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+        codigo: "5.1.01.09 ",
+        nombre: "HONORARIOS "
     },
     {
-      codigo: '5.1.01.01 ',
-      nombre: 'SUELDOS DEL PERSONAL ',
+        codigo: "5.1.01.13 ",
+        nombre: "PRIMA DE VACACIONES "
     },
     {
-      codigo: '5.1.01.03 ',
-      nombre: 'HORAS EXTRAS Y FESTIVOS ',
+        codigo: "5.1.01.14 ",
+        nombre: "PRIMA DE NAVIDAD "
     },
     {
-      codigo: '5.1.01.05 ',
-      nombre: 'GASTOS DE REPRESENTACIÓN ',
+        codigo: "5.1.01.17 ",
+        nombre: "VACACIONES "
     },
     {
-      codigo: '5.1.01.06 ',
-      nombre: 'REMUNERACIÓN SERVICIOS TÉCNICOS ',
+        codigo: "5.1.01.19 ",
+        nombre: "BONIFICACIONES "
     },
     {
-      codigo: '5.1.01.09 ',
-      nombre: 'HONORARIOS ',
+        codigo: "5.1.01.23 ",
+        nombre: "AUXILIO DE TRANSPORTE "
     },
     {
-      codigo: '5.1.01.13 ',
-      nombre: 'PRIMA DE VACACIONES ',
+        codigo: "5.1.01.24 ",
+        nombre: "CESANTÍAS "
     },
     {
-      codigo: '5.1.01.14 ',
-      nombre: 'PRIMA DE NAVIDAD ',
+        codigo: "5.1.01.25 ",
+        nombre: "INTERESES A LAS CESANTÍAS "
     },
     {
-      codigo: '5.1.01.17 ',
-      nombre: 'VACACIONES ',
+        codigo: "5.1.01.30 ",
+        nombre: "CAPACITACIÓN, BIENESTAR SOCIAL Y ESTÍMULOS "
     },
     {
-      codigo: '5.1.01.19 ',
-      nombre: 'BONIFICACIONES ',
+        codigo: "5.1.01.31 ",
+        nombre: "DOTACIÓN Y SUMINISTRO A TRABAJADORES "
     },
     {
-      codigo: '5.1.01.23 ',
-      nombre: 'AUXILIO DE TRANSPORTE ',
+        codigo: "5.1.01.33 ",
+        nombre: "GASTOS DEPORTIVOS Y DE RECREACIÓN "
     },
     {
-      codigo: '5.1.01.24 ',
-      nombre: 'CESANTÍAS ',
+        codigo: "5.1.01.47 ",
+        nombre: "VIÁTICOS "
     },
     {
-      codigo: '5.1.01.25 ',
-      nombre: 'INTERESES A LAS CESANTÍAS ',
+        codigo: "5.1.01.48 ",
+        nombre: "GASTOS DE VIAJE "
     },
     {
-      codigo: '5.1.01.30 ',
-      nombre: 'CAPACITACIÓN, BIENESTAR SOCIAL Y ESTÍMULOS ',
+        codigo: "5.1.01.50 ",
+        nombre: "BONIFICACIÓN POR SERVICIOS PRESTADOS "
     },
     {
-      codigo: '5.1.01.31 ',
-      nombre: 'DOTACIÓN Y SUMINISTRO A TRABAJADORES ',
+        codigo: "5.1.01.52 ",
+        nombre: "PRIMA DE SERVICIOS "
     },
     {
-      codigo: '5.1.01.33 ',
-      nombre: 'GASTOS DEPORTIVOS Y DE RECREACIÓN ',
+        codigo: "5.1.01.60 ",
+        nombre: "SUBSIDIO DE ALIMENTACIÓN "
     },
     {
-      codigo: '5.1.01.47 ',
-      nombre: 'VIÁTICOS ',
+        codigo: "5.1.01.64 ",
+        nombre: "OTRAS PRIMAS "
     },
     {
-      codigo: '5.1.01.48 ',
-      nombre: 'GASTOS DE VIAJE ',
+        codigo: "5.1.01.90 ",
+        nombre: "OTROS SUELDOS Y SALARIOS "
     },
     {
-      codigo: '5.1.01.50 ',
-      nombre: 'BONIFICACIÓN POR SERVICIOS PRESTADOS ',
+        codigo: "5.1.02 ",
+        nombre: "CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '5.1.01.52 ',
-      nombre: 'PRIMA DE SERVICIOS ',
+        codigo: "5.1.02.01 ",
+        nombre: "INCAPACIDADES "
     },
     {
-      codigo: '5.1.01.60 ',
-      nombre: 'SUBSIDIO DE ALIMENTACIÓN ',
+        codigo: "5.1.02.02 ",
+        nombre: "SUBSIDIO FAMILIAR "
     },
     {
-      codigo: '5.1.01.64 ',
-      nombre: 'OTRAS PRIMAS ',
+        codigo: "5.1.02.07 ",
+        nombre: "CUOTAS PARTES DE PENSIONES "
     },
     {
-      codigo: '5.1.01.90 ',
-      nombre: 'OTROS SUELDOS Y SALARIOS ',
+        codigo: "5.1.02.90 ",
+        nombre: "OTRAS CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '5.1.02 ',
-      nombre: 'CONTRIBUCIONES IMPUTADAS ',
+        codigo: "5.1.03 ",
+        nombre: "CONTRIBUCIONES EFECTIVAS "
     },
     {
-      codigo: '5.1.02.01 ',
-      nombre: 'INCAPACIDADES ',
+        codigo: "5.1.03.03 ",
+        nombre: "COTIZACIONES A SEGURIDAD SOCIAL EN SALUD "
     },
     {
-      codigo: '5.1.02.02 ',
-      nombre: 'SUBSIDIO FAMILIAR ',
+        codigo: "5.1.03.04 ",
+        nombre: "APORTES SINDICALES "
     },
     {
-      codigo: '5.1.02.07 ',
-      nombre: 'CUOTAS PARTES DE PENSIONES ',
+        codigo: "5.1.03.05 ",
+        nombre: "COTIZACIONES A RIESGOS PROFESIONALES "
     },
     {
-      codigo: '5.1.02.90 ',
-      nombre: 'OTRAS CONTRIBUCIONES IMPUTADAS ',
+        codigo: "5.1.03.06 ",
+        nombre: "COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE PRIMA MEDIA "
     },
     {
-      codigo: '5.1.03 ',
-      nombre: 'CONTRIBUCIONES EFECTIVAS ',
+        codigo: "5.1.03.07 ",
+        nombre: "COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE AHORRO INDIVIDUAL "
     },
     {
-      codigo: '5.1.03.03 ',
-      nombre: 'COTIZACIONES A SEGURIDAD SOCIAL EN SALUD ',
+        codigo: "5.1.03.90 ",
+        nombre: "OTRAS CONTRIBUCIONES EFECTIVAS "
     },
     {
-      codigo: '5.1.03.04 ',
-      nombre: 'APORTES SINDICALES ',
+        codigo: "5.1.04 ",
+        nombre: "APORTES SOBRE LA NÓMINA "
     },
     {
-      codigo: '5.1.03.05 ',
-      nombre: 'COTIZACIONES A RIESGOS PROFESIONALES ',
+        codigo: "5.1.04.01 ",
+        nombre: "APORTES AL ICBF "
     },
     {
-      codigo: '5.1.03.06 ',
-      nombre:
-        'COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE PRIMA MEDIA ',
+        codigo: "5.1.11 ",
+        nombre: "GENERALES "
     },
+    {
+      codigo: "5.1.07 ",
+      nombre: "PRESTACIONES SOCIALES "
+  },
+  {
+    codigo: "5.1.07.01 ",
+   nombre: "vacaciones "
+  },
+  {
+    codigo: "5.1.07.02 ",
+   nombre: "CESANTIAS "
+  },
+  {
+    codigo: "5.1.07.03 ",
+   nombre: "INTERESES DE LAS CESANTIAS "
+  },
+  {
+    codigo: "5.1.07.04 ",
+   nombre: "PRIMA DE VACACIONES "
+  },
+  {
+    codigo: "5.1.07.05 ",
+   nombre: "PRIMA DE NAVIDAD"
+  },
+  {
+    codigo: "5.1.07.06",
+   nombre: "PRIMA DE SERVICIOS"
+  },
+  {
+      codigo: "5.1.08 ",
+      nombre: "GASTOS DE PERSONAL DIVERSOS "
+  },
+  {
+    codigo: "5.1.08.01 ",
+    nombre: "renumeracion por servicios tecnicos"
+},
+{
+  codigo: "5.1.08.03 ",
+  nombre: "capacitacion bienestar social"
+},
+{
+  codigo: "5.1.08.04 ",
+  nombre: "dotacion y suministro a trabajadores"
+},
+{
+  codigo: "5.1.08.05 ",
+  nombre: "gastos deportivos y de recreacion"
+},
+{
+  codigo: "5.1.08.07 ",
+  nombre: "gastos de viaje"
+},
+{
+  codigo: "5.1.08.10 ",
+  nombre: "gastos de viaje"
+},
+{
+  codigo: "5.1.08.90 ",
+  nombre: "otros gastos de personal diversos"
+},
+
     {
-      codigo: '5.1.03.07 ',
-      nombre:
-        'COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE AHORRO INDIVIDUAL ',
+        codigo: "5.1.11.06 ",
+        nombre: "ESTUDIOS Y PROYECTOS "
     },
     {
-      codigo: '5.1.03.90 ',
-      nombre: 'OTRAS CONTRIBUCIONES EFECTIVAS ',
+        codigo: "5.1.11.11 ",
+        nombre: "COMISIONES, HONORARIOS Y SERVICIOS "
     },
     {
-      codigo: '5.1.04 ',
-      nombre: 'APORTES SOBRE LA NÓMINA ',
+        codigo: "5.1.11.12 ",
+        nombre: "OBRAS Y MEJORAS EN PROPIEDAD AJENA "
     },
     {
-      codigo: '5.1.04.01 ',
-      nombre: 'APORTES AL ICBF ',
+        codigo: "5.1.11.13 ",
+        nombre: "VIGILANCIA Y SEGURIDAD "
     },
     {
-      codigo: '5.1.11 ',
-      nombre: 'GENERALES ',
+        codigo: "5.1.11.14 ",
+        nombre: "MATERIALES Y SUMINISTROS "
     },
     {
-      codigo: '5.1.11.06 ',
-      nombre: 'ESTUDIOS Y PROYECTOS ',
+        codigo: "5.1.11.15 ",
+        nombre: "MANTENIMIENTO "
     },
     {
-      codigo: '5.1.11.11 ',
-      nombre: 'COMISIONES, HONORARIOS Y SERVICIOS ',
+        codigo: "5.1.11.16 ",
+        nombre: "REPARACIONES "
     },
     {
-      codigo: '5.1.11.12 ',
-      nombre: 'OBRAS Y MEJORAS EN PROPIEDAD AJENA ',
+        codigo: "5.1.11.17 ",
+        nombre: "SERVICIOS PÚBLICOS "
     },
     {
-      codigo: '5.1.11.13 ',
-      nombre: 'VIGILANCIA Y SEGURIDAD ',
+        codigo: "5.1.11.18 ",
+        nombre: "ARRENDAMIENTO "
     },
     {
-      codigo: '5.1.11.14 ',
-      nombre: 'MATERIALES Y SUMINISTROS ',
+        codigo: "5.1.11.19 ",
+        nombre: "VIÁTICOS Y GASTOS DE VIAJE "
     },
     {
-      codigo: '5.1.11.15 ',
-      nombre: 'MANTENIMIENTO ',
+        codigo: "5.1.11.20 ",
+        nombre: "PUBLICIDAD Y PROPAGANDA "
     },
     {
-      codigo: '5.1.11.16 ',
-      nombre: 'REPARACIONES ',
+        codigo: "5.1.11.21 ",
+        nombre: "IMPRESOS, PUBLICACIONES, SUSCRIPCIONES Y AFILIACIONES "
     },
     {
-      codigo: '5.1.11.17 ',
-      nombre: 'SERVICIOS PÚBLICOS ',
+        codigo: "5.1.11.22 ",
+        nombre: "FOTOCOPIAS "
     },
     {
-      codigo: '5.1.11.18 ',
-      nombre: 'ARRENDAMIENTO ',
+        codigo: "5.1.11.23 ",
+        nombre: "COMUNICACIONES Y TRANSPORTE "
     },
     {
-      codigo: '5.1.11.19 ',
-      nombre: 'VIÁTICOS Y GASTOS DE VIAJE ',
+        codigo: "5.1.11.25 ",
+        nombre: "SEGUROS GENERALES "
     },
     {
-      codigo: '5.1.11.20 ',
-      nombre: 'PUBLICIDAD Y PROPAGANDA ',
+        codigo: "5.1.11.33 ",
+        nombre: "SEGURIDAD INDUSTRIAL "
     },
     {
-      codigo: '5.1.11.21 ',
-      nombre: 'IMPRESOS, PUBLICACIONES, SUSCRIPCIONES Y AFILIACIONES ',
+        codigo: "5.1.11.36 ",
+        nombre: "IMPLEMENTOS DEPORTIVOS "
     },
     {
-      codigo: '5.1.11.22 ',
-      nombre: 'FOTOCOPIAS ',
+        codigo: "5.1.11.37 ",
+        nombre: "EVENTOS CULTURALES "
     },
     {
-      codigo: '5.1.11.23 ',
-      nombre: 'COMUNICACIONES Y TRANSPORTE ',
+        codigo: "5.1.11.46 ",
+        nombre: "COMBUSTIBLES Y LUBRICANTES "
     },
     {
-      codigo: '5.1.11.25 ',
-      nombre: 'SEGUROS GENERALES ',
+        codigo: "5.1.11.49 ",
+        nombre: "SERVICIOS DE ASEO, CAFETERÍA, RESTAURANTE Y LAVANDERÍA "
     },
     {
-      codigo: '5.1.11.33 ',
-      nombre: 'SEGURIDAD INDUSTRIAL ',
+        codigo: "5.1.11.55 ",
+        nombre: "ELEMENTOS DE ASEO, LAVANDERÍA Y CAFETERÍA "
     },
     {
-      codigo: '5.1.11.36 ',
-      nombre: 'IMPLEMENTOS DEPORTIVOS ',
+        codigo: "5.1.11.64 ",
+        nombre: "GASTOS LEGALES "
     },
     {
-      codigo: '5.1.11.37 ',
-      nombre: 'EVENTOS CULTURALES ',
+        codigo: "5.1.11.65 ",
+        nombre: "INTANGIBLES "
     },
     {
-      codigo: '5.1.11.46 ',
-      nombre: 'COMBUSTIBLES Y LUBRICANTES ',
+      codigo: "5.1.11.79 ",
+      nombre: "HONORARIOS "
+  },
+  {
+    codigo: "5.1.11.80 ",
+    nombre: "SERVICIOS "
+},
+    {
+        codigo: "5.1.11.90 ",
+        nombre: "OTROS GASTOS GENERALES "
     },
     {
-      codigo: '5.1.11.49 ',
-      nombre: 'SERVICIOS DE ASEO, CAFETERÍA, RESTAURANTE Y LAVANDERÍA ',
+        codigo: "5.1.20 ",
+        nombre: "IMPUESTOS, CONTRIBUCIONES Y TASAS "
     },
     {
-      codigo: '5.1.11.55 ',
-      nombre: 'ELEMENTOS DE ASEO, LAVANDERÍA Y CAFETERÍA ',
+        codigo: "5.1.20.01 ",
+        nombre: "IMPUESTO PREDIAL UNIFICADO "
     },
     {
-      codigo: '5.1.11.64 ',
-      nombre: 'GASTOS LEGALES ',
+        codigo: "5.1.20.02 ",
+        nombre: "CUOTA DE FISCALIZACIÓN Y AUDITAJE "
     },
     {
-      codigo: '5.1.11.65 ',
-      nombre: 'INTANGIBLES ',
+        codigo: "5.1.20.06 ",
+        nombre: "VALORIZACIÓN "
     },
     {
-      codigo: '5.1.11.90 ',
-      nombre: 'OTROS GASTOS GENERALES ',
+        codigo: "5.1.20.08 ",
+        nombre: "SANCIONES "
     },
     {
-      codigo: '5.1.20 ',
-      nombre: 'IMPUESTOS, CONTRIBUCIONES Y TASAS ',
+        codigo: "5.1.20.10 ",
+        nombre: "TASAS "
     },
     {
-      codigo: '5.1.20.01 ',
-      nombre: 'IMPUESTO PREDIAL UNIFICADO ',
+        codigo: "5.1.20.11 ",
+        nombre: "IMPUESTO SOBRE VEHÍCULOS AUTOMOTORES "
     },
     {
-      codigo: '5.1.20.02 ',
-      nombre: 'CUOTA DE FISCALIZACIÓN Y AUDITAJE ',
+        codigo: "5.1.20.12 ",
+        nombre: "IMPUESTO DE REGISTRO "
     },
     {
-      codigo: '5.1.20.06 ',
-      nombre: 'VALORIZACIÓN ',
+        codigo: "5.1.20.24 ",
+        nombre: "GRAVAMEN A LOS MOVIMIENTOS FINANCIEROS "
     },
     {
-      codigo: '5.1.20.08 ',
-      nombre: 'SANCIONES ',
+        codigo: "5.1.20.26 ",
+        nombre: "CONTRIBUCIONES "
     },
     {
-      codigo: '5.1.20.10 ',
-      nombre: 'TASAS ',
+        codigo: "5.1.20.27 ",
+        nombre: "LICENCIAS "
     },
     {
-      codigo: '5.1.20.11 ',
-      nombre: 'IMPUESTO SOBRE VEHÍCULOS AUTOMOTORES ',
+        codigo: "5.1.20.90 ",
+        nombre: "OTROS IMPUESTOS "
     },
     {
-      codigo: '5.1.20.12 ',
-      nombre: 'IMPUESTO DE REGISTRO ',
+      codigo: "5.3 ",
+      nombre: "DETERIORO, DEPRECIACIONES, AMORTIZACIONES Y PROVIS "
+  },
+  {
+    codigo: "5.3.60 ",
+    nombre: "DEPRECIACIﾓN DE PROPIEDADES, PLANTA Y EQUIPO "
+  },
+  {
+    codigo: "5.3.60.01 ",
+    nombre: "Edificaciones "
+  },
+  {
+    codigo: "5.3.60.02 ",
+    nombre: "Plantas, ductos y t佖eles "
+  },
+  {
+    codigo: "5.3.62 ",
+    nombre: "DEPRECIACIﾓN DE PROPIEDADES DE INVERSIﾓN "
+  },
+  {
+    codigo: "5.3.62.01 ",
+    nombre: "Edificaciones "
+  },
+    {
+        codigo: "5.8 ",
+        nombre: "OTROS GASTOS "
     },
     {
-      codigo: '5.1.20.24 ',
-      nombre: 'GRAVAMEN A LOS MOVIMIENTOS FINANCIEROS ',
+        codigo: "5.8.02 ",
+        nombre: "COMISIONES "
     },
     {
-      codigo: '5.1.20.26 ',
-      nombre: 'CONTRIBUCIONES ',
+        codigo: "5.8.02.37 ",
+        nombre: "COMISIONES SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN "
     },
     {
-      codigo: '5.1.20.27 ',
-      nombre: 'LICENCIAS ',
+        codigo: "5.8.02.38 ",
+        nombre: "COMISIONES Y OTROS GASTOS BANCARIOS "
     },
+    {
+      codigo: "5.8.02.40 ",
+      nombre: "COMISIONES Y SERVICIOS FINANCIEROS"
+  },
     {
-      codigo: '5.1.20.90 ',
-      nombre: 'OTROS IMPUESTOS ',
+        codigo: "5.8.02.90 ",
+        nombre: "OTRAS COMISIONES "
     },
     {
-      codigo: '5.8 ',
-      nombre: 'OTROS GASTOS ',
+        codigo: "5.8.08 ",
+        nombre: "OTROS GASTOS ORDINARIOS "
     },
     {
-      codigo: '5.8.02 ',
-      nombre: 'COMISIONES ',
+        codigo: "5.8.08.02 ",
+        nombre: "PÉRDIDA EN RETIRO DE ACTIVOS "
     },
     {
-      codigo: '5.8.02.37 ',
-      nombre: 'COMISIONES SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN ',
+        codigo: "5.8.08.12 ",
+        nombre: "SENTENCIAS "
     },
     {
-      codigo: '5.8.02.38 ',
-      nombre: 'COMISIONES Y OTROS GASTOS BANCARIOS ',
+        codigo: "5.8.08.90 ",
+        nombre: "OTROS GASTOS ORDINARIOS "
     },
     {
-      codigo: '5.8.02.90 ',
-      nombre: 'OTRAS COMISIONES ',
+        codigo: "5.8.10 ",
+        nombre: "EXTRAORDINARIOS "
     },
     {
-      codigo: '5.8.08 ',
-      nombre: 'OTROS GASTOS ORDINARIOS ',
+        codigo: "5.8.10.06 ",
+        nombre: "PÉRDIDAS EN SINIESTROS "
     },
     {
-      codigo: '5.8.08.02 ',
-      nombre: 'PÉRDIDA EN RETIRO DE ACTIVOS ',
+        codigo: "5.8.10.90 ",
+        nombre: "OTROS GASTOS EXTRAORDINARIOS "
     },
     {
-      codigo: '5.8.08.12 ',
-      nombre: 'SENTENCIAS ',
+        codigo: "5.8.15 ",
+        nombre: "AJUSTE DE EJERCICIOS ANTERIORES "
     },
     {
-      codigo: '5.8.08.90 ',
-      nombre: 'OTROS GASTOS ORDINARIOS ',
+        codigo: "5.8.15.88 ",
+        nombre: "GASTOS DE ADMINISTRACIÓN "
     },
     {
-      codigo: '5.8.10 ',
-      nombre: 'EXTRAORDINARIOS ',
+        codigo: "5.8.15.90 ",
+        nombre: "PROVISIONES, DEPRECIACIONES Y AMORTIZACIONES "
     },
     {
-      codigo: '5.8.10.06 ',
-      nombre: 'PÉRDIDAS EN SINIESTROS ',
+        codigo: "5.8.15.93 ",
+        nombre: "OTROS GASTOS "
     },
     {
-      codigo: '5.8.10.90 ',
-      nombre: 'OTROS GASTOS EXTRAORDINARIOS ',
+      codigo: "5.9 ",
+      nombre: "CIERRE DE INGRESOS, GASTOS Y COSTOS "
+  },
+  {
+    codigo: "5.9.05 ",
+    nombre: "CIERRE DE INGRESOS, GASTOS Y COSTOS"
+  },
+  {
+    codigo: "5.9.05.01 ",
+    nombre: "Cierre de ingresos, gastos y costos"
+  },
+    {
+        codigo: "6 ",
+        nombre: "COSTOS DE VENTAS Y OPERACIÓN "
     },
     {
-      codigo: '5.8.15 ',
-      nombre: 'AJUSTE DE EJERCICIOS ANTERIORES ',
+        codigo: "6.3 ",
+        nombre: "COSTO DE VENTAS DE SERVICIOS "
     },
     {
-      codigo: '5.8.15.88 ',
-      nombre: 'GASTOS DE ADMINISTRACIÓN ',
+        codigo: "6.3.05 ",
+        nombre: "SERVICIOS EDUCATIVOS "
     },
     {
-      codigo: '5.8.15.90 ',
-      nombre: 'PROVISIONES, DEPRECIACIONES Y AMORTIZACIONES ',
+        codigo: "6.3.05.08 ",
+        nombre: "EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL "
     },
     {
-      codigo: '5.8.15.93 ',
-      nombre: 'OTROS GASTOS ',
+        codigo: "6.3.05.09 ",
+        nombre: "EDUCACIÓN FORMAL - SUPERIOR POSTGRADO "
     },
     {
-      codigo: '6 ',
-      nombre: 'COSTOS DE VENTAS Y OPERACIÓN ',
+        codigo: "6.3.10 ",
+        nombre: "SERVICIOS DE SALUD "
     },
     {
-      codigo: '6.3 ',
-      nombre: 'COSTO DE VENTAS DE SERVICIOS ',
+        codigo: "6.3.10.15 ",
+        nombre: "SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS "
     },
     {
-      codigo: '6.3.05 ',
-      nombre: 'SERVICIOS EDUCATIVOS ',
+        codigo: "6.3.10.16 ",
+        nombre: "SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA "
     },
     {
-      codigo: '6.3.05.08 ',
-      nombre: 'EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL ',
+        codigo: "6.3.10.17 ",
+        nombre: "SERVICIOS AMBULATORIOS - ACTIVIDADES DE SALUD ORAL "
     },
     {
-      codigo: '6.3.05.09 ',
-      nombre: 'EDUCACIÓN FORMAL - SUPERIOR POSTGRADO ',
+        codigo: "6.3.10.50 ",
+        nombre: "APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS "
     },
     {
-      codigo: '6.3.10 ',
-      nombre: 'SERVICIOS DE SALUD ',
+        codigo: "6.3.10.67 ",
+        nombre: "SERVICIOS CONEXOS A LA SALUD OTROS SERVICIOS "
     },
     {
-      codigo: '6.3.10.15 ',
-      nombre: 'SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS ',
+        codigo: "7 ",
+        nombre: "COSTOS DE PRODUCCIÓN "
     },
     {
-      codigo: '6.3.10.16 ',
-      nombre: 'SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA ',
+        codigo: "7.2 ",
+        nombre: "SERVICIOS EDUCATIVOS "
     },
     {
-      codigo: '6.3.10.17 ',
-      nombre: 'SERVICIOS AMBULATORIOS - ACTIVIDADES DE SALUD ORAL ',
+        codigo: "7.2.08 ",
+        nombre: "EDUCACIÓN FORMAL  SUPERIOR - FORMACIÓN PROFESIONAL "
     },
     {
-      codigo: '6.3.10.50 ',
-      nombre: 'APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS ',
+        codigo: "7.2.08.02 ",
+        nombre: "GENERALES "
     },
     {
-      codigo: '6.3.10.67 ',
-      nombre: 'SERVICIOS CONEXOS A LA SALUD OTROS SERVICIOS ',
+        codigo: "7.2.08.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7 ',
-      nombre: 'COSTOS DE PRODUCCIÓN ',
+        codigo: "7.2.08.04 ",
+        nombre: "CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '7.2 ',
-      nombre: 'SERVICIOS EDUCATIVOS ',
+        codigo: "7.2.08.05 ",
+        nombre: "CONTRIBUCIONES EFECTIVAS "
     },
     {
-      codigo: '7.2.08 ',
-      nombre: 'EDUCACIÓN FORMAL  SUPERIOR - FORMACIÓN PROFESIONAL ',
+        codigo: "7.2.08.06 ",
+        nombre: "APORTES SOBRE LA NÓMINA "
     },
     {
-      codigo: '7.2.08.02 ',
-      nombre: 'GENERALES ',
+        codigo: "7.2.08.07 ",
+        nombre: "DEPRECIACIÓN Y AMORTIZACIÓN "
     },
     {
-      codigo: '7.2.08.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+        codigo: "7.2.08.08 ",
+        nombre: "IMPUESTOS "
     },
+    {
+      codigo: "7.2.08.09 ",
+      nombre: "PRESTACIONES SOCIALES "
+  },
+  {
+    codigo: "7.2.08.10 ",
+    nombre: "REMUNERACION SERVICIOS TECNICOS"
+  },
     {
-      codigo: '7.2.08.04 ',
-      nombre: 'CONTRIBUCIONES IMPUTADAS ',
+        codigo: "7.2.08.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.2.08.05 ',
-      nombre: 'CONTRIBUCIONES EFECTIVAS ',
+        codigo: "7.2.09 ",
+        nombre: "EDUCACIÓN FORMAL - SUPERIOR - POSTGRADO "
     },
     {
-      codigo: '7.2.08.06 ',
-      nombre: 'APORTES SOBRE LA NÓMINA ',
+        codigo: "7.2.09.02 ",
+        nombre: "GENERALES "
     },
     {
-      codigo: '7.2.08.07 ',
-      nombre: 'DEPRECIACIÓN Y AMORTIZACIÓN ',
+        codigo: "7.2.09.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7.2.08.08 ',
-      nombre: 'IMPUESTOS ',
+        codigo: "7.2.09.05 ",
+        nombre: "CONTRIBUCIONES EFECTIVAS "
     },
     {
-      codigo: '7.2.08.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+        codigo: "7.2.09.08 ",
+        nombre: "IMPUESTOS "
     },
     {
-      codigo: '7.2.09 ',
-      nombre: 'EDUCACIÓN FORMAL - SUPERIOR - POSTGRADO ',
+      codigo: "7.2.09.10 ",
+      nombre: "GASTOS DE PERSONAL DIVERSOS "
+  },
+    {
+        codigo: "7.2.09.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.2.09.02 ',
-      nombre: 'GENERALES ',
+        codigo: "7.3 ",
+        nombre: "SERVICIOS DE SALUD "
     },
     {
-      codigo: '7.2.09.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+      codigo: "7.3.01 ",
+      nombre: "URGENCIAS CONSULTA Y PROCEDIMIENTOS "
+  },
+    {
+        codigo: "7.3.10 ",
+        nombre: "SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS "
     },
+    {
+      codigo: "7.3.10.01 ",
+      nombre: "MATERIALES UISSALUD "
+  },
     {
-      codigo: '7.2.09.05 ',
-      nombre: 'CONTRIBUCIONES EFECTIVAS ',
+        codigo: "7.3.10.04 ",
+        nombre: "CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '7.2.09.08 ',
-      nombre: 'IMPUESTOS ',
+      codigo: "7.3.10.10 ",
+      nombre: "GASTOS DE PERSONAL DIVERSOS"
+  },
+    {
+        codigo: "7.3.10.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.2.09.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+        codigo: "7.3.11 ",
+        nombre: "SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA "
     },
     {
-      codigo: '7.3 ',
-      nombre: 'SERVICIOS DE SALUD ',
+      codigo: "7.3.11.02 ",
+      nombre: "GENERALES "
     },
     {
-      codigo: '7.3.10 ',
-      nombre: 'SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS ',
+        codigo: "7.3.11.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7.3.10.04 ',
-      nombre: 'CONTRIBUCIONES IMPUTADAS ',
+        codigo: "7.3.11.04 ",
+        nombre: "CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '7.3.10.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+        codigo: "7.3.11.05 ",
+        nombre: "CONTRIBUCIONES EFECTIVAS "
     },
     {
-      codigo: '7.3.11 ',
-      nombre: 'SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA ',
+        codigo: "7.3.11.07 ",
+        nombre: "DEPRECIACIÓN Y AMORTIZACIÓN "
     },
     {
-      codigo: '7.3.11.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+     codigo: "7.3.11.09 ",
+     nombre: "PRESTACIONES SOCIALES"
+  },
+  {
+    codigo: "7.3.11.10 ",
+    nombre: "GASTOS DE PERSONAL DIVERSOS"
+  },
+    {
+        codigo: "7.3.11.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.3.11.04 ',
-      nombre: 'CONTRIBUCIONES IMPUTADAS ',
+        codigo: "7.3.12 ",
+        nombre: "SERVICIOS AMBULATORIOS - SALUD ORAL "
     },
     {
-      codigo: '7.3.11.05 ',
-      nombre: 'CONTRIBUCIONES EFECTIVAS ',
+        codigo: "7.3.12.01 ",
+        nombre: "MATERIALES "
     },
+    {
+      codigo: "7.3.12.02 ",
+      nombre: "GENERALES "
+  },
     {
-      codigo: '7.3.11.07 ',
-      nombre: 'DEPRECIACIÓN Y AMORTIZACIÓN ',
+        codigo: "7.3.12.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7.3.11.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+      codigo: "7.3.12.04 ",
+      nombre: "CONTRIBUCIONES IMPUTADAS "
+  },
+  {
+    codigo: "7.3.12.09 ",
+    nombre: "PRESTACIONES SOCIALES "
+},
+  {
+    codigo: "7.3.12.10 ",
+    nombre: "GASTOS DE PERSONAL DIVERSOS "
+},
+    {
+        codigo: "7.3.12.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.3.12 ',
-      nombre: 'SERVICIOS AMBULATORIOS - SALUD ORAL ',
+      codigo: "7.3.14 ",
+      nombre: "	SERVICIOS AMBULATORIOS - OTRAS ACTIVIDADES EXTRAMU "
+  },
+  {
+    codigo: "7.3.14.01 ",
+    nombre: "	suministro de oxigeno "
+},
+{
+  codigo: "7.3.14.02 ",
+  nombre: "	generales "
+},
+{
+  codigo: "7.3.14.04 ",
+  nombre: "	contribuciones imputadas "
+},
+  {
+    codigo: "7.3.20 ",
+    nombre: "HOSPITALIZACIﾓN - ESTANCIA GENERAL "
+},
+{
+  codigo: "7.3.20.02 ",
+  nombre: "GENERALES"
+},
+{
+  codigo: "7.3.24 ",
+  nombre: "HOSPITALIZACION SALUD MENTAL "
+},
+{
+  codigo: "7.3.24.02 ",
+  nombre: "HPSIQUIATRIA INFANTIL pn "
+},
+{
+  codigo: "7.3.40 ",
+  nombre: "APOYO DIAGNﾓSTICO - LABORATORIO CLﾍNICO"
+},
+{
+  codigo: "7.3.40.02 ",
+  nombre: "GENERALES"
+},
+{
+  codigo: "7.3.41 ",
+  nombre: "APOYO DIAGNﾓSTICO - IMAGENOLOGﾍA"
+},
+{
+  codigo: "7.3.41.02 ",
+  nombre: "GENERALES"
+},
+{
+  codigo: "7.3.41.04 ",
+  nombre: "CONTRIBUCIONES IMPUTADAS"
+},
+{
+  codigo: "7.3.42 ",
+  nombre: "APOYO DIAGNﾓSTICO - ANATOMﾍA PATOLﾓGICA"
+},
+{
+  codigo: "7.3.42.02 ",
+  nombre: "GENERALES"
+},
+
+{
+  codigo: "7.3.43 ",
+  nombre: "APOYO DIAGNﾓSTICO - OTRAS UNIDADES DE APOYO DIAGNﾓ"
+},
+{
+  codigo: "7.3.43.01 ",
+  nombre: "LENTES Y MONTURAS"
+},
+{
+  codigo: "7.3.43.02 ",
+  nombre: "MATERIAL ORTOPEDICO"
+},
+{
+  codigo: "7.3.43.04 ",
+  nombre: "CONTRIBUCIONES IMPUTADAS"
+},
+    {
+        codigo: "7.3.49 ",
+        nombre: "APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS "
     },
+    {
+      codigo: "7.3.49.02 ",
+      nombre: "GENERALES "
+  },
     {
-      codigo: '7.3.12.01 ',
-      nombre: 'MATERIALES ',
+        codigo: "7.3.49.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7.3.12.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+        codigo: "7.3.49.04 ",
+        nombre: "CONTRIBUCIONES IMPUTADAS "
     },
     {
-      codigo: '7.3.12.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+      codigo: "7.3.49.09",
+      nombre: "PRESTACIONES SOCIALES "
+  },
+  {
+    codigo: "7.3.49.10",
+    nombre: "GASTOS DE PERSONAL DIVERSOS"
+},
+    {
+        codigo: "7.3.49.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.3.49 ',
-      nombre: 'APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS ',
+      codigo: "7.3.56 ",
+      nombre: "APOYO TERAPﾉUTICO - OTRAS UNIDADES DE APOYO TERAPﾉ"
     },
     {
-      codigo: '7.3.49.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+      codigo: "7.3.56.02 ",
+     nombre: "generales"
     },
     {
-      codigo: '7.3.49.04 ',
-      nombre: 'CONTRIBUCIONES IMPUTADAS ',
+      codigo: "7.3.56.10 ",
+      nombre: "Gastos de personal diversos"
     },
     {
-      codigo: '7.3.49.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+        codigo: "7.3.87 ",
+        nombre: "SERVICIOS CONEXOS A LA SALUD  OTROS SERVICIOS "
     },
+    {
+      codigo: "7.3.87.02 ",
+      nombre: "GENERALES "
+  },
     {
-      codigo: '7.3.87 ',
-      nombre: 'SERVICIOS CONEXOS A LA SALUD  OTROS SERVICIOS ',
+        codigo: "7.3.87.03 ",
+        nombre: "SUELDOS Y SALARIOS "
     },
     {
-      codigo: '7.3.87.03 ',
-      nombre: 'SUELDOS Y SALARIOS ',
+      codigo: "7.3.87.04 ",
+      nombre: "CONTRIBUCIONES IMPUTADAS"
+  },
+  {
+    codigo: "7.3.87.09 ",
+    nombre: "PRESTACIONES SOCIALES"
+},
+{
+  codigo: "7.3.87.10 ",
+  nombre: "GASTOS DE PERSONAL"
+},
+    {
+        codigo: "7.3.87.95 ",
+        nombre: "TRASLADO DE COSTOS (CR) "
     },
     {
-      codigo: '7.3.87.95 ',
-      nombre: 'TRASLADO DE COSTOS (CR) ',
+        codigo: "8 ",
+        nombre: "CUENTAS DE ORDEN DEUDORAS "
     },
     {
-      codigo: '8 ',
-      nombre: 'CUENTAS DE ORDEN DEUDORAS ',
+        codigo: "8.1 ",
+        nombre: "DERECHOS CONTINGENTES "
     },
     {
-      codigo: '8.1 ',
-      nombre: 'DERECHOS CONTINGENTES ',
+        codigo: "8.1.20 ",
+        nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
     },
     {
-      codigo: '8.1.20 ',
-      nombre: 'LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS ',
+        codigo: "8.1.20.01 ",
+        nombre: "CIVILES "
     },
     {
-      codigo: '8.1.20.01 ',
-      nombre: 'CIVILES ',
+        codigo: "8.1.20.02 ",
+        nombre: "LABORALES "
     },
     {
-      codigo: '8.1.20.02 ',
-      nombre: 'LABORALES ',
+        codigo: "8.1.90 ",
+        nombre: "OTROS DERECHOS CONTINGENTES "
     },
     {
-      codigo: '8.1.90 ',
-      nombre: 'OTROS DERECHOS CONTINGENTES ',
+        codigo: "8.1.90.90 ",
+        nombre: "OTROS DERECHOS CONTINGENTES "
     },
     {
-      codigo: '8.1.90.90 ',
-      nombre: 'OTROS DERECHOS CONTINGENTES ',
+        codigo: "8.3 ",
+        nombre: "DEUDORAS DE CONTROL "
     },
     {
-      codigo: '8.3 ',
-      nombre: 'DEUDORAS DE CONTROL ',
+      codigo: "8.3.47 ",
+      nombre: "BIENES ENTREGADOS A TERCEROS"
     },
     {
-      codigo: '8.3.61 ',
-      nombre: 'RESPONSABILIDADES EN PROCESO ',
+      codigo: "8.3.47.04 ",
+      nombre: "PROPIEDADES, PLANTA Y EQUIPO"
     },
     {
-      codigo: '8.3.61.01 ',
-      nombre: 'INTERNAS ',
+        codigo: "8.3.61 ",
+        nombre: "RESPONSABILIDADES EN PROCESO "
     },
     {
-      codigo: '8.9 ',
-      nombre: 'DEUDORAS POR CONTRA (CR) ',
+        codigo: "8.3.61.01 ",
+        nombre: "INTERNAS "
     },
     {
-      codigo: '8.9.05 ',
-      nombre: 'DERECHOS CONTINGENTES POR CONTRA (CR) ',
+        codigo: "8.9 ",
+        nombre: "DEUDORAS POR CONTRA (CR) "
     },
     {
-      codigo: '8.9.05.06 ',
-      nombre: 'LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS ',
+        codigo: "8.9.05 ",
+        nombre: "DERECHOS CONTINGENTES POR CONTRA (CR) "
     },
     {
-      codigo: '8.9.05.90 ',
-      nombre: 'OTROS DERECHOS CONTINGENTES ',
+        codigo: "8.9.05.06 ",
+        nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
     },
     {
-      codigo: '8.9.15 ',
-      nombre: 'DEUDORAS DE CONTROL POR CONTRA (CR) ',
+        codigo: "8.9.05.90 ",
+        nombre: "OTROS DERECHOS CONTINGENTES "
     },
     {
-      codigo: '8.9.15.21 ',
-      nombre: 'RESPONSABILIDADES EN PROCESO ',
+        codigo: "8.9.15 ",
+        nombre: "DEUDORAS DE CONTROL POR CONTRA (CR) "
     },
     {
-      codigo: '9 ',
-      nombre: 'CUENTAS DE ORDEN ACREEDORAS ',
+      codigo: "8.9.15.16 ",
+      nombre: "Ejecuci de proyectos de inversi"
+  },
+  {
+    codigo: "8.9.15.18 ",
+    nombre: "Bienes entregados a terceros"
+},
+
+
+    {
+        codigo: "8.9.15.21 ",
+        nombre: "RESPONSABILIDADES EN PROCESO "
     },
+
     {
-      codigo: '9.1 ',
-      nombre: 'RESPONSABILIDADES CONTINGENTES ',
+        codigo: "9 ",
+        nombre: "CUENTAS DE ORDEN ACREEDORAS "
     },
     {
-      codigo: '9.1.20 ',
-      nombre: 'LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS ',
+        codigo: "9.1 ",
+        nombre: "RESPONSABILIDADES CONTINGENTES "
     },
+    {
+      codigo: "9.1.10 ",
+      nombre: "BIENES RECIBIDOS EN GARANTIA"
+  },
+  {
+    codigo: "9.1.10.01 ",
+    nombre: "INVERSIONES"
+},
     {
-      codigo: '9.1.20.05 ',
-      nombre: 'OBLIGACIONES FISCALES ',
+        codigo: "9.1.20 ",
+        nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
     },
     {
-      codigo: '9.1.90 ',
-      nombre: 'OTRAS RESPONSABILIDADES CONTINGENTES ',
+      codigo: "9.1.20.04 ",
+      nombre: "	ADMINISTRATIVOS"
+  },
+    {
+        codigo: "9.1.20.05 ",
+        nombre: "OBLIGACIONES FISCALES "
     },
     {
-      codigo: '9.1.90.01 ',
-      nombre: 'CUENTAS EN PARTICIPACIÓN ',
+        codigo: "9.1.90 ",
+        nombre: "OTRAS RESPONSABILIDADES CONTINGENTES "
     },
     {
-      codigo: '9.3 ',
-      nombre: 'ACREEDORAS DE CONTROL ',
+        codigo: "9.1.90.01 ",
+        nombre: "CUENTAS EN PARTICIPACIÓN "
     },
     {
-      codigo: '9.3.46 ',
-      nombre: 'BIENES RECIBIDOS DE TERCEROS ',
+      codigo: "9.1.90.90 ",
+      nombre: "Otros pasivos contingentes"
+  },
+    {
+        codigo: "9.3 ",
+        nombre: "ACREEDORAS DE CONTROL "
     },
+    {
+      codigo: "9.3.13 ",
+      nombre: "MERCANCIAS RECIBIDAS EN CONSIGNACION"
+  },
+  {
+    codigo: "9.3.13.01 ",
+    nombre: "MERCANCIAS RECIBIDAS EN CONSIGNACION"
+},
     {
-      codigo: '9.3.46.19 ',
-      nombre: 'PROPIEDADES, PLANTA Y EQUIPO ',
+        codigo: "9.3.46 ",
+        nombre: "BIENES RECIBIDOS DE TERCEROS "
     },
     {
-      codigo: '9.3.46.90 ',
-      nombre: 'OTROS BIENES RECIBIDOS DE TERCEROS ',
+        codigo: "9.3.46.19 ",
+        nombre: "PROPIEDADES, PLANTA Y EQUIPO "
     },
     {
-      codigo: '9.3.90 ',
-      nombre: 'OTRAS CUENTAS ACREEDORAS DE CONTROL ',
+        codigo: "9.3.46.90 ",
+        nombre: "OTROS BIENES RECIBIDOS DE TERCEROS "
     },
     {
-      codigo: '9.3.90.90 ',
-      nombre: 'OTRAS CUENTAS ACREEDORAS DE CONTROL ',
+        codigo: "9.3.90 ",
+        nombre: "OTRAS CUENTAS ACREEDORAS DE CONTROL "
     },
     {
-      codigo: '9.9 ',
-      nombre: 'ACREEDORAS POR CONTRA (DB) ',
+      codigo: "9.3.90.12 ",
+      nombre: "FACTURACION GLOSADA ADQUIS.SERVICIOS SALUD"
+  },
+  {
+    codigo: "9.3.90.13 ",
+    nombre: "CONVENIOS"
+},
+    {
+        codigo: "9.3.90.90 ",
+        nombre: "OTRAS CUENTAS ACREEDORAS DE CONTROL "
     },
     {
-      codigo: '9.9.05 ',
-      nombre: 'RESPONSABILIDADES CONTINGENTES POR CONTRA (DB) ',
+        codigo: "9.9 ",
+        nombre: "ACREEDORAS POR CONTRA (DB) "
     },
     {
-      codigo: '9.9.05.05 ',
-      nombre: 'LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS ',
+        codigo: "9.9.05 ",
+        nombre: "RESPONSABILIDADES CONTINGENTES POR CONTRA (DB) "
     },
     {
-      codigo: '9.9.05.90 ',
-      nombre: 'OTRAS RESPONSABILIDADES CONTINGENTES ',
+        codigo: "9.9.05.05 ",
+        nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
     },
     {
-      codigo: '9.9.15 ',
-      nombre: 'ACREEDORAS DE CONTROL POR CONTRA (DB) ',
+        codigo: "9.9.05.90 ",
+        nombre: "OTRAS RESPONSABILIDADES CONTINGENTES "
     },
     {
-      codigo: '9.9.15.06 ',
-      nombre: 'BIENES RECIBIDOS DE TERCEROS ',
+        codigo: "9.9.15 ",
+        nombre: "ACREEDORAS DE CONTROL POR CONTRA (DB) "
     },
     {
-      codigo: '9.9.15.90 ',
-      nombre: 'OTRAS CUENTAS ACREEDORAS DE CONTROL ',
+      codigo: "9.9.15.03 ",
+      nombre: "	MERCANCIAS RECIBIDAS EN CONSIGNACION"
+  },
+    {
+        codigo: "9.9.15.06 ",
+        nombre: "BIENES RECIBIDOS DE TERCEROS "
     },
+    {
+        codigo: "9.9.15.90 ",
+        nombre: "OTRAS CUENTAS ACREEDORAS DE CONTROL "
+    }
   ];
   // modeloDeDatosContabilidad: any = [
   //   {
@@ -43677,14 +44051,1243 @@ export class PruebaComponent implements OnInit {
         "codigo": "totalambos"
     },
     {
-        "codigo": 8
+      "codigo": "8"
     },
-    {
-        "codigo": 9
-    },
-    {
-        "codigo": "totalochoynueve"
-    }
+  {
+      "codigo": "8.1 "
+  },
+  {
+      "codigo": "8.1.20 "
+  },
+  {
+      "codigo": "8.1.20.01 "
+  },
+  {
+      "codigo": "8.1.20.02 "
+  },
+  {
+      "codigo": "8.1.90 "
+  },
+  {
+      "codigo": "8.1.90.90 "
+  },
+  {
+      "codigo": "8.3 "
+  },
+  {
+    "codigo": "8.3.47 "
+  },
+  {
+    "codigo": "8.3.47.04 "
+  },
+  {
+      "codigo": "8.3.61 ",
+      nombre: "RESPONSABILIDADES EN PROCESO "
+  },
+  {
+      "codigo": "8.3.61.01 ",
+      nombre: "INTERNAS "
+  },
+  {
+      "codigo": "8.9 ",
+      nombre: "DEUDORAS POR CONTRA (CR) "
+  },
+  {
+      "codigo": "8.9.05 ",
+      nombre: "DERECHOS CONTINGENTES POR CONTRA (CR) "
+  },
+  {
+      "codigo": "8.9.05.06 ",
+      nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
+  },
+  {
+      "codigo": "8.9.05.90 ",
+      nombre: "OTROS DERECHOS CONTINGENTES "
+  },
+  {
+      "codigo": "8.9.15 ",
+      nombre: "DEUDORAS DE CONTROL POR CONTRA (CR) "
+  },
+  {
+    "codigo": "8.9.15.16 ",
+    nombre: "Ejecuci de proyectos de inversi"
+},
+{
+  "codigo": "8.9.15.18 ",
+  nombre: "Bienes entregados a terceros"
+},
+
+
+  {
+      "codigo": "8.9.15.21 ",
+      nombre: "RESPONSABILIDADES EN PROCESO "
+  },
+
+  {
+      "codigo": "9 ",
+      nombre: "CUENTAS DE ORDEN ACREEDORAS "
+  },
+  {
+      "codigo": "9.1 ",
+      nombre: "RESPONSABILIDADES CONTINGENTES "
+  },
+  {
+    "codigo": "9.1.10 ",
+    nombre: "BIENES RECIBIDOS EN GARANTIA"
+},
+{
+  "codigo": "9.1.10.01 ",
+  nombre: "INVERSIONES"
+},
+  {
+      "codigo": "9.1.20 ",
+      nombre: "LITIGIOS Y MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONFLICTOS "
+  },
+  {
+    "codigo": "9.1.20.04 ",
+    nombre: "	ADMINISTRATIVOS"
+},
+  {
+      "codigo": "9.1.20.05 ",
+      nombre: "OBLIGACIONES FISCALES "
+  },
+  {
+      "codigo": "9.1.90 ",
+      nombre: "OTRAS RESPONSABILIDADES CONTINGENTES "
+  },
+  {
+      "codigo": "9.1.90.01 ",
+      nombre: "CUENTAS EN PARTICIPACIÓN "
+  },
+  {
+    "codigo": "9.1.90.90 ",
+    nombre: "Otros pasivos contingentes"
+},
+  {
+      "codigo": "9.3 ",
+      nombre: "ACREEDORAS DE CONTROL "
+  },
+  {
+    "codigo": "9.3.13 ",
+    nombre: "MERCANCIAS RECIBIDAS EN CONSIGNACION"
+},
+{
+  "codigo": "9.3.13.01 ",
+  nombre: "MERCANCIAS RECIBIDAS EN CONSIGNACION"
+},
+  {
+      "codigo": "9.3.46 ",
+      nombre: "BIENES RECIBIDOS DE TERCEROS "
+  },
+  {
+      "codigo": "9.3.46.19 ",
+      nombre: "PROPIEDADES, PLANTA Y EQUIPO "
+  },
+  {
+      "codigo": "9.3.46.90 ",
+      nombre: "OTROS BIENES RECIBIDOS DE TERCEROS "
+  },
+  {
+      "codigo": "9.3.90 ",
+      nombre: "OTRAS CUENTAS ACREEDORAS DE CONTROL "
+  },
+  {
+    "codigo": "9.3.90.12 ",
+    nombre: "FACTURACION GLOSADA ADQUIS.SERVICIOS SALUD"
+},
+{
+  "codigo": "9.3.90.13 "
+},
+  {
+      "codigo": "9.3.90.90 "
+  },
+  {
+      "codigo": "9.9 "
+  },
+  {
+      "codigo": "9.9.05 "
+  },
+  {
+      "codigo": "9.9.05.05 "
+  },
+  {
+      "codigo": "9.9.05.90 "
+  },
+  {
+      "codigo": "9.9.15 "
+  },
+  {
+    "codigo": "9.9.15.03 "
+},
+  {
+      "codigo": "9.9.15.06 "
+  },
+  {
+      "codigo": "9.9.15.90 "
+  },
+  {
+    "codigo": "totalochoynueve"
+  }
+]
+  
+modeloDatosReporte2 = [
+  {
+      "CODIGO": "4 ",
+      "NOMBRE": "INGRESOS "
+  },
+  {
+      "CODIGO": "4.3 ",
+      "NOMBRE": "VENTA DE SERVICIOS "
+  },
+  {
+      "CODIGO": "4.3.05 ",
+      "NOMBRE": "SERVICIOS EDUCATIVOS "
+  },
+  {
+      "CODIGO": "4.3.05.14 ",
+      "NOMBRE": "EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL "
+  },
+  {
+      "CODIGO": "4.3.05.15 ",
+      "NOMBRE": "EDUCACIÓN FORMAL- SUPERIOR POSTGRADOS "
+  },
+  {
+      "CODIGO": "4.3.05.27 ",
+      "NOMBRE": "EDUCACIÓN NO FORMAL - FORMACIÓN EXTENSIVA "
+  },
+  {
+      "CODIGO": "4.3.05.50 ",
+      "NOMBRE": "SERVICIOS CONEXOS A LA EDUCACIÓN "
+  },
+  {
+      "CODIGO": "4.3.11 ",
+      "NOMBRE": "ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD "
+  },
+  {
+    "CODIGO": "4.3.11.05 ",
+    "NOMBRE": ""
+  },
+  {
+      "CODIGO": "4.3.11.90 ",
+      "NOMBRE": "OTROS INGRESOS POR LA ADMINISTRACIÓN DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD "
+  },
+  {
+    "CODIGO": "4.3.90 ",
+    "NOMBRE": "SERVICIOS "
+},
+{
+  "CODIGO": "4.3.90.07 ",
+  "NOMBRE": "PUBLICIDAD Y PROPAGANDA "
+},
+  {
+      "CODIGO": "4.3.95 ",
+      "NOMBRE": "DEVOLUCIONES, REBAJAS Y DESCUENTOS EN VENTA DE SERVICIOS (DB) "
+  },
+  {
+      "CODIGO": "4.3.95.01 ",
+      "NOMBRE": "SERVICIOS EDUCATIVOS "
+  },
+  {
+      "CODIGO": "4.4 ",
+      "NOMBRE": "TRANSFERENCIAS "
+  },
+  {
+      "CODIGO": "4.4.13 ",
+      "NOMBRE": "SISTEMA GENERAL DE REGALÍAS "
+  },
+  {
+      "CODIGO": "4.4.13.01 ",
+      "NOMBRE": "ASIGNACIONES DIRECTAS "
+  },
+  {
+      "CODIGO": "4.4.28 ",
+      "NOMBRE": "OTRAS TRANSFERENCIAS "
+  },
+  {
+      "CODIGO": "4.4.28.02 ",
+      "NOMBRE": "PARA PROYECTOS DE INVERSIÓN "
+  },
+  {
+      "CODIGO": "4.4.28.03 ",
+      "NOMBRE": "PARA GASTOS DE FUNCIONAMIENTO "
+  },
+  {
+      "CODIGO": "4.8 ",
+      "NOMBRE": "OTROS INGRESOS "
+  },
+  {
+    "CODIGO": "4.8.02 ",
+    "NOMBRE": "FINANCIEROS "
+},
+{
+  "CODIGO": "4.8.02.11 ",
+  "NOMBRE": "RENDIM.EFECTIVO INVERS.DE ADMON.DE LIQUID.COSTO AM "
+},
+{
+"CODIGO": "4.8.02.16 ",
+"NOMBRE": "GCIA.POR VALORAC.INSTRUMENT.DERIV.VR.MCDO.VR.RAZON"
+},
+{
+"CODIGO": "4.8.02.32 ",
+"NOMBRE": "Rendimientos sobre recursos entregados en administ"
+},
+{
+"CODIGO": "4.8.02.90 ",
+"NOMBRE": "Otros ingresos financierost"
+},
+  {
+      "CODIGO": "4.8.05 ",
+      "NOMBRE": "FINANCIEROS "
+  },
+  {
+      "CODIGO": "4.8.05.04 ",
+      "NOMBRE": "INTERESES DE DEUDORES "
+  },
+  {
+      "CODIGO": "4.8.05.07 ",
+      "NOMBRE": "RENDIMIENTO POR REAJUSTE MONETARIO "
+  },
+  {
+      "CODIGO": "4.8.05.13 ",
+      "NOMBRE": "INTERESES DE MORA "
+  },
+  {
+      "CODIGO": "4.8.05.22 ",
+      "NOMBRE": "INTERESES SOBRE DEPÓSITOS EN INSTITUCIONES FINANCIERAS "
+  },
+  {
+      "CODIGO": "4.8.05.35 ",
+      "NOMBRE": "RENDIMIENTOS SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN "
+  },
+  {
+      "CODIGO": "4.8.05.90 ",
+      "NOMBRE": "OTROS INGRESOS FINANCIEROS "
+  },
+  {
+      "CODIGO": "4.8.08 ",
+      "NOMBRE": "OTROS INGRESOS ORDINARIOS "
+  },
+  {
+      "CODIGO": "4.8.08.02 ",
+      "NOMBRE": "VENTA DE PLIEGOS "
+  },
+  {
+      "CODIGO": "4.8.08.03 ",
+      "NOMBRE": "CUOTAS PARTES DE PENSIONES "
+  },
+  {
+      "CODIGO": "4.8.08.05 ",
+      "NOMBRE": "UTILIDAD EN VENTA DE ACTIVOS "
+  },
+  {
+      "CODIGO": "4.8.08.06 ",
+      "NOMBRE": "PUBLICACIONES "
+  },
+  {
+      "CODIGO": "4.8.08.08 ",
+      "NOMBRE": "HONORARIOS "
+  },
+  {
+      "CODIGO": "4.8.08.17 ",
+      "NOMBRE": "ARRENDAMIENTOS "
+  },
+  {
+      "CODIGO": "4.8.08.19 ",
+      "NOMBRE": "DONACIONES "
+  },
+  {
+    "CODIGO": "4.8.08.25 ",
+    "NOMBRE": "SOBRANTES "
+},
+{
+  "CODIGO": "4.8.08.27 ",
+  "NOMBRE": "APROVECHAMIENTO "
+},
+{
+  "CODIGO": "4.8.08.28 ",
+  "NOMBRE": "INDEMNIZACIONES "
+},
+  {
+      "CODIGO": "4.8.08.90 ",
+      "NOMBRE": "OTROS INGRESOS ORDINARIOS "
+  },
+  {
+      "CODIGO": "4.8.10 ",
+      "NOMBRE": "EXTRAORDINARIOS "
+  },
+  {
+      "CODIGO": "4.8.10.07 ",
+      "NOMBRE": "SOBRANTES "
+  },
+  {
+      "CODIGO": "4.8.10.08 ",
+      "NOMBRE": "RECUPERACIONES "
+  },
+  {
+      "CODIGO": "4.8.10.47 ",
+      "NOMBRE": "APROVECHAMIENTOS "
+  },
+  {
+      "CODIGO": "4.8.10.49 ",
+      "NOMBRE": "INDEMNIZACIONES "
+  },
+  {
+      "CODIGO": "4.8.10.90 ",
+      "NOMBRE": "OTROS INGRESOS EXTRAORDINARIOS "
+  },
+  {
+      "CODIGO": "4.8.15 ",
+      "NOMBRE": "AJUSTE DE EJERCICIOS ANTERIORES "
+  },
+  {
+      "CODIGO": "4.8.15.57 ",
+      "NOMBRE": "TRANSFERENCIAS "
+  },
+  {
+      "CODIGO": "4.8.15.59 ",
+      "NOMBRE": "OTROS INGRESOS "
+  },
+  {
+      "CODIGO": "5 ",
+      "NOMBRE": "GASTOS "
+  },
+  {
+      "CODIGO": "5.1 ",
+      "NOMBRE": "DE ADMINISTRACIÓN "
+  },
+  {
+      "CODIGO": "5.1.01 ",
+      "NOMBRE": "SUELDOS Y SALARIOS "
+  },
+  {
+      "CODIGO": "5.1.01.01 ",
+      "NOMBRE": "SUELDOS DEL PERSONAL "
+  },
+  {
+      "CODIGO": "5.1.01.03 ",
+      "NOMBRE": "HORAS EXTRAS Y FESTIVOS "
+  },
+  {
+      "CODIGO": "5.1.01.05 ",
+      "NOMBRE": "GASTOS DE REPRESENTACIÓN "
+  },
+  {
+      "CODIGO": "5.1.01.06 ",
+      "NOMBRE": "REMUNERACIÓN SERVICIOS TÉCNICOS "
+  },
+  {
+      "CODIGO": "5.1.01.09 ",
+      "NOMBRE": "HONORARIOS "
+  },
+  {
+      "CODIGO": "5.1.01.13 ",
+      "NOMBRE": "PRIMA DE VACACIONES "
+  },
+  {
+      "CODIGO": "5.1.01.14 ",
+      "NOMBRE": "PRIMA DE NAVIDAD "
+  },
+  {
+      "CODIGO": "5.1.01.17 ",
+      "NOMBRE": "VACACIONES "
+  },
+  {
+      "CODIGO": "5.1.01.19 ",
+      "NOMBRE": "BONIFICACIONES "
+  },
+  {
+      "CODIGO": "5.1.01.23 ",
+      "NOMBRE": "AUXILIO DE TRANSPORTE "
+  },
+  {
+      "CODIGO": "5.1.01.24 ",
+      "NOMBRE": "CESANTÍAS "
+  },
+  {
+      "CODIGO": "5.1.01.25 ",
+      "NOMBRE": "INTERESES A LAS CESANTÍAS "
+  },
+  {
+      "CODIGO": "5.1.01.30 ",
+      "NOMBRE": "CAPACITACIÓN, BIENESTAR SOCIAL Y ESTÍMULOS "
+  },
+  {
+      "CODIGO": "5.1.01.31 ",
+      "NOMBRE": "DOTACIÓN Y SUMINISTRO A TRABAJADORES "
+  },
+  {
+      "CODIGO": "5.1.01.33 ",
+      "NOMBRE": "GASTOS DEPORTIVOS Y DE RECREACIÓN "
+  },
+  {
+      "CODIGO": "5.1.01.47 ",
+      "NOMBRE": "VIÁTICOS "
+  },
+  {
+      "CODIGO": "5.1.01.48 ",
+      "NOMBRE": "GASTOS DE VIAJE "
+  },
+  {
+      "CODIGO": "5.1.01.50 ",
+      "NOMBRE": "BONIFICACIÓN POR SERVICIOS PRESTADOS "
+  },
+  {
+      "CODIGO": "5.1.01.52 ",
+      "NOMBRE": "PRIMA DE SERVICIOS "
+  },
+  {
+      "CODIGO": "5.1.01.60 ",
+      "NOMBRE": "SUBSIDIO DE ALIMENTACIÓN "
+  },
+  {
+      "CODIGO": "5.1.01.64 ",
+      "NOMBRE": "OTRAS PRIMAS "
+  },
+  {
+      "CODIGO": "5.1.01.90 ",
+      "NOMBRE": "OTROS SUELDOS Y SALARIOS "
+  },
+  {
+      "CODIGO": "5.1.02 ",
+      "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+  },
+  {
+      "CODIGO": "5.1.02.01 ",
+      "NOMBRE": "INCAPACIDADES "
+  },
+  {
+      "CODIGO": "5.1.02.02 ",
+      "NOMBRE": "SUBSIDIO FAMILIAR "
+  },
+  {
+      "CODIGO": "5.1.02.07 ",
+      "NOMBRE": "CUOTAS PARTES DE PENSIONES "
+  },
+  {
+      "CODIGO": "5.1.02.90 ",
+      "NOMBRE": "OTRAS CONTRIBUCIONES IMPUTADAS "
+  },
+  {
+      "CODIGO": "5.1.03 ",
+      "NOMBRE": "CONTRIBUCIONES EFECTIVAS "
+  },
+  {
+      "CODIGO": "5.1.03.03 ",
+      "NOMBRE": "COTIZACIONES A SEGURIDAD SOCIAL EN SALUD "
+  },
+  {
+      "CODIGO": "5.1.03.04 ",
+      "NOMBRE": "APORTES SINDICALES "
+  },
+  {
+      "CODIGO": "5.1.03.05 ",
+      "NOMBRE": "COTIZACIONES A RIESGOS PROFESIONALES "
+  },
+  {
+      "CODIGO": "5.1.03.06 ",
+      "NOMBRE": "COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE PRIMA MEDIA "
+  },
+  {
+      "CODIGO": "5.1.03.07 ",
+      "NOMBRE": "COTIZACIONES A ENTIDADES ADMINISTRADORAS DEL RÉGIMEN DE AHORRO INDIVIDUAL "
+  },
+  {
+      "CODIGO": "5.1.03.90 ",
+      "NOMBRE": "OTRAS CONTRIBUCIONES EFECTIVAS "
+  },
+  {
+      "CODIGO": "5.1.04 ",
+      "NOMBRE": "APORTES SOBRE LA NÓMINA "
+  },
+  {
+      "CODIGO": "5.1.04.01 ",
+      "NOMBRE": "APORTES AL ICBF "
+  },
+  {
+    "CODIGO": "5.1.07 ",
+   "NOMBRE": "PRESTACIONES SOCIALES "
+},
+{
+  "CODIGO": "5.1.07.01 ",
+ "NOMBRE": "vacaciones "
+},
+{
+  "CODIGO": "5.1.07.02 ",
+ "NOMBRE": "CESANTIAS "
+},
+{
+  "CODIGO": "5.1.07.03 ",
+ "NOMBRE": "INTERESES DE LAS CESANTIAS "
+},
+{
+  "CODIGO": "5.1.07.04 ",
+ "NOMBRE": "PRIMA DE VACACIONES "
+},
+{
+  "CODIGO": "5.1.07.05 ",
+ "NOMBRE": "PRIMA DE NAVIDAD"
+},
+{
+  "CODIGO": "5.1.07.06",
+ "NOMBRE": "PRIMA DE SERVICIOS"
+},
+{
+    "CODIGO": "5.1.08 ",
+    "NOMBRE": "GASTOS DE PERSONAL DIVERSOS "
+},
+{
+  "CODIGO": "5.1.08.01 ",
+  "NOMBRE": "renumeracion por servicios tecnicos"
+},
+{
+"CODIGO": "5.1.08.03 ",
+"NOMBRE": "capacitacion bienestar social"
+},
+{
+"CODIGO": "5.1.08.04 ",
+"NOMBRE": "dotacion y suministro a trabajadores"
+},
+{
+"CODIGO": "5.1.08.05 ",
+"NOMBRE": "gastos deportivos y de recreacion"
+},
+{
+"CODIGO": "5.1.08.07 ",
+"NOMBRE": "gastos de viaje"
+},
+{
+"CODIGO": "5.1.08.10 ",
+"NOMBRE": "gastos de viaje"
+},
+{
+"CODIGO": "5.1.08.90 ",
+"NOMBRE": "otros gastos de personal diversos"
+},
+  {
+      "CODIGO": "5.1.11 ",
+      "NOMBRE": "GENERALES "
+  },
+  {
+      "CODIGO": "5.1.11.06 ",
+      "NOMBRE": "ESTUDIOS Y PROYECTOS "
+  },
+  {
+      "CODIGO": "5.1.11.11 ",
+      "NOMBRE": "COMISIONES, HONORARIOS Y SERVICIOS "
+  },
+  {
+      "CODIGO": "5.1.11.12 ",
+      "NOMBRE": "OBRAS Y MEJORAS EN PROPIEDAD AJENA "
+  },
+  {
+      "CODIGO": "5.1.11.13 ",
+      "NOMBRE": "VIGILANCIA Y SEGURIDAD "
+  },
+  {
+      "CODIGO": "5.1.11.14 ",
+      "NOMBRE": "MATERIALES Y SUMINISTROS "
+  },
+  {
+      "CODIGO": "5.1.11.15 ",
+      "NOMBRE": "MANTENIMIENTO "
+  },
+  {
+      "CODIGO": "5.1.11.16 ",
+      "NOMBRE": "REPARACIONES "
+  },
+  {
+      "CODIGO": "5.1.11.17 ",
+      "NOMBRE": "SERVICIOS PÚBLICOS "
+  },
+  {
+      "CODIGO": "5.1.11.18 ",
+      "NOMBRE": "ARRENDAMIENTO "
+  },
+  {
+      "CODIGO": "5.1.11.19 ",
+      "NOMBRE": "VIÁTICOS Y GASTOS DE VIAJE "
+  },
+  {
+      "CODIGO": "5.1.11.20 ",
+      "NOMBRE": "PUBLICIDAD Y PROPAGANDA "
+  },
+  {
+      "CODIGO": "5.1.11.21 ",
+      "NOMBRE": "IMPRESOS, PUBLICACIONES, SUSCRIPCIONES Y AFILIACIONES "
+  },
+  {
+      "CODIGO": "5.1.11.22 ",
+      "NOMBRE": "FOTOCOPIAS "
+  },
+  {
+      "CODIGO": "5.1.11.23 ",
+      "NOMBRE": "COMUNICACIONES Y TRANSPORTE "
+  },
+  {
+      "CODIGO": "5.1.11.25 ",
+      "NOMBRE": "SEGUROS GENERALES "
+  },
+  {
+      "CODIGO": "5.1.11.33 ",
+      "NOMBRE": "SEGURIDAD INDUSTRIAL "
+  },
+  {
+      "CODIGO": "5.1.11.36 ",
+      "NOMBRE": "IMPLEMENTOS DEPORTIVOS "
+  },
+  {
+      "CODIGO": "5.1.11.37 ",
+      "NOMBRE": "EVENTOS CULTURALES "
+  },
+  {
+      "CODIGO": "5.1.11.46 ",
+      "NOMBRE": "COMBUSTIBLES Y LUBRICANTES "
+  },
+  {
+      "CODIGO": "5.1.11.49 ",
+      "NOMBRE": "SERVICIOS DE ASEO, CAFETERÍA, RESTAURANTE Y LAVANDERÍA "
+  },
+  {
+      "CODIGO": "5.1.11.55 ",
+      "NOMBRE": "ELEMENTOS DE ASEO, LAVANDERÍA Y CAFETERÍA "
+  },
+  {
+      "CODIGO": "5.1.11.64 ",
+      "NOMBRE": "GASTOS LEGALES "
+  },
+  {
+      "CODIGO": "5.1.11.65 ",
+      "NOMBRE": "INTANGIBLES "
+  },
+  {
+    "CODIGO": "5.1.11.79 ",
+    "NOMBRE": "HONORARIOS "
+  },
+  {
+    "CODIGO": "5.1.11.80 ",
+    "NOMBRE": "SERVICIOS "
+  },
+  {
+      "CODIGO": "5.1.11.90 ",
+      "NOMBRE": "OTROS GASTOS GENERALES "
+  },
+  {
+      "CODIGO": "5.1.20 ",
+      "NOMBRE": "IMPUESTOS, CONTRIBUCIONES Y TASAS "
+  },
+  {
+      "CODIGO": "5.1.20.01 ",
+      "NOMBRE": "IMPUESTO PREDIAL UNIFICADO "
+  },
+  {
+      "CODIGO": "5.1.20.02 ",
+      "NOMBRE": "CUOTA DE FISCALIZACIÓN Y AUDITAJE "
+  },
+  {
+      "CODIGO": "5.1.20.06 ",
+      "NOMBRE": "VALORIZACIÓN "
+  },
+  {
+      "CODIGO": "5.1.20.08 ",
+      "NOMBRE": "SANCIONES "
+  },
+  {
+      "CODIGO": "5.1.20.10 ",
+      "NOMBRE": "TASAS "
+  },
+  {
+      "CODIGO": "5.1.20.11 ",
+      "NOMBRE": "IMPUESTO SOBRE VEHÍCULOS AUTOMOTORES "
+  },
+  {
+      "CODIGO": "5.1.20.12 ",
+      "NOMBRE": "IMPUESTO DE REGISTRO "
+  },
+  {
+      "CODIGO": "5.1.20.24 ",
+      "NOMBRE": "GRAVAMEN A LOS MOVIMIENTOS FINANCIEROS "
+  },
+  {
+      "CODIGO": "5.1.20.26 ",
+      "NOMBRE": "CONTRIBUCIONES "
+  },
+  {
+      "CODIGO": "5.1.20.27 ",
+      "NOMBRE": "LICENCIAS "
+  },
+  {
+      "CODIGO": "5.1.20.90 ",
+      "NOMBRE": "OTROS IMPUESTOS "
+  },
+  {
+    "CODIGO": "5.3 ",
+    "NOMBRE": "DETERIORO, DEPRECIACIONES, AMORTIZACIONES Y PROVIS "
+},
+{
+  "CODIGO": "5.3.60 ",
+  "NOMBRE": "DEPRECIACIﾓN DE PROPIEDADES, PLANTA Y EQUIPO "
+},
+{
+  "CODIGO": "5.3.60.01 ",
+  "NOMBRE": "Edificaciones "
+},
+{
+  "CODIGO": "5.3.60.02 ",
+  "NOMBRE": "Plantas, ductos y t佖eles "
+},
+{
+  "CODIGO": "5.3.62 ",
+  "NOMBRE": "DEPRECIACIﾓN DE PROPIEDADES DE INVERSIﾓN "
+},
+{
+  "CODIGO": "5.3.62.01 ",
+  "NOMBRE": "Edificaciones "
+},
+  {
+      "CODIGO": "5.8 ",
+      "NOMBRE": "OTROS GASTOS "
+  },
+  {
+      "CODIGO": "5.8.02 ",
+      "NOMBRE": "COMISIONES "
+  },
+  {
+      "CODIGO": "5.8.02.37 ",
+      "NOMBRE": "COMISIONES SOBRE RECURSOS ENTREGADOS EN ADMINISTRACIÓN "
+  },
+  {
+      "CODIGO": "5.8.02.38 ",
+      "NOMBRE": "COMISIONES Y OTROS GASTOS BANCARIOS "
+  },
+  {
+    "CODIGO": "5.8.02.40 ",
+    "NOMBRE": "COMISIONES Y servicios financieros"
+},
+  {
+      "CODIGO": "5.8.02.90 ",
+      "NOMBRE": "OTRAS COMISIONES "
+  },
+  {
+      "CODIGO": "5.8.08 ",
+      "NOMBRE": "OTROS GASTOS ORDINARIOS "
+  },
+  {
+      "CODIGO": "5.8.08.02 ",
+      "NOMBRE": "PÉRDIDA EN RETIRO DE ACTIVOS "
+  },
+  {
+      "CODIGO": "5.8.08.12 ",
+      "NOMBRE": "SENTENCIAS "
+  },
+  {
+      "CODIGO": "5.8.08.90 ",
+      "NOMBRE": "OTROS GASTOS ORDINARIOS "
+  },
+  {
+      "CODIGO": "5.8.10 ",
+      "NOMBRE": "EXTRAORDINARIOS "
+  },
+  {
+      "CODIGO": "5.8.10.06 ",
+      "NOMBRE": "PÉRDIDAS EN SINIESTROS "
+  },
+  {
+      "CODIGO": "5.8.10.90 ",
+      "NOMBRE": "OTROS GASTOS EXTRAORDINARIOS "
+  },
+  {
+      "CODIGO": "5.8.15 ",
+      "NOMBRE": "AJUSTE DE EJERCICIOS ANTERIORES "
+  },
+  {
+      "CODIGO": "5.8.15.88 ",
+      "NOMBRE": "GASTOS DE ADMINISTRACIÓN "
+  },
+  {
+      "CODIGO": "5.8.15.90 ",
+      "NOMBRE": "PROVISIONES, DEPRECIACIONES Y AMORTIZACIONES "
+  },
+  {
+      "CODIGO": "5.8.15.93 ",
+      "NOMBRE": "OTROS GASTOS "
+  },
+  {
+    "CODIGO": "5.9 ",
+    "NOMBRE": "CIERRE DE INGRESOS, GASTOS Y COSTOS "
+},
+{
+  "CODIGO": "5.9.05 ",
+  "NOMBRE": "CIERRE DE INGRESOS, GASTOS Y COSTOS"
+},
+{
+  "CODIGO": "5.9.05.01 ",
+  "NOMBRE": "Cierre de ingresos, gastos y costos"
+},
+  {
+      "CODIGO": "6 ",
+      "NOMBRE": "COSTOS DE VENTAS Y OPERACIÓN "
+  },
+  {
+      "CODIGO": "6.3 ",
+      "NOMBRE": "COSTO DE VENTAS DE SERVICIOS "
+  },
+  {
+      "CODIGO": "6.3.05 ",
+      "NOMBRE": "SERVICIOS EDUCATIVOS "
+  },
+  {
+      "CODIGO": "6.3.05.08 ",
+      "NOMBRE": "EDUCACIÓN FORMAL - SUPERIOR FORMACIÓN PROFESIONAL "
+  },
+  {
+      "CODIGO": "6.3.05.09 ",
+      "NOMBRE": "EDUCACIÓN FORMAL - SUPERIOR POSTGRADO "
+  },
+  {
+      "CODIGO": "6.3.10 ",
+      "NOMBRE": "SERVICIOS DE SALUD "
+  },
+  {
+      "CODIGO": "6.3.10.15 ",
+      "NOMBRE": "SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS "
+  },
+  {
+      "CODIGO": "6.3.10.16 ",
+      "NOMBRE": "SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA "
+  },
+  {
+      "CODIGO": "6.3.10.17 ",
+      "NOMBRE": "SERVICIOS AMBULATORIOS - ACTIVIDADES DE SALUD ORAL "
+  },
+  {
+      "CODIGO": "6.3.10.50 ",
+      "NOMBRE": "APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS "
+  },
+  {
+      "CODIGO": "6.3.10.67 ",
+      "NOMBRE": "SERVICIOS CONEXOS A LA SALUD OTROS SERVICIOS "
+  },
+  {
+      "CODIGO": "7 ",
+      "NOMBRE": "COSTOS DE PRODUCCIÓN "
+  },
+  {
+      "CODIGO": "7.2 ",
+      "NOMBRE": "SERVICIOS EDUCATIVOS "
+  },
+  {
+      "CODIGO": "7.2.08 ",
+      "NOMBRE": "EDUCACIÓN FORMAL  SUPERIOR - FORMACIÓN PROFESIONAL "
+  },
+  {
+      "CODIGO": "7.2.08.02 ",
+      "NOMBRE": "GENERALES "
+  },
+  {
+      "CODIGO": "7.2.08.03 ",
+      "NOMBRE": "SUELDOS Y SALARIOS "
+  },
+  {
+      "CODIGO": "7.2.08.04 ",
+      "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+  },
+  {
+      "CODIGO": "7.2.08.05 ",
+      "NOMBRE": "CONTRIBUCIONES EFECTIVAS "
+  },
+  {
+      "CODIGO": "7.2.08.06 ",
+      "NOMBRE": "APORTES SOBRE LA NÓMINA "
+  },
+  {
+      "CODIGO": "7.2.08.07 ",
+      "NOMBRE": "DEPRECIACIÓN Y AMORTIZACIÓN "
+  },
+  {
+      "CODIGO": "7.2.08.08 ",
+      "NOMBRE": "IMPUESTOS "
+  },
+  {
+    "CODIGO": "7.2.08.09 ",
+    "NOMBRE": "PRESTACIONES SOCIALES "
+},
+{
+  "CODIGO": "7.2.08.10 ",
+  "NOMBRE": "REMUNERACION SERVICIOS TECNICOS"
+},
+  {
+      "CODIGO": "7.2.08.95 ",
+      "NOMBRE": "TRASLADO DE COSTOS (CR) "
+  },
+  {
+      "CODIGO": "7.2.09 ",
+      "NOMBRE": "EDUCACIÓN FORMAL - SUPERIOR - POSTGRADO "
+  },
+  {
+      "CODIGO": "7.2.09.02 ",
+      "NOMBRE": "GENERALES "
+  },
+  {
+      "CODIGO": "7.2.09.03 ",
+      "NOMBRE": "SUELDOS Y SALARIOS "
+  },
+  {
+      "CODIGO": "7.2.09.05 ",
+      "NOMBRE": "CONTRIBUCIONES EFECTIVAS "
+  },
+  {
+      "CODIGO": "7.2.09.08 ",
+      "NOMBRE": "IMPUESTOS "
+  },
+  {
+    "CODIGO": "7.2.09.10 ",
+    "NOMBRE": "GASTOS DE PERSONAL DIVERSOS "
+},
+  {
+      "CODIGO": "7.2.09.95 ",
+      "NOMBRE": "TRASLADO DE COSTOS (CR) "
+  },
+  {
+    "CODIGO": "7.3 ",
+    "NOMBRE": "SERVICIOS DE SALUD "
+},
+{
+  "CODIGO": "7.3.01 ",
+  "NOMBRE": "URGENCIAS CONSULTA Y PROCEDIMIENTOS "
+},
+{
+    "CODIGO": "7.3.10 ",
+    "NOMBRE": "SERVICIOS AMBULATORIOS - CONSULTA EXTERNA Y PROCEDIMIENTOS "
+},
+{
+  "CODIGO": "7.3.10.01 ",
+  "NOMBRE": "MATERIALES UISSALUD "
+},
+{
+    "CODIGO": "7.3.10.04 ",
+    "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+},
+{
+  "CODIGO": "7.3.10.10 ",
+  "NOMBRE": "GASTOS DE PERSONAL DIVERSOS"
+},
+{
+    "CODIGO": "7.3.10.95 ",
+    "NOMBRE": "TRASLADO DE COSTOS (CR) "
+},
+{
+    "CODIGO": "7.3.11 ",
+    "NOMBRE": "SERVICIOS AMBULATORIOS - CONSULTA ESPECIALIZADA "
+},
+{
+  "CODIGO": "7.3.11.02 ",
+  "NOMBRE": "GENERALES "
+},
+{
+    "CODIGO": "7.3.11.03 ",
+    "NOMBRE": "SUELDOS Y SALARIOS "
+},
+{
+    "CODIGO": "7.3.11.04 ",
+    "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+},
+{
+    "CODIGO": "7.3.11.05 ",
+    "NOMBRE": "CONTRIBUCIONES EFECTIVAS "
+},
+{
+    "CODIGO": "7.3.11.07 ",
+    "NOMBRE": "DEPRECIACIÓN Y AMORTIZACIÓN "
+},
+{
+ "CODIGO": "7.3.11.09 ",
+ "NOMBRE": "PRESTACIONES SOCIALES"
+},
+{
+"CODIGO": "7.3.11.10 ",
+"NOMBRE": "GASTOS DE PERSONAL DIVERSOS"
+},
+{
+    "CODIGO": "7.3.11.95 ",
+    "NOMBRE": "TRASLADO DE COSTOS (CR) "
+},
+{
+    "CODIGO": "7.3.12 ",
+    "NOMBRE": "SERVICIOS AMBULATORIOS - SALUD ORAL "
+},
+{
+    "CODIGO": "7.3.12.01 ",
+    "NOMBRE": "MATERIALES "
+},
+{
+  "CODIGO": "7.3.12.02 ",
+  "NOMBRE": "GENERALES "
+},
+{
+    "CODIGO": "7.3.12.03 ",
+    "NOMBRE": "SUELDOS Y SALARIOS "
+},
+{
+  "CODIGO": "7.3.12.04 ",
+  "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+},
+{
+"CODIGO": "7.3.12.09 ",
+"NOMBRE": "PRESTACIONES SOCIALES "
+},
+{
+"CODIGO": "7.3.12.10 ",
+"NOMBRE": "GASTOS DE PERSONAL DIVERSOS "
+},
+{
+    "CODIGO": "7.3.12.95 ",
+    "NOMBRE": "TRASLADO DE COSTOS (CR) "
+},
+{
+  "CODIGO": "7.3.14 ",
+  "NOMBRE": "	SERVICIOS AMBULATORIOS - OTRAS ACTIVIDADES EXTRAMU "
+},
+{
+"CODIGO": "7.3.14.01 ",
+"NOMBRE": "	suministro de oxigeno "
+},
+{
+"CODIGO": "7.3.14.02 ",
+"NOMBRE": "	generales "
+},
+{
+"CODIGO": "7.3.14.04 ",
+"NOMBRE": "	contribuciones imputadas "
+},
+{
+"CODIGO": "7.3.20 ",
+"NOMBRE": "HOSPITALIZACIﾓN - ESTANCIA GENERAL "
+},
+{
+"CODIGO": "7.3.20.02 ",
+"NOMBRE": "GENERALES"
+},
+{
+"CODIGO": "7.3.24 ",
+"NOMBRE": "HOSPITALIZACION SALUD MENTAL "
+},
+{
+"CODIGO": "7.3.24.02 ",
+"NOMBRE": "HPSIQUIATRIA INFANTIL pn "
+},
+{
+"CODIGO": "7.3.40 ",
+"NOMBRE": "APOYO DIAGNﾓSTICO - LABORATORIO CLﾍNICO"
+},
+{
+"CODIGO": "7.3.40.02 ",
+"NOMBRE": "GENERALES"
+},
+{
+"CODIGO": "7.3.41 ",
+"NOMBRE": "APOYO DIAGNﾓSTICO - IMAGENOLOGﾍA"
+},
+{
+"CODIGO": "7.3.41.02 ",
+"NOMBRE": "GENERALES"
+},
+{
+"CODIGO": "7.3.41.04 ",
+"NOMBRE": "CONTRIBUCIONES IMPUTADAS"
+},
+{
+"CODIGO": "7.3.42 ",
+"NOMBRE": "APOYO DIAGNﾓSTICO - ANATOMﾍA PATOLﾓGICA"
+},
+{
+"CODIGO": "7.3.42.02 ",
+"NOMBRE": "GENERALES"
+},
+
+{
+"CODIGO": "7.3.43 ",
+"NOMBRE": "APOYO DIAGNﾓSTICO - OTRAS UNIDADES DE APOYO DIAGNﾓ"
+},
+{
+"CODIGO": "7.3.43.01 ",
+"NOMBRE": "LENTES Y MONTURAS"
+},
+{
+"CODIGO": "7.3.43.02 ",
+"NOMBRE": "MATERIAL ORTOPEDICO"
+},
+{
+"CODIGO": "7.3.43.04 ",
+"NOMBRE": "CONTRIBUCIONES IMPUTADAS"
+},
+{
+    "CODIGO": "7.3.49 ",
+    "NOMBRE": "APOYO TERAPÉUTICO - REHABILITACIÓN Y TERAPIAS "
+},
+{
+  "CODIGO": "7.3.49.02 ",
+  "NOMBRE": "GENERALES "
+},
+{
+    "CODIGO": "7.3.49.03 ",
+    "NOMBRE": "SUELDOS Y SALARIOS "
+},
+{
+    "CODIGO": "7.3.49.04 ",
+    "NOMBRE": "CONTRIBUCIONES IMPUTADAS "
+},
+{
+  "CODIGO": "7.3.49.09",
+  "NOMBRE": "PRESTACIONES SOCIALES "
+},
+{
+"CODIGO": "7.3.49.10",
+"NOMBRE": "GASTOS DE PERSONAL DIVERSOS"
+},
+{
+    "CODIGO": "7.3.49.95 ",
+    "NOMBRE": "TRASLADO DE COSTOS (CR) "
+},
+{
+  "CODIGO": "7.3.56 ",
+  "NOMBRE": "APOYO TERAPﾉUTICO - OTRAS UNIDADES DE APOYO TERAPﾉ"
+},
+{
+  "CODIGO": "7.3.56.02 ",
+  "NOMBRE": "generales"
+},
+{
+  "CODIGO": "7.3.56.10 ",
+  "NOMBRE": "Gastos de personal diversos"
+},
+{
+    "CODIGO": "7.3.87 ",
+    "NOMBRE": "SERVICIOS CONEXOS A LA SALUD  OTROS SERVICIOS "
+},
+{
+  "CODIGO": "7.3.87.02 ",
+  "NOMBRE": "GENERALES "
+},
+{
+    "CODIGO": "7.3.87.03 ",
+    "NOMBRE": "SUELDOS Y SALARIOS "
+},
+{
+  "CODIGO": "7.3.87.04 ",
+  "NOMBRE": "CONTRIBUCIONES IMPUTADAS"
+},
+{
+"CODIGO": "7.3.87.09 ",
+"NOMBRE": "PRESTACIONES SOCIALES"
+},
+{
+"CODIGO": "7.3.87.10 ",
+"NOMBRE": "GASTOS DE PERSONAL"
+},
+{
+    "CODIGO": "7.3.87.95 ",
+    "NOMBRE": "TRASLADO DE COSTOS (CR) "
+}
 ]
 
   constructor(private router: Router, private dialog: MatDialog) {
@@ -45084,7 +46687,7 @@ export class PruebaComponent implements OnInit {
         this.mostrarTabla = true;
         break;
       default:
-        this.datosTabla = this.datosTabla2;
+        this.datosTabla = this.datosTabla334
         this.mostrarTabla = true;
         break;
     }
@@ -45092,6 +46695,7 @@ export class PruebaComponent implements OnInit {
   }
   generarReporteGeneral(){
     this.mostrarTabla = false
+    this.datosTabla = this.datosTabla334
   let suma1 = {
     1: JSON.parse(localStorage.getItem('1.1.05') ?? '{}'),
     2: JSON.parse(localStorage.getItem('1.1.10') ?? '{}'),
@@ -45615,7 +47219,7 @@ export class PruebaComponent implements OnInit {
                                                   
                                                    } else{
                                                     let y = this.datosTabla.filter(
-                                                      (codigo: any) => codigo.codigo == element.codigo
+                                                      (codigo: any) => codigo.codigo == element.codigo.trim()
                                                     );
                                                     x.push(y[0]);
                                                    }
@@ -45664,6 +47268,22 @@ export class PruebaComponent implements OnInit {
     this.datosTabla = x
     this.mostrarTabla = true
     this.consultarTabla();
+  }
+
+  generarReporteSecundario(){
+    this.mostrarTabla = false
+    this.datosTabla = this.datosTabla334
+    let x: any = [];
+    this.modeloDatosReporte2.forEach((element) => {
+        let y = this.datosTabla.filter(
+          (codigo: any) => codigo.codigo == element.CODIGO.trim()
+        );
+        x.push(y[0]);
+      });
+      console.log(x);
+      this.datosTabla = x
+      this.mostrarTabla = true
+      this.consultarTabla();
   }
   secuenciaDecodigosNuevos() {}
   applyFilter(event: any) {

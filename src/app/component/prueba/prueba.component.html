@@ -65,8 +65,9 @@
               </label>
             </form>
           </div>
-          <div class="col-4" *ngIf="mostrarTabla">
-            <button (click)="generarReporteGeneral()" class="btn btn-outline-success" type="button">Generar reporte general</button>
+          <div class="col-4" style="display: flex; flex-direction: column;"  *ngIf="mostrarTabla">
+            <button (click)="generarReporteGeneral()" style="margin-bottom: 20px;" class="btn btn-outline-success" type="button">Balance de comprobacion</button>
+            <button (click)="generarReporteSecundario()" class="btn btn-outline-success" type="button">Resultados</button>
           </div>
         </div>
       </div>
