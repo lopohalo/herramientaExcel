@@ -1,0 +1,128 @@
+@media (max-width: 1200px) {
+  .form-add-document {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .back {
+    height: 930px !important;
+  }
+  .front {
+    height: 930px !important;
+  }
+  .container {
+    margin-top: 25% !important;
+  }
+  .table {
+    height: 70% !important;
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  perspective: 800px;
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  height: 40%;
+  overflow-y: auto;
+  display: block;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+}
+
+th:nth-child(1) {
+  width: 40%;
+}
+
+th:nth-child(2) {
+  width: 35%;
+}
+
+th:nth-child(3) {
+  width: 40%;
+}
+
+.card {
+  background-color: var(--color-surface-container);
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.button-content {
+  background-color: greenyellow;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+}
+
+.button-content {
+  height: 25px;
+  width: 24px;
+}
+.icon-button {
+  font-size: 16px !important;
+  position: absolute;
+  top: 23px;
+  right: 19px;
+}
+
+.card .front,
+.card .back {
+  backface-visibility: hidden;
+}
+
+.back {
+  position: absolute;
+  right: -4px;
+  transform: rotateY(180deg);
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+.example-container {
+  margin:0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.mat-sidenav {
+  width: 250px;
+  background-color: #fafafa;
+}
+
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  background-color: rgb(18, 2, 2);
+  height:150px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}

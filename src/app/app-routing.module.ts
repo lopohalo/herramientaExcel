@@ -4,6 +4,7 @@ import { IngresosComponent } from './component/ingresos/ingresos.component';
 import { GastosComponent } from './component/gastos/gastos.component';
 import { NavbarComponent } from './component/navbar/navbar.component';
 import { PruebaComponent } from './component/prueba/prueba.component';
+import { CaculadoraComponent } from './component/calculadora/calculadora.component';
 
 
 
@@ -11,7 +12,7 @@ import { PruebaComponent } from './component/prueba/prueba.component';
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: NavbarComponent},
+    {path: "", component: CaculadoraComponent},
 
 
 ]

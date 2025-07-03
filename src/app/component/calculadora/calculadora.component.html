@@ -1,0 +1,429 @@
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav class="mat-elevation-z10" mode="side" opened>
+    <h4>Tipos de herramientas</h4>
+    <ul>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+    </ul>
+  </mat-sidenav>
+  <mat-sidenav-content class="sidenav-content">
+    <mat-toolbar color="primary">
+      <button mat-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      Herramienta calculos financieros
+    </mat-toolbar>
+    <div style="display: flex; justify-content: center; margin-bottom: 20px">
+      <button
+        style="
+          color: rgb(2, 92, 11);
+          border: 1px solid rgb(0, 0, 0);
+          background-color: #fafafa;
+        "
+        mat-stroked-button
+        (click)="agregarExperienciaPeriodo()"
+        [title]="'Agregar periodo'"
+      >
+        <strong>Agregar calculadora</strong>
+      </button>
+    </div>
+    <div
+      class="form-add-document"
+      style="
+        display: grid;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        grid-template-columns: 1fr 1fr;
+        margin: 40px;
+        height: 700px;
+      "
+    >
+      <div
+        class="container"
+        *ngFor="let formulario of formularios; let i = index; let last = last"
+      >
+        <div class="card" [ngClass]="flipped[i] ? 'flipped' : ''">
+          <div
+            class="back"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+              border: 1px solid black;
+              border-radius: 10px;
+              background-color: #ffffff;
+              padding: 20px;
+              width: 100%;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <strong>Calculo {{ i + 1 }}</strong>
+              <button class="button-content" (click)="flipped[i] = !flipped[i]">
+                <mat-icon class="icon-button">swap_horiz</mat-icon>
+              </button>
+            </div>
+            <div class="uis-flex-1">
+              <div style="margin-bottom: 4px">
+                <strong> El titulo retira beneficios? </strong>
+              </div>
+              <div style="display: flex; width: 100%">
+                <mat-radio-group
+                  (change)="onChangeViewChange($event, i)"
+                  [(ngModel)]="changeView[i]"
+                  [ngModelOptions]="{ standalone: true }"
+                >
+                  <mat-radio-button [value]="true" style="padding-right: 32px"
+                    >Si</mat-radio-button
+                  >
+                  <mat-radio-button [value]="false">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+            <h1>
+              <strong> Total ganado + capital</strong>
+            </h1>
+            <h1 *ngIf="formulario.form.get('total')?.value && changeView[i]">
+              {{ formulario.form.get("total")?.value }}
+            </h1>
+              <h1 *ngIf="formulario.form.get('total')?.value && !changeView[i]">
+              {{ formulario.form.get("totalAcumulado")?.value }}
+            </h1>
+            <h1>Total intereses</h1>
+               <h1 *ngIf="formulario.form.get('total')?.value && changeView[i]">
+              {{ this.totalesMesaMesIntereses }}
+             </h1>
+                <h1 *ngIf="formulario.form.get('total')?.value && !changeView[i]">
+              {{ this.totalesMesaMesRendimientos }}
+            </h1>  
+            <h3>
+              Rendimientos por
+              {{
+                formulario.form.get("periocidad")?.value === 1
+                  ? "meses"
+                  : formulario.form.get("periocidad")?.value === 2
+                  ? "trimestres"
+                  : formulario.form.get("periocidad")?.value === 3
+                  ? "semestres"
+                  : "anuales"
+              }}
+            </h3>
+            <table
+              class="table"
+              style="height: 40%; overflow-y: auto; display: block"
+              *ngIf="beneficiosAsignados.length > 0 && changeView[i]"
+            >
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th>Año</th>
+                  <th>Beneficio Mensual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let beneficio of beneficiosAsignados">
+                  <td>{{ beneficio.mes }}</td>
+                  <td>{{ beneficio.ano }}</td>
+                  <td>{{ beneficio.beneficioMensual }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table
+              class="table"
+              style="height: 40%; overflow-y: auto; display: block"
+              *ngIf="beneficiosAsignadosAcum.length > 0 && !changeView[i]"
+            >
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th>Año</th>
+                  <th>Beneficio Mensual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let beneficio of beneficiosAsignadosAcum">
+                  <td>{{ beneficio.mes }}</td>
+                  <td>{{ beneficio.ano }}</td>
+                  <td>{{ beneficio.beneficioMensual }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <h1>Inversion Amortizada (  Kapital + Intereses)</h1>
+             <table
+              class="table"
+              style="height: 40%; overflow-y: auto; display: block"
+              *ngIf="tablaKapital.length > 0"
+            >
+              <thead>
+                <tr>
+                  <th>Dato</th>
+                  <th>Periodo</th>
+                  <th>Beneficio</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let beneficio of tablaKapital">
+                  <td>{{ beneficio.dato }}</td>
+                  <td>{{ beneficio.id }}</td>
+                  <td>{{ beneficio.valor }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <h1>Total tasa pactada</h1>
+              <table
+              class="table"
+              style="height: 40%; overflow-y: auto; display: block"
+              *ngIf="beneficiosTasaPactada.length > 0"
+            >
+              <thead>
+                <tr>
+                  <th>periodo</th>
+                  <th>valor</th>
+                  <th>interes</th>
+                  <th>Beneficio</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let beneficio of beneficiosTasaPactada">
+                  <td>{{ beneficio.mes }}</td>
+                  <td>{{ beneficio.valor }}</td>
+                  <td>{{ beneficio.interes }}</td>
+                  <td>{{ beneficio.beneficioTotal }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            class="front"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+              border: 1px solid black;
+              border-radius: 10px;
+              background-color: #ffffff;
+              padding: 20px;
+              width: 100%;
+              height: 650px;
+            "
+          >
+            <div
+              *ngIf="!flipped[i]"
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <strong>Calculadora {{ i + 1 }}</strong>
+              <button class="button-content" (click)="flipped[i] = !flipped[i]">
+                <mat-icon class="icon-button">swap_horiz</mat-icon>
+              </button>
+            </div>
+            <form
+              *ngIf="!flipped[i]"
+              class="form-add-document"
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                width: 100%;
+              "
+              [formGroup]="formulario.form"
+            >
+              <mat-form-field>
+                <mat-label> tipo de título </mat-label>
+                <mat-select
+                  formControlName="idTipoTitulo"
+                  placeholder="
+      seleccione un tipo de título
+    "
+                  required
+                >
+                  <mat-option
+                    *ngFor="let claseEntidadItem of claseEntidadList"
+                    [value]="claseEntidadItem.id"
+                  >
+                    {{ claseEntidadItem.nombre }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix> format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Valor del título</mat-label>
+                <input
+                  #valorTitulo
+                  placeholder="Digite el valor del titulo"
+                  formControlName="valorTitulo"
+                  matInput
+                  type="number"
+                  required
+                />
+                <mat-icon matPrefix>format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Tipo de tasa</mat-label>
+                <mat-select
+                  formControlName="tipoTasa"
+                  placeholder="
+      seleccione un tipo de tasa
+    "
+                  required
+                >
+                  <mat-option *ngFor="let x of tiposDeTasa" [value]="x.id">
+                    {{ x.nombre }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix> format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Tasa facial </mat-label>
+                <input
+                  #tasaFacial
+                  placeholder="Digite una tasa"
+                  formControlName="tasaFacial"
+                  matInput
+                  type="number"
+                  required
+                />
+                <mat-icon matPrefix>format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Tasa DFT </mat-label>
+                <input
+                  #tasaFacial
+                  placeholder="Digite una tasa"
+                  formControlName="tasaDFT"
+                  matInput
+                  type="number"
+                  required
+                />
+                <mat-icon matPrefix>format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Fecha de Emisión </mat-label>
+                <input
+                  matInput
+                  maxlength="10"
+                  placeholder="
+             Seleccione la fecha de ingreso
+            "
+                  [matDatepicker]="pickerFechaIngresoEmpresa"
+                  formControlName="fechaEmision"
+                  required
+                  #fechaIngreso
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerFechaIngresoEmpresa"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #pickerFechaIngresoEmpresa
+                  color="primary"
+                ></mat-datepicker>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Meses</mat-label>
+                <input
+                  #tasaFacial
+                  placeholder="Digite los meses"
+                  formControlName="meses"
+                  matInput
+                  type="number"
+                  required
+                />
+                <mat-icon matPrefix>format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Años</mat-label>
+                <input
+                  #tasaFacial
+                  placeholder="Digite los años"
+                  formControlName="anios"
+                  matInput
+                  type="number"
+                />
+                <mat-icon matPrefix>format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Periocidad</mat-label>
+                <mat-select
+                  formControlName="periocidad"
+                  placeholder="
+      seleccione un tipo de Periocidad
+    "
+                  required
+                >
+                  <mat-option *ngFor="let x of frecuencias" [value]="x.id">
+                    {{ x.nombre }}
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix> format_list_bulleted </mat-icon>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+            </form>
+            <div
+              style="display: flex; justify-content: space-evenly"
+              *ngIf="!flipped[i]"
+            >
+              <button
+                style="
+                  color: rgb(252, 252, 252);
+                  background-color: rgb(14, 77, 1);
+                "
+                mat-stroked-button
+                (click)="calcular(i)"
+                [title]="'Agregar periodo'"
+              >
+                <div class="uis-ll">Calcular</div>
+              </button>
+              <button
+                *ngIf="i !== 0"
+                style="color: rgb(0, 0, 0); background-color: rgb(209, 21, 21)"
+                mat-stroked-button
+                (click)="deleteExperienciaPeriodo(i)"
+                title="Eliminar"
+              >
+                <mat-icon>delete</mat-icon>
+                <div class="uis-ll">Eliminar calculadora</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+<footer class="text-center bg-body-tertiary" style="height: 0 !important">
+  <!-- Copyright -->
+  <div
+    class="text-center p-3"
+    style="
+      background-color: #3f51b5;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+    "
+  >
+    © 2025 Copyright: financiera
+  </div>
+  <!-- Copyright -->
+</footer>

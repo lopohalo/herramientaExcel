@@ -3482,7 +3482,8 @@ export class IngresosComponent implements OnInit {
             '1.1.02.05.002.03',
             '1.1.02.06.009.02',
             '1.1.02.02.116.01',
-            '1.1.02.06.006.06'
+            '1.1.02.06.006.06',
+            '1.1.02.01.001.01.02'
           );
         }
         if (this.contadormodelo == 19) {
@@ -3493,7 +3494,9 @@ export class IngresosComponent implements OnInit {
             '1.1.02.02.116.01.01.01',
             '1.1.02.02.116.01.01.02',
             '1.1.02.02.116.01.01.03',
-            '1.1.02.02.116.01.01.04'
+            '1.1.02.02.116.01.01.04',
+            '1.1.02.05.001.08.03.01',
+            '1.1.02.05.001.08.03.11'
           );
         }
         this.unicosmodelo = unicos;
@@ -3504,6 +3507,9 @@ export class IngresosComponent implements OnInit {
       let x = unicos.filter((element: any) => element.length == contadorValor);
       unicos = x;
       this.unicosmodelo = x;
+      if(contadorValor === 16){
+         unicos.push('1.1.02.01.001.01.02')
+      }
     }
     let arreglosDuplicados: any = [];
     unicos.forEach((element: any) => {
@@ -3518,13 +3524,18 @@ export class IngresosComponent implements OnInit {
     let element2;
     for (let index = 0; index < arreglosDuplicados.length; index++) {
       element1 = arreglosDuplicados[index].length;
-      element2 = arreglosDuplicados[index];
+      element2 = arreglosDuplicados[index]
       let x = 0;
       let y = 0;
       let w = 0;
       let p = 0;
       for (let i = 0; i < element1; i++) {
+
         const element = element2[i];
+        
+        if(element.RUBROPRESUPEUSTAL.trim() === '1.1.02.01.001.01.02'){
+          console.log(element)
+        }
         // REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
         if (p == 0) {
           if (element.POREJECUTAR == undefined) {
@@ -3701,14 +3712,11 @@ export class IngresosComponent implements OnInit {
         );
       }
     });
-    console.log(arraydeDuplicados);
     for (let index = 0; index < arraydeDuplicados.length; index++) {
-      console.log(this.modeloInformacion);
       let x = this.modeloInformacion.filter(
         (element: any) =>
           element.RUBROPRESUPEUSTAL.trim() == arraydeDuplicados[index].codigo
       );
-      console.log(x);
       x.forEach((element: any) => {
         element.APROPIACIONINICIAL = arraydeDuplicados[index].valor;
         element.RECAUDO = arraydeDuplicados[index].recaudoMODELO;
@@ -3900,7 +3908,6 @@ export class IngresosComponent implements OnInit {
         this.datosTabla[i].PRESUPUESTODEFINITIVO = 0;
       }
     }
-    console.log(this.datosTabla);
     this.mostrarReporte = tipoReporte;
   }
 }
