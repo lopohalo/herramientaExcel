@@ -45864,6 +45864,7 @@ modeloDatosReporte2 = [
  
 
   ejecutarModeloDeResumidos(contadorValor: any) {
+  this.datosTabla =  this.eliminarComas(this.datosTabla);
     const busqueda = this.datosTabla.reduce((acc: any, codigo: any) => {
       acc[codigo.codigo.trim().slice(0, contadorValor)] =
         ++acc[codigo.codigo.trim().slice(0, contadorValor)] || 0;
@@ -45989,7 +45990,8 @@ modeloDatosReporte2 = [
             if (element.debito == undefined) {
               w = 0;
             } else {
-              w = w + element.debito;
+ const debitoNumero = parseFloat(element.debito); // convierte a número decimal
+    w = w + debitoNumero;
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -46007,7 +46009,9 @@ modeloDatosReporte2 = [
             if (element.debito == undefined || element.debito == null) {
               w = w + 0;
             } else {
-              w = w + element.debito;
+    const debitoNumero = parseFloat(element.debito); // convierte a número decimal
+    w = w + debitoNumero;
+                            
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
                 JSON.stringify({
@@ -46173,7 +46177,8 @@ modeloDatosReporte2 = [
             if (element.credito == undefined) {
               y = 0;
             } else {
-              y = element.credito;
+              const credito = parseFloat(element.credito); // convierte a número decimal
+ y = y + credito;     
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -46191,8 +46196,9 @@ modeloDatosReporte2 = [
             if (element.credito == undefined || element.credito == null) {
               y = y + 0;
             } else {
-              y = y + element.credito;
-              localStorage.setItem(
+               const credito = parseFloat(element.credito); // convierte a número decimal
+ y = y + credito;             
+  localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
                 JSON.stringify({
                   codigo: element.codigo.trim().slice(0, contadorValor),
@@ -46207,6 +46213,7 @@ modeloDatosReporte2 = [
             }
           }
         }
+
       }
       // this.callback(contadorValor)
       this.extrayendoDuplicadosSumadosMODELO(contadorValor);
@@ -46242,6 +46249,7 @@ modeloDatosReporte2 = [
         );
       });
     }
+    console.log(this.modeloDeDatosSistemaContaduria);
     this.elementosUnificados.forEach((element: any) => {
       element.codigo = element.codigo.trim();
     });
@@ -46372,7 +46380,7 @@ modeloDatosReporte2 = [
         for (let i = 0; i < this.datosTabla.length; i++) {
           if (this.datosTabla[i].corriente && !this.datosTabla[i].noCorriente) {
             this.datosTabla[i].tipoDeCuenta = this.datosTabla[i].nuevoSaldo;
-            for (let index = 0; index < this.datosTabla.length; index++) {
+            for (let index = 0; index < this.datosTabla2Recorrido.length; index++) {
               if (
                 this.datosTabla2Recorrido[index].codigo ===
                 this.datosTabla[i].codigo
@@ -46387,7 +46395,7 @@ modeloDatosReporte2 = [
               this.datosTabla[i].noCorriente
             ) {
               this.datosTabla[i].compartidoTipo = this.datosTabla[i].nuevoSaldo;
-              for (let index = 0; index < this.datosTabla.length; index++) {
+              for (let index = 0; index < this.datosTabla2Recorrido.length; index++) {
                 if (
                   this.datosTabla2Recorrido[index].codigo ===
                   this.datosTabla[i].codigo
@@ -46824,6 +46832,7 @@ modeloDatosReporte2 = [
   let obj:any
     this.modeloDatosReporte.forEach((element:any) => {
       if(element.codigo === '1.1'){
+            console.log(suma1[1].credito + suma1[2].credito + suma1[3].credito)
        obj = {
         codigo: '1.1',
         credito: suma1[1].credito + suma1[2].credito + suma1[3].credito,
@@ -46834,6 +46843,7 @@ modeloDatosReporte2 = [
         nuevoSaldo: suma1[1].nuevoSaldo + suma1[2].nuevoSaldo + suma1[3].nuevoSaldo,
        }  
        x.push(obj);
+       console.log(x)
       }else {
         if(element.codigo === '1.2' && element.tipo == 'C'){
           obj = {

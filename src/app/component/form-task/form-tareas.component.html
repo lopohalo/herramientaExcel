@@ -1,0 +1,63 @@
+<mat-card class="p-5 text-center">
+<form [formGroup]="formData">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-12 mb-3" *ngFor="let field of [
+        {name:'nemotecnico', label:'Nemotécnico'},
+        {name:'clasetitulo', label:'Clase Título'},
+        {name:'emisor', label:'Emisor'},
+        {name:'sociedadComisionista', label:'Sociedad Comisionista'},
+        {name:'tasaReferencia', label:'Tasa de Referencia'},
+        {name:'spread', label:'Spread', type:'number'},
+        {name:'periodicidad', label:'Periodicidad'},
+        {name:'valorNominal', label:'Valor Nominal', type:'number'},
+        {name:'vrCompra', label:'Vr. Compra', type:'number'},
+        {name:'numeroInterno', label:'Número Interno'},
+        {name:'uaa', label:'UAA'}
+      ]">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>{{field.label}}</mat-label>
+          <input matInput [formControlName]="field.name" [type]="field.type || 'text'" required />
+          <mat-error *ngIf="formData.get(field.name).hasError('required')">
+            {{field.label}} es requerido.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <!-- Campos de fecha con datepicker -->
+      <div class="col-md-6 col-12 mb-3">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Fecha Emisión</mat-label>
+          <input matInput [matDatepicker]="pickerEmision" formControlName="fechaEmision" required />
+          <mat-datepicker-toggle matSuffix [for]="pickerEmision"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEmision></mat-datepicker>
+          <mat-error *ngIf="formData.get('fechaEmision').hasError('required')">
+            Fecha Emisión es requerido.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6 col-12 mb-3">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Fecha Vcto</mat-label>
+          <input matInput [matDatepicker]="pickerVcto" formControlName="fechaVcto" required />
+          <mat-datepicker-toggle matSuffix [for]="pickerVcto"></mat-datepicker-toggle>
+          <mat-datepicker #pickerVcto></mat-datepicker>
+          <mat-error *ngIf="formData.get('fechaVcto').hasError('required')">
+            Fecha Vcto es requerido.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6 col-12 mb-3">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Fecha Compra</mat-label>
+          <input matInput [matDatepicker]="pickerCompra" formControlName="fechaCompra" required />
+          <mat-datepicker-toggle matSuffix [for]="pickerCompra"></mat-datepicker-toggle>
+          <mat-datepicker #pickerCompra></mat-datepicker>
+          <mat-error *ngIf="formData.get('fechaCompra').hasError('required')">
+            Fecha Compra es requerido.
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>

@@ -1,0 +1,46 @@
+<div style="display: flex; flex-direction: column; min-height: 100vh;">
+<mat-sidenav-container class="example-container" style="flex: 1 0 auto;">
+  <mat-sidenav #sidenav class="mat-elevation-z10" mode="side" opened>
+    <h4>Tipos de herramientas</h4>
+    <ul>
+      <li><a routerLink="/tabla">Tabla de registros</a></li>
+      <li><a routerLink="/">Calculadora</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+      <li><a href="#">Herramienta</a></li>
+    </ul>
+  </mat-sidenav>
+  <mat-sidenav-content class="sidenav-content" style="display: flex; flex-direction: column; flex: 1 0 auto;">
+    <mat-toolbar color="primary">
+      <button mat-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      Herramienta calculos financieros
+    </mat-toolbar>
+    <div style="flex: 1 1 auto; overflow-x: auto; width: 100%; padding: 32px;">
+      <app-table-tareas
+        *ngIf="dataTareas"
+        [dataTareas]="dataTareas"
+        [accionTareas]="accionTareas"
+        (eliminarTarea)="eliminarTarea($event)"
+        (agregarTarea)="agregarTarea($event)"
+        (editarTarea)="editarTarea($event)"
+      ></app-table-tareas>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+<footer class="text-center bg-body-tertiary" style="flex-shrink: 0; width: 100%;">
+  <div
+    class="text-center p-3"
+    style="
+      background-color: #3f51b5;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+    "
+  >
+    © 2025 Copyright: financiera
+  </div>
+</footer>
+</div>

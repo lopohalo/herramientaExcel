@@ -2,8 +2,8 @@
   <mat-sidenav #sidenav class="mat-elevation-z10" mode="side" opened>
     <h4>Tipos de herramientas</h4>
     <ul>
-      <li><a href="#">Herramienta</a></li>
-      <li><a href="#">Herramienta</a></li>
+      <li><a routerLink="/tabla">Tabla de registros</a></li>
+      <li><a routerLink="/">Calculadora</a></li>
       <li><a href="#">Herramienta</a></li>
       <li><a href="#">Herramienta</a></li>
       <li><a href="#">Herramienta</a></li>
@@ -30,6 +30,41 @@
       >
         <strong>Agregar calculadora</strong>
       </button>
+      <button
+        style="
+          color: rgb(243, 236, 100);
+          border: 1px solid rgb(0, 0, 0);
+          background-color: #fafafa;
+        "
+        mat-stroked-button
+        (click)="comparar()"
+        [title]="'Comparar'"
+      >
+        <strong>Comparar</strong>
+      </button>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        width: 500px;
+        flex-direction: column;
+      "
+    >
+      <h4 *ngIf="chartData1 && chartData1.length > 1">Grafica Comparativa</h4>
+      <div style="max-width: 600px;  display: flex; justify-content: center;" style="background-color: #fafafaaf;">
+        <canvas
+          *ngIf="chartData1 && chartData1.length > 1"
+          baseChart
+          [chartType]="'line'"
+          [legend]="true"
+          [datasets]="chartData1"
+          [labels]="chartLabels1"
+          [options]="chartOptions"
+        >
+        </canvas>
+      </div>
     </div>
     <div
       class="form-add-document"
@@ -68,12 +103,20 @@
                 align-items: center;
               "
             >
+              <div style="display: flex; justify-content: space-between; gap: 20px;">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="seleccionados[i]"
+                  (ngModelChange)="seleccionarFormulario(i)"
+                />
+                <span>Seleccionar</span>
+              </div>
               <strong>Calculo {{ i + 1 }}</strong>
               <button class="button-content" (click)="flipped[i] = !flipped[i]">
                 <mat-icon class="icon-button">swap_horiz</mat-icon>
               </button>
             </div>
-            <div class="uis-flex-1">
+            <!-- <div class="uis-flex-1">
               <div style="margin-bottom: 4px">
                 <strong> El titulo retira beneficios? </strong>
               </div>
@@ -89,39 +132,68 @@
                   <mat-radio-button [value]="false">No</mat-radio-button>
                 </mat-radio-group>
               </div>
-            </div>
+            </div> -->
             <h1>
               <strong> Total ganado + capital</strong>
             </h1>
-            <h1 *ngIf="formulario.form.get('total')?.value && changeView[i]">
+            <h1 *ngIf="formulario.form.get('total')?.value">
               {{ formulario.form.get("total")?.value }}
             </h1>
-              <h1 *ngIf="formulario.form.get('total')?.value && !changeView[i]">
-              {{ formulario.form.get("totalAcumulado")?.value }}
-            </h1>
             <h1>Total intereses</h1>
-               <h1 *ngIf="formulario.form.get('total')?.value && changeView[i]">
-              {{ this.totalesMesaMesIntereses }}
-             </h1>
-                <h1 *ngIf="formulario.form.get('total')?.value && !changeView[i]">
-              {{ this.totalesMesaMesRendimientos }}
-            </h1>  
-            <h3>
-              Rendimientos por
-              {{
-                formulario.form.get("periocidad")?.value === 1
-                  ? "meses"
-                  : formulario.form.get("periocidad")?.value === 2
-                  ? "trimestres"
-                  : formulario.form.get("periocidad")?.value === 3
-                  ? "semestres"
-                  : "anuales"
-              }}
-            </h3>
+            <h1 *ngIf="formulario.form.get('total')?.value && changeView[i]">
+              {{ totalesMesaMesIntereses[i] }}
+            </h1>
+            <h1 *ngIf="formulario.form.get('total')?.value && !changeView[i]">
+              {{ totalesMesaMesRendimientos[i] }}
+            </h1>
+            <h1>grafico</h1>
+            <canvas
+              *ngIf="
+                chartData[i] &&
+                chartLabels[i] &&
+                chartData[i].length > 0 &&
+                chartLabels[i].length > 0
+              "
+              baseChart
+              [chartType]="'line'"
+              [legend]="true"
+              [datasets]="chartData[i]"
+              [labels]="chartLabels[i]"
+              [options]="chartOptions"
+            >
+            </canvas>
+            <div style="text-align: center"></div>
+            <div style="display: flex; flex-direction: space-between">
+              <h3>
+                Rendimientos por
+                {{
+                  formulario.form.get("periocidad")?.value === 1
+                    ? "meses"
+                    : formulario.form.get("periocidad")?.value === 2
+                    ? "trimestres"
+                    : formulario.form.get("periocidad")?.value === 3
+                    ? "semestres"
+                    : "anuales"
+                }}
+              </h3>
+              <button
+                (click)="exportExcel(i)"
+                class="btn btn-outline-success"
+                type="button"
+              >
+                Exportar a Excel
+              </button>
+            </div>
+
             <table
               class="table"
-              style="height: 40%; overflow-y: auto; display: block"
-              *ngIf="beneficiosAsignados.length > 0 && changeView[i]"
+              style="
+                height: 80%;
+                max-height: 70%;
+                overflow-y: auto;
+                display: block;
+              "
+              *ngIf="beneficiosAsignados.length > 0"
             >
               <thead>
                 <tr>
@@ -131,14 +203,14 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let beneficio of beneficiosAsignados">
+                <tr *ngFor="let beneficio of beneficiosAsignados[i]">
                   <td>{{ beneficio.mes }}</td>
                   <td>{{ beneficio.ano }}</td>
                   <td>{{ beneficio.beneficioMensual }}</td>
                 </tr>
               </tbody>
             </table>
-            <table
+            <!-- <table
               class="table"
               style="height: 40%; overflow-y: auto; display: block"
               *ngIf="beneficiosAsignadosAcum.length > 0 && !changeView[i]"
@@ -157,9 +229,9 @@
                   <td>{{ beneficio.beneficioMensual }}</td>
                 </tr>
               </tbody>
-            </table>
-            <h1>Inversion Amortizada (  Kapital + Intereses)</h1>
-             <table
+            </table> -->
+            <!-- <h1>Inversion Amortizada ( Kapital + Intereses)</h1>
+            <table
               class="table"
               style="height: 40%; overflow-y: auto; display: block"
               *ngIf="tablaKapital.length > 0"
@@ -178,8 +250,8 @@
                   <td>{{ beneficio.valor }}</td>
                 </tr>
               </tbody>
-            </table>
-            <h1>Total tasa pactada</h1>
+            </table> -->
+            <!-- <h1>Total tasa pactada</h1>
               <table
               class="table"
               style="height: 40%; overflow-y: auto; display: block"
@@ -201,7 +273,7 @@
                   <td>{{ beneficio.beneficioTotal }}</td>
                 </tr>
               </tbody>
-            </table>
+            </table> -->
           </div>
           <div
             class="front"
@@ -303,7 +375,7 @@
                 <mat-error> Valor requerido </mat-error>
               </mat-form-field>
               <mat-form-field>
-                <mat-label> Tasa DFT </mat-label>
+                <mat-label> Valor tasa IPC </mat-label>
                 <input
                   #tasaFacial
                   placeholder="Digite una tasa"
@@ -338,6 +410,30 @@
                 ></mat-datepicker>
                 <mat-error> Valor requerido </mat-error>
               </mat-form-field>
+              <mat-form-field>
+                <mat-label> Fecha de Vencimiento </mat-label>
+                <input
+                  matInput
+                  maxlength="10"
+                  placeholder="
+             Seleccione la fecha de vencimiento
+            "
+                  [matDatepicker]="pickerFechaVencimiento"
+                  formControlName="fechaVcto"
+                  required
+                  #fechaVencimiento
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="pickerFechaVencimiento"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #pickerFechaVencimiento
+                  color="primary"
+                ></mat-datepicker>
+                <mat-error> Valor requerido </mat-error>
+              </mat-form-field>
+
               <mat-form-field>
                 <mat-label>Meses</mat-label>
                 <input

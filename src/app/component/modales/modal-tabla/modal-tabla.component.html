@@ -1,0 +1,25 @@
+<div style="max-height: 80vh; overflow-y: auto; padding: 0 8px;">
+  <h2 class="mb-5 mt-3 text-center">{{data.titulo}} Información</h2>
+  <app-form-tareas [data]="data" (form)="form = $event"></app-form-tareas>
+  <div class="row text-center p-5">
+    <div class="col-6">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        (click)="submit()"
+      >
+        Enviar
+      </button>
+    </div>
+    <div class="col-6">
+      <button
+        mat-raised-button
+        color="danger"
+        (click)="cancelar()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
