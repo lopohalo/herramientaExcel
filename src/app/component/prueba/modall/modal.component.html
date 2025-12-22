@@ -1,4 +1,11 @@
-<div style="padding: 40px" *ngIf="!mostrarCorrientesyNoCorrientes">
+<div
+  style="padding: 40px"
+  *ngIf="
+    !mostrarCorrientesyNoCorrientes &&
+    !mostrarSaldoAnterior &&
+    !mostrarCompartidosCorriente
+  "
+>
   <h6>Cambio de propiedades</h6>
 
   <mat-form-field>
@@ -10,7 +17,7 @@
   </mat-form-field>
 
   <mat-form-field>
-    <mat-label>Cuenta corriente y no corriente:</mat-label>
+    <mat-label>Cuenta no corriente:</mat-label>
     <mat-select [(ngModel)]="cuentaCorrienteNoCorriente">
       <mat-option value="si">Si</mat-option>
       <mat-option value="no">No</mat-option>
@@ -40,7 +47,7 @@
     <div class="row">
       <div class="col-12 mb-4">
         <h6>Cuentas corrientes y no corrientes</h6>
-        <span>!Favor colocar valor CORRIENTE!</span>
+        <span>!Favor colocar el % corriente de cada cuenta!</span>
       </div>
       <div class="col-4 mb-3" *ngFor="let item of data.data; let i = index">
         <mat-card class="p-3 text-center">
@@ -53,8 +60,8 @@
             <input
               matInput
               type="number"
-              (ngModelChange)="checkValorCorriente($event, item.nuevoSaldo)"
-              placeholder="Valor corriente"
+              maxlength="3"
+              placeholder="Porcentaje corriente"
               [(ngModel)]="valorCorriente[i]"
             />
           </mat-form-field>
@@ -62,6 +69,104 @@
       </div>
       <div class="col-12">
         <button mat-button class="bg-success" (click)="verificarCorriente()">
+          Terminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 40px" *ngIf="mostrarSaldoAnterior">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <span>!Favor colocar el valor de saldo anterior!</span>
+      </div>
+      <div class="col-4 mb-3" *ngFor="let item of data.data; let i = index">
+        <mat-card class="p-3 text-center">
+          <mat-card-title class="mb-2">{{ item.nombre }}</mat-card-title>
+          <mat-card-subtitle class="mb-2">{{ item.codigo }}</mat-card-subtitle>
+          <mat-card-subtitle class="mb-2"
+            >NUEVO SALDO: ${{ item.nuevoSaldo }}</mat-card-subtitle
+          >
+          <mat-card-subtitle class="mb-2"
+            >SALDO ANTERIOR: ${{ item.saldoAnterior }}</mat-card-subtitle
+          >
+          <mat-form-field class="mb-2">
+            <input
+              matInput
+              type="number"
+              maxlength="3"
+              placeholder="Valor saldo anterior"
+              [(ngModel)]="valorNormalSaldo[i]"
+            />
+          </mat-form-field>
+        </mat-card>
+      </div>
+      <div class="col-12">
+        <button
+          mat-button
+          class="bg-success"
+          (click)="verificarSaldoAnterior()"
+        >
+          Terminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 40px" *ngIf="mostrarCompartidosCorriente">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <span>!Favor colocar el valor de saldo!</span>
+      </div>
+      <div class="col-4 mb-3" *ngFor="let item of data.data; let i = index">
+        <mat-card class="p-3 text-center">
+          <mat-radio-group
+            aria-label="Selecciona una cuenta"
+            [(ngModel)]="selectedAccountType[i]"
+          >
+            <mat-radio-button value="current"
+              >Cuenta corriente</mat-radio-button
+            >
+            <mat-radio-button value="nonCurrent"
+              >Cuenta no corriente</mat-radio-button
+            >
+          </mat-radio-group>
+          <mat-card-title class="mb-2">{{ item.nombre }}</mat-card-title>
+          <mat-card-subtitle class="mb-2">{{ item.codigo }}</mat-card-subtitle>
+          <mat-card-subtitle class="mb-2"
+            >NUEVO SALDO: ${{ item.nuevoSaldo }}</mat-card-subtitle
+          >
+          <mat-card-subtitle class="mb-2"
+            >SALDO ANTERIOR: ${{ item.saldoAnterior }}</mat-card-subtitle
+          >
+          <mat-card-subtitle class="mb-2"
+            >SALDO CORRIENTE: ${{ item.tipoDeCuenta }}</mat-card-subtitle
+          >
+          <mat-card-subtitle class="mb-2"
+            >SALDO NO CORRIENTE: ${{ item.compartidoTipo }}</mat-card-subtitle
+          >
+
+          <mat-form-field class="mb-2">
+            <input
+              matInput
+              type="number"
+              maxlength="3"
+              [placeholder]="selectedAccountType[i] === 'current' ? 'Valor saldo corriente' : ' Valor saldo no corriente'"
+              [(ngModel)]="valorNormalSaldo[i]"
+            />
+          </mat-form-field>
+        </mat-card>
+      </div>
+      <div class="col-12">
+        <button
+          mat-button
+          class="bg-success"
+          (click)="verificarCorrienteDespues()"
+        >
           Terminar
         </button>
       </div>

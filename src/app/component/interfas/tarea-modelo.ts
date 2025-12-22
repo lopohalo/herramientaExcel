@@ -5,7 +5,7 @@ export interface Tarea {
   fechaCompra: Date;
   fechaVencimiento: Date;
   fechaEmision: Date;
-  periodicidad: string;
+  periocidad: string;
   spread: number;
   clasetitulo: string;
   tasaReferencia: number;
@@ -14,4 +14,9 @@ export interface Tarea {
   nemotecnico: string;
   id: number;
   selected?: boolean;
+  meses: number;
+  valorNominal: number;
+  fechaVcto: Date;
+  tipoTasa: number;
+  idTipoTitulo: number;
 }

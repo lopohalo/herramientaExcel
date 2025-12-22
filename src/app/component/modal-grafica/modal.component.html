@@ -1,0 +1,16 @@
+<div style="padding: 32px; background-color: aliceblue; border-radius: 10px; width: 1000px; height: 700px;">
+     <h4 *ngIf="chartData1 && chartData1.length > 1">Grafica Comparativa</h4>
+  <canvas
+  style="display: block; width: 100%; height: 400px;"
+    *ngIf="chartData1 && chartData1.length > 1"
+    baseChart
+    [chartType]="'line'"
+    [legend]="true"
+    [datasets]="chartData1"
+    [labels]="chartLabels1"
+    [options]="chartOptions"
+  >
+  </canvas>
+
+  <button mat-stroked-button (click)="cerrarModal()">cerrar</button>
+</div>

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { dataSeries } from './data';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalTablaGraficaComponent } from '../modal-grafica/modal.component';
 
 @Component({
   selector: 'app-calculadora',
@@ -13,18 +15,10 @@ export class CaculadoraComponent implements OnInit {
   chartLabels: any = [];
   chartData: any = [];
   chartLabels1: any = [];
-  chartData1: any = [
-    {
-      data: [
-        10000000, 20000000, 30000000, 40000000, 50000000, 60000000, 70000000,
-        80000000, 90000000, 100000000, 110000000, 120000000, 130000000,
-        140000000, 150000000, 160000000, 170000000, 180000000, 190000000,
-        200000000,
-      ],
-      label: '',
-    },
-  ];
+  chartData1: any = [];
   seleccionados: any = [];
+  totalTodo: any;
+  interesesTotales: any;
   chartOptions = {
     responsive: true,
   };
@@ -852,7 +846,11 @@ export class CaculadoraComponent implements OnInit {
       ipc: '3,74%"',
     },
   ];
-  constructor(private router: Router, private fb: FormBuilder) {}
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) {}
 
   cambiarVista(index: number) {
     this.changeView[index] = !this.changeView[index];
@@ -866,30 +864,50 @@ export class CaculadoraComponent implements OnInit {
   agregarExperienciaPeriodo() {
     const nuevoFormPeriodos: any = this.fb.group({
       idTipoTitulo: ['', Validators.required],
-      fechaEmision: ['', Validators.required],
+      fechaCompra: ['', Validators.required],
       fechaVcto: ['', Validators.required],
       periocidad: ['', Validators.required],
       tipoTasa: ['', Validators.required],
       tasaDFT: ['', Validators.required],
       tasaFacial: ['', Validators.required],
       valorTitulo: ['', Validators.required],
+      totalIntereses: [''],
+      valorTir: [''],
+      valorCompra: ['', Validators.required],
       meses: ['', Validators.required],
       anios: [0],
       total: [''],
       totalAcumulado: [''],
       id: Math.random().toString(36).substr(2, 9), // agregar un id único
     });
-    this.formularios.push({ form: nuevoFormPeriodos });
+    if (localStorage.getItem('dataTareasCalcular')) {
+      const data = localStorage.getItem('dataTareasCalcular');
+      const formas = JSON.parse(data!);
+      formas.forEach((forma: any, index: any) => {
+        const fechaCompra = new Date(forma.fechaCompra);
+        const fechaVcto = new Date(forma.fechaVcto);
+        this.formularios.push({ form: nuevoFormPeriodos });
+        this.formularios[index].form.patchValue(forma);
+        this.formularios[index].form.patchValue({
+          fechaCompra: fechaCompra,
+          fechaVcto: fechaVcto,
+        });
+      });
+    } else {
+      this.formularios.push({ form: nuevoFormPeriodos });
+    }
   }
   deleteExperienciaPeriodo(index: number) {
     this.formularios.splice(index, 1);
+    const data = this.formularios.map((form) => form.form.value);
+    localStorage.setItem('dataTareasCalcular', JSON.stringify(data));
   }
 
   seleccionarFormulario(index: number) {
     if (this.seleccionados.includes(index)) {
       this.seleccionados.splice(this.seleccionados.indexOf(index), 1);
       this.chartData1 = this.chartData1.filter(
-        (dataset: any) => dataset.label !== `Beneficio Mensual ${index}`
+        (dataset: any) => dataset.label !== `Calculadora ${index}`
       );
     } else {
       this.seleccionados.push(index);
@@ -898,13 +916,12 @@ export class CaculadoraComponent implements OnInit {
         data: tablaBeneficios.map(
           (beneficio: any) => beneficio.beneficioMensual
         ),
-        label: `Beneficio Mensual ${index}`,
+        label: `Calculadora ${index}`,
       });
       this.chartLabels1 = tablaBeneficios.map(
         (beneficio: any) => `${beneficio.mes} ${beneficio.ano}`
       );
     }
-    console.log(this.chartData1, this.chartLabels1);
   }
 
   calcular(i: any) {
@@ -912,6 +929,7 @@ export class CaculadoraComponent implements OnInit {
     const formularioExistente = localStorage.getItem('formulario');
     let fechaActual: Date;
     let fechaBeneficio: Date;
+    let sumainteres = 0;
 
     if (formularioExistente) {
       const formulariosGuardados: any[] = JSON.parse(formularioExistente);
@@ -952,29 +970,39 @@ export class CaculadoraComponent implements OnInit {
         i,
         dias
       );
+      console.log('totalMesaMesRendmiento', totalMesaMesRendmiento);
       const kapital: any = this.calcularKapital(i, dias);
       this.tablaKapital = kapital;
-      console.log(totalMesaMesRendmiento, totalesMesaMes);
       this.totalesMesaMesRendimientos.push(
         totalMesaMesRendmiento.sumaIntereses.toLocaleString('es-ES', {
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         })
       );
       let tablaBeneficiosAcumulados: any = this.asignarBeneficiosMensuales(
-        formulario.get('fechaEmision')?.value,
+        formulario.get('fechaCompra')?.value,
         dias,
         totalMesaMesRendmiento.beneficiosMensuales,
         formulario.get('periocidad')?.value
       );
-      console.log(tablaBeneficiosAcumulados);
+      console.log('tablaBeneficiosAcumulados', tablaBeneficiosAcumulados);
       let tablaBeneficios: any = this.asignarBeneficiosMensuales(
-        formulario.get('fechaEmision')?.value,
+        formulario.get('fechaCompra')?.value,
         dias,
         totalesMesaMes.beneficiosMensuales,
         formulario.get('periocidad')?.value
       );
-      console.log(tablaBeneficios);
+      console.log(tablaBeneficiosAcumulados, 'asdas')
 
+      let resultadorTir = this.calcularTIR(
+        this.formularios[i].form.get('valorCompra')?.value,
+        this.formularios[i].form.get('valorTitulo')?.value,
+        tablaBeneficiosAcumulados[0].beneficioMensual,
+        tablaBeneficios.length,
+        this.formularios[i].form.get('periocidad')?.value
+      );
+      console.log('resultadoTir', resultadorTir);
+     this.formularios[i].form.get('valorTir')?.setValue(resultadorTir)
       const meses: any = {
         Enero: '01',
         Febrero: '02',
@@ -989,12 +1017,12 @@ export class CaculadoraComponent implements OnInit {
         Noviembre: '11',
         Diciembre: '12',
       };
+      console.log('tablaBeneficiosAcumulados', tablaBeneficiosAcumulados);
       if (this.formularios[i].form.get('tipoTasa')?.value === 2) {
         tablaBeneficiosAcumulados.forEach((beneficio: any) => {
           const mes = meses[beneficio.mes];
           const ano = beneficio.ano;
           const beneficioMensual = beneficio.beneficioMensual;
-
           const ipc = this.lista.find((item) => {
             const fecha = item.mes.replace('"', '');
             const [dia, mesLista, anoLista] = fecha.split('/');
@@ -1009,15 +1037,11 @@ export class CaculadoraComponent implements OnInit {
           } else {
             fechaActual = new Date();
             fechaBeneficio = new Date(`${ano}-${mes}-01`);
-            if (fechaBeneficio > fechaActual) {
-              ipcValor = 3;
-            }
           }
           ipcValor = parseFloat(ipcValor);
           const tasa = parseFloat(
             this.formularios[i].form.get('tasaFacial')?.value
           );
-          console.log(ipcValor, tasa);
           const valorCdt = parseFloat(
             this.formularios[i].form.get('valorTitulo')?.value
           );
@@ -1027,7 +1051,11 @@ export class CaculadoraComponent implements OnInit {
               tablaBeneficiosAcumulados[0].beneficioMensual &&
             fechaBeneficio > fechaActual
           ) {
-            suma = tasa.toFixed(2); // Agrega un valor adicional de 0.5
+            suma = (
+              tasa -
+              parseFloat(this.formularios[i].form.get('tasaDFT')?.value) +
+              ipcValor
+            ).toFixed(2); // Agrega un valor adicional de 0.5
           } else {
             suma = (
               tasa -
@@ -1035,8 +1063,11 @@ export class CaculadoraComponent implements OnInit {
               ipcValor
             ).toFixed(2);
           }
-          const resultado = (valorCdt * parseFloat(suma)) / 4;
+          let resultado: any = (valorCdt * parseFloat(suma)) / 4;
+          resultado = resultado / 10;
           const interes = resultado - beneficioMensual; // Calcula el interés
+          sumainteres = sumainteres + resultado;
+          console.log('resultado ajustado', resultado);
           tablaBeneficiosAcumulados[
             tablaBeneficiosAcumulados.indexOf(beneficio)
           ].beneficioMensual = resultado;
@@ -1044,28 +1075,107 @@ export class CaculadoraComponent implements OnInit {
             tablaBeneficiosAcumulados.indexOf(beneficio)
           ].interes = interes; // Agrega el interés a la tabla
         });
-        console.log(tablaBeneficiosAcumulados);
         tablaBeneficios = tablaBeneficiosAcumulados;
-
-        // Suma los intereses
-        const sumaIntereses = tablaBeneficiosAcumulados.reduce(
-          (a: any, b: any) => a + b.interes,
-          0
-        );
-        this.totalesMesaMesIntereses.push(
-          sumaIntereses.toLocaleString('es-ES', {
+        this.formularios[i].form.get('totalIntereses')?.setValue(
+          sumainteres.toLocaleString('es-ES', {
             minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        // Suma los intereses
+        this.totalesMesaMesIntereses.push(
+          sumainteres.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })
         );
         let total: any =
-          sumaIntereses + this.formularios[i].form.get('valorTitulo')?.value;
-        this.formularios[i].form
-          .get('total')
-          ?.setValue(
-            total.toLocaleString('es-ES', { minimumFractionDigits: 2 })
+          Number(this.formularios[i].form.get('valorTitulo')?.value) +
+          sumainteres;
+        let totalFormateado = total.toLocaleString('es-ES', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        this.formularios[i].form.get('total')?.setValue(totalFormateado);
+      }
+      if (this.formularios[i].form.get('tipoTasa')?.value !== 2) {
+        tablaBeneficiosAcumulados.forEach((beneficio: any) => {
+          const mes = meses[beneficio.mes];
+          const ano = beneficio.ano;
+          const beneficioMensual = beneficio.beneficioMensual;
+          const ipc = this.lista.find((item) => {
+            const fecha = item.mes.replace('"', '');
+            const [dia, mesLista, anoLista] = fecha.split('/');
+            return mesLista === mes.toString() && anoLista === ano.toString();
+          });
+          let ipcValor: any = 0;
+          if (ipc) {
+            ipcValor = ipc.ipc
+              .replace(/"$/, '')
+              .replace('%', '')
+              .replace(',', '.');
+          } else {
+            fechaActual = new Date();
+            fechaBeneficio = new Date(`${ano}-${mes}-01`);
+          }
+          ipcValor = parseFloat(ipcValor);
+          const tasa = parseFloat(
+            this.formularios[i].form.get('tasaFacial')?.value
           );
+          const valorCdt = parseFloat(
+            this.formularios[i].form.get('valorTitulo')?.value
+          );
+          let resultado: any;
+          if (this.formularios[i].form.get('periocidad')?.value == 1) {
+            resultado = (valorCdt * tasa) / 12 / 100;
+          }
+          if (this.formularios[i].form.get('periocidad')?.value == 3) {
+            resultado = (valorCdt * tasa) / 2 / 100;
+          }
+          if (this.formularios[i].form.get('periocidad')?.value == 2) {
+            resultado = (valorCdt * (tasa / 4)) / 100;
+          }
+          if (this.formularios[i].form.get('periocidad')?.value == 4) {
+            resultado = (valorCdt * tasa) / 100;
+          }
+          const interes = resultado; // Calcula el interés
+          sumainteres = sumainteres + resultado;
+          tablaBeneficiosAcumulados[
+            tablaBeneficiosAcumulados.indexOf(beneficio)
+          ].beneficioMensual = resultado;
+          tablaBeneficiosAcumulados[
+            tablaBeneficiosAcumulados.indexOf(beneficio)
+          ].interes = interes;
+        });
+        tablaBeneficios = tablaBeneficiosAcumulados;
+        console.log(tablaBeneficios);
+
+        this.formularios[i].form.get('totalIntereses')?.setValue(
+          sumainteres.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+
+        // Suma los intereses
+        console.log('sumainteres', sumainteres);
+        this.totalesMesaMesIntereses.push(
+          sumainteres.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+        let total: any =
+          Number(this.formularios[i].form.get('valorTitulo')?.value) +
+          sumainteres;
+        let totalFormateado = total.toLocaleString('es-ES', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        this.formularios[i].form.get('total')?.setValue(totalFormateado);
       }
       // this.beneficiosAsignadosAcum = tablaBeneficiosAcumulados;
+      console.log('tablaBenasdasdaseficios',this.beneficiosAsignados[i]);
       if (this.beneficiosAsignados[i]) {
         this.beneficiosAsignados[i] = tablaBeneficios;
       } else {
@@ -1086,9 +1196,7 @@ export class CaculadoraComponent implements OnInit {
       if (this.chartData[i]) {
         this.chartData[i] = [
           {
-            data: tablaBeneficios.map(
-              (beneficio: any) => beneficio.beneficioMensual
-            ),
+            data: tablaBeneficios.map((beneficio: any) => beneficio.interes),
             label: 'Beneficio Mensual',
           },
         ];
@@ -1102,12 +1210,18 @@ export class CaculadoraComponent implements OnInit {
           },
         ]);
       }
-      console.log(this.chartData, this.chartLabels);
       this.flipped[i] = !this.flipped[i];
     }
   }
 
-  comparar() {}
+  comparar() {
+    this.dialog.open(ModalTablaGraficaComponent, {
+      data: {
+        chartLabels1: this.chartLabels1,
+        chartData1: this.chartData1,
+      },
+    });
+  }
   calcularPeriocidad(i: any, dias: any) {
     const periocidad = this.formularios[i].form.get('periocidad')?.value;
     const tasa = parseFloat(this.formularios[i].form.get('tasaFacial')?.value); // convertir a número
@@ -1120,31 +1234,31 @@ export class CaculadoraComponent implements OnInit {
       case 1: // mensual
         const meses = Math.round(diasNumerico / 30);
         const interes = valorCdt * (tasa / 100) * meses;
-        const valorTotal = valorCdt + interes;
+        const valorTotal = interes;
         return valorTotal;
       case 2: // trimestral
         const trimestres = Math.round(diasNumerico / 90);
         const interesTrimestral = valorCdt * (tasa / 100) * trimestres;
-        const valorTotalTrimestral = valorCdt + interesTrimestral;
+        const valorTotalTrimestral = interesTrimestral;
         return valorTotalTrimestral;
       case 3: // semestral
         const semestres = Math.round(diasNumerico / 180);
         const interesSemestral = valorCdt * (tasa / 100) * semestres;
-        const valorTotalSemestral = valorCdt + interesSemestral;
+        const valorTotalSemestral = interesSemestral;
         return valorTotalSemestral;
       case 4: // anual
         const anos = Math.round(diasNumerico / 360);
         const interesAnual = valorCdt * (tasa / 100) * anos;
-        const valorTotalAnual = valorCdt + interesAnual;
+        const valorTotalAnual = interesAnual;
         return valorTotalAnual;
       default:
         return 0; // devuelve 0 si no se selecciona una periocidad
     }
   }
 
-  obtenerMeses(fechaEmision: any, fechaVencimiento: any) {
+  obtenerMeses(fechaCompra: any, fechaVencimiento: any) {
     const meses = [];
-    let fecha = new Date(fechaEmision);
+    let fecha = new Date(fechaCompra);
     while (fecha <= fechaVencimiento) {
       meses.push(new Date(fecha));
       fecha.setMonth(fecha.getMonth() + 1);
@@ -1254,14 +1368,13 @@ export class CaculadoraComponent implements OnInit {
         }
 
         return { valorTotal, beneficiosMensuales, sumaIntereses };
-      case 2: // trimestral
+      case 2: // trimestral ERROOOOOOOOOOOOR ME AYUDO YEIMMISITA
         const trimestres = Math.round(diasNumerico / 90);
         const tasaTrimestral = tasa / 100 / 4;
         valorCdtInicial = valorCdt;
         valorTotal = valorCdtInicial;
         beneficiosMensuales = [];
         sumaIntereses = 0;
-
         for (let i = 0; i < trimestres; i++) {
           const interesTrimestral = valorTotal * tasaTrimestral;
           const beneficioTrimestral = interesTrimestral;
@@ -1269,7 +1382,7 @@ export class CaculadoraComponent implements OnInit {
           beneficiosMensuales.push(beneficioTrimestral);
           sumaIntereses += beneficioTrimestral; // suma los intereses trimestrales
         }
-
+        console.log(valorTotal, beneficiosMensuales, sumaIntereses);
         return { valorTotal, beneficiosMensuales, sumaIntereses };
 
       case 3: // semestral
@@ -1313,7 +1426,7 @@ export class CaculadoraComponent implements OnInit {
   }
 
   asignarBeneficiosMensuales(
-    fechaEmision: any,
+    fechaCompra: any,
     dias: any,
     beneficiosMensuales: any,
     periodoBeneficios: 1 | 2 | 4 | 3
@@ -1353,7 +1466,20 @@ export class CaculadoraComponent implements OnInit {
         throw new Error('Período de beneficios no válido');
     }
 
-    let fecha = new Date(fechaEmision);
+    let fecha = new Date(fechaCompra);
+    if (frecuenciaBeneficios === 1) {
+      fecha.setMonth(fecha.getMonth() + 1);
+    }
+    if (frecuenciaBeneficios === 3) {
+      fecha.setMonth(fecha.getMonth() + 2);
+    }
+    if (frecuenciaBeneficios === 6) {
+      fecha.setMonth(fecha.getMonth() + 6);
+    }
+    if (frecuenciaBeneficios === 12) {
+      fecha.setMonth(fecha.getMonth() + 12);
+    }
+    console.log('frecuenciaBeneficios', beneficiosMensuales);
     for (let i = 0; i < meses; i += frecuenciaBeneficios) {
       const mes = nombresMeses[fecha.getMonth()];
       const ano = fecha.getFullYear();
@@ -1377,12 +1503,12 @@ export class CaculadoraComponent implements OnInit {
     let tasa = parseFloat(this.formularios[i].form.get('tasaFacial')?.value);
     let periocidad = this.formularios[i].form.get('periocidad')?.value;
 
-    let datoGanancias = valorCdt * (tasa / 100);
-    console.log(datoGanancias);
+    let datoGanancias;
     let resultado = [];
 
     switch (periocidad) {
       case 1: // mensual
+        datoGanancias = valorCdt * (tasa / 100 / 12);
         let meses = Math.round(dias / 30);
         let beneficioMensual = datoGanancias;
         resultado.push({
@@ -1406,6 +1532,7 @@ export class CaculadoraComponent implements OnInit {
         }
         break;
       case 2: // trimestral
+        datoGanancias = valorCdt * (tasa / 100 / 4);
         let trimestres = Math.round(dias / 90);
         let beneficioTrimestral = datoGanancias;
         resultado.push({
@@ -1419,8 +1546,12 @@ export class CaculadoraComponent implements OnInit {
           id: trimestres - 1,
           valor: beneficioTrimestral,
         });
-        for (let i = trimestres - 2; i > 0; i--) {
-          beneficioTrimestral = beneficioTrimestral + 20 * 1000000;
+        for (let i = trimestres - 1; i >= 0; i--) {
+          if (i === trimestres) {
+            beneficioTrimestral = beneficioTrimestral + 20 * 1000000;
+          } else {
+            beneficioTrimestral = beneficioTrimestral + 20 * 1000000;
+          }
           resultado.push({
             dato: 'trimestre',
             id: i,
@@ -1429,6 +1560,7 @@ export class CaculadoraComponent implements OnInit {
         }
         break;
       case 3: // semestral
+        datoGanancias = valorCdt * (tasa / 100 / 2);
         let semestres = Math.round(dias / 180);
         let beneficioSemestral = datoGanancias;
         resultado.push({
@@ -1452,6 +1584,7 @@ export class CaculadoraComponent implements OnInit {
         }
         break;
       case 4: // anual
+        datoGanancias = valorCdt * (tasa / 100);
         let anos = Math.round(dias / 360);
         let beneficioAnual = datoGanancias;
         resultado.push({
@@ -1479,97 +1612,26 @@ export class CaculadoraComponent implements OnInit {
     return resultado;
   }
 
-  // calcularTasaPactada(i: any, dias: any, totalbeneficio: any) {
-  //   const tasaPactada = this.formularios[i].form.get('tasaDFT')?.value;
-  //   let valorCdt = parseFloat(
-  //     this.formularios[i].form.get('valorTitulo')?.value
-  //   );
-  //   let beneficioTotal = totalbeneficio;
-  //   let resultado = [];
-  //   let acumulado;
-  //   let interes;
-  //   switch (this.formularios[i].form.get('periocidad')?.value) {
-  //     case 1: // Mensual
-  //       let meses = Math.round(dias / 30);
-  //       console.log(beneficioTotal);
-  //       acumulado = valorCdt;
-  //       interes = 0;
-  //       beneficioTotal = beneficioTotal;
-  //       for (let j = 0; j < meses; j++) {
-  //         interes = beneficioTotal * (tasaPactada / 100);
-  //         acumulado = beneficioTotal + interes;
-  //         resultado.push({
-  //           mes: j + 1,
-  //           valor: beneficioTotal,
-  //           interes: interes,
-  //           beneficioTotal: acumulado,
-  //         });
-  //         beneficioTotal = acumulado;
-  //       }
-  //       break;
+  calcularTIR(
+    valorCompra: any,
+    valorTitulo: any,
+    pagoPeriodico: any,
+    numPeriodos: any,
+    periocidad: any
+  ) {
+    
+    console.log(valorCompra, valorTitulo, pagoPeriodico, numPeriodos);
+    // El valor final es la suma de todos los pagos periódicos más el capital devuelto.
+    const valorFinal = pagoPeriodico * numPeriodos - valorCompra;
 
-  //     case 2: // Trimestral
-  //       let trimestres = Math.round(dias / 90);
-  //       console.log(beneficioTotal);
-  //       acumulado = valorCdt;
-  //       interes = 0;
-  //       beneficioTotal = beneficioTotal;
-  //       for (let j = 0; j < trimestres; j++) {
-  //         interes = beneficioTotal * (tasaPactada / 100);
-  //         acumulado = beneficioTotal + interes;
-  //         resultado.push({
-  //           mes: j + 1,
-  //           valor: beneficioTotal,
-  //           interes: interes,
-  //           beneficioTotal: acumulado,
-  //         });
-  //         beneficioTotal = acumulado;
-  //       }
-  //       break;
+    console.log('El valor final es:', valorFinal);
 
-  //     case 3: // Semestral
-  //       let semestres = Math.round(dias / 180);
-  //       console.log(beneficioTotal);
-  //       acumulado = valorCdt;
-  //       interes = 0;
-  //       beneficioTotal = beneficioTotal;
-  //       for (let j = 0; j < semestres; j++) {
-  //         interes = beneficioTotal * (tasaPactada / 100);
-  //         acumulado = beneficioTotal + interes;
-  //         resultado.push({
-  //           mes: j + 1,
-  //           valor: beneficioTotal,
-  //           interes: interes,
-  //           beneficioTotal: acumulado,
-  //         });
-  //         beneficioTotal = acumulado;
-  //       }
-  //       break;
+    // El rendimiento total se calcula con la fórmula: ((Valor Final - Valor Inicial) / Valor Inicial) * 100
+    const rendimiento = ((valorFinal +  valorTitulo)/ valorCompra) * 100;
 
-  //     case 4: // Anual
-  //       let anios = Math.round(dias / 360);
-  //       console.log(beneficioTotal);
-  //       acumulado = valorCdt;
-  //       interes = 0;
-  //       beneficioTotal = beneficioTotal;
-  //       for (let j = 0; j < anios; j++) {
-  //         interes = beneficioTotal * (tasaPactada / 100);
-  //         acumulado = beneficioTotal + interes;
-  //         resultado.push({
-  //           mes: j + 1,
-  //           valor: beneficioTotal,
-  //           interes: interes,
-  //           beneficioTotal: acumulado,
-  //         });
-  //         beneficioTotal = acumulado;
-  //       }
-  //       break;
+    return rendimiento;
+  }
 
-  //     default:
-  //       break;
-  //   }
-  //   return resultado;
-  // }
   onChangeViewChange($event: any, i: any) {
     this.changeView[i] = $event.value;
   }

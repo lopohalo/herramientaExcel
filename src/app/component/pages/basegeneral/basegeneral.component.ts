@@ -13,36 +13,49 @@ export class BasegeneralComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    const tareaEjemplo = {
-      nemotecnico: 'MEC2025',
-      clasetitulo: 'A',
-      emisor: 'Empresa XYZ',
-      sociedadComisionista: 'Comisionista ABC',
-      tasaReferencia: 'DTF',
-      spread: 2.5,
-      periodicidad: 'Mensual',
-      fechaEmision: '2025-01-15',
-      fechaVcto: '2030-01-15',
-      fechaCompra: '2025-07-01',
-      valorNominal: 1000000,
-      vrCompra: 950000,
-      numeroInterno: 'INT-001',
-      uaa: 'UAA-456',
-    };
-    this.dataTareas = [tareaEjemplo];
-    this.consultarTareas();
+    if (localStorage.getItem('dataTareas')) {
+      this.dataTareas = JSON.parse(localStorage.getItem('dataTareas') || '{}');
+      this.consultarTareas();
+    } else {
+      const tareaEjemplo = {
+        nemotecnico: 'MEC2025',
+        clasetitulo: 'A',
+        emisor: 'Empresa XYZ',
+        sociedadComisionista: 'Comisionista ABC',
+        tasaReferencia: 'DTF',
+        spread: 2.5,
+        fechaEmision: '2025-01-15',
+        fechaVcto: '2030-01-15',
+        fechaCompra: '2025-07-01',
+        valorNominal: 1000000,
+        vrCompra: 950000,
+        numeroInterno: 'INT-001',
+        uaa: 'UAA-456',
+        meses: 60,
+        id: 1,
+        periocidad: 1,
+        tipoTasa: 2,
+        idTipoTitulo: 1,
+      };
+      this.dataTareas = [tareaEjemplo];
+      this.consultarTareas();
+    }
   }
 
   consultarTareas() {
     this.accionTareas.emit();
   }
   eliminarTarea(tarea: any) {
-    this.dataTareas = this.dataTareas.filter((item: any) => item.numeroInterno !== tarea.numeroInterno);
+    this.dataTareas = this.dataTareas.filter(
+      (item: any) => item.numeroInterno !== tarea.numeroInterno
+    );
+    localStorage.setItem('dataTareas', JSON.stringify(this.dataTareas));
   }
   agregarTarea(tarea: any) {
-    const newId = this.dataTareas && this.dataTareas.length > 0
-      ? Math.max(...this.dataTareas.map((t: any) => t.id || 0)) + 1
-      : 1;
+    const newId =
+      this.dataTareas && this.dataTareas.length > 0
+        ? Math.max(...this.dataTareas.map((t: any) => t.id || 0)) + 1
+        : 1;
     const nuevaTarea = {
       id: newId,
       nemotecnico: tarea.nemotecnico,
@@ -51,16 +64,20 @@ export class BasegeneralComponent implements OnInit {
       sociedadComisionista: tarea.sociedadComisionista,
       tasaReferencia: tarea.tasaReferencia,
       spread: tarea.spread,
-      periodicidad: tarea.periodicidad,
+      periocidad: tarea.periocidad,
       fechaEmision: tarea.fechaEmision,
       fechaVcto: tarea.fechaVcto,
       fechaCompra: tarea.fechaCompra,
       valorNominal: tarea.valorNominal,
       vrCompra: tarea.vrCompra,
       numeroInterno: tarea.numeroInterno,
-      uaa: tarea.uaa
+      uaa: tarea.uaa,
+      meses: tarea.meses,
+      tipoTasa: tarea.tipoTasa,
+      idTipoTitulo: tarea.idTipoTitulo,
     };
     this.dataTareas = [...this.dataTareas, nuevaTarea];
+    localStorage.setItem('dataTareas', JSON.stringify(this.dataTareas));
   }
   cerrarSesion() {
     localStorage.clear();
@@ -77,17 +94,21 @@ export class BasegeneralComponent implements OnInit {
           sociedadComisionista: tarea.sociedadComisionista,
           tasaReferencia: tarea.tasaReferencia,
           spread: tarea.spread,
-          periodicidad: tarea.periodicidad,
+          periocidad: tarea.periocidad,
           fechaEmision: tarea.fechaEmision,
           fechaVcto: tarea.fechaVcto,
           fechaCompra: tarea.fechaCompra,
           valorNominal: tarea.valorNominal,
           vrCompra: tarea.vrCompra,
           numeroInterno: tarea.numeroInterno,
-          uaa: tarea.uaa
+          uaa: tarea.uaa,
+          meses: tarea.meses,
+          tipoTasa: tarea.tipoTasa,
+          idTipoTitulo: tarea.idTipoTitulo,
         };
       }
       return item;
     });
+    localStorage.setItem('dataTareas', JSON.stringify(this.dataTareas));
   }
 }

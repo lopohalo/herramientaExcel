@@ -70,10 +70,9 @@ th:nth-child(3) {
   box-sizing: border-box;
 }
 .button-content {
-  background-color: greenyellow;
+  background-color: transparent;
   border: none;
-  border-radius: 50%;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   height: 40px;
   width: 40px;
@@ -87,7 +86,7 @@ th:nth-child(3) {
   width: 24px;
 }
 .icon-button {
-  font-size: 16px !important;
+  font-size: 25px !important;
   position: absolute;
   top: 23px;
   right: 19px;
@@ -123,9 +122,7 @@ th:nth-child(3) {
 .sidenav-content {
   display: flex;
   flex-direction: column;
-  background-image: url('/assets/img/fondo.jpg');
-  background-size: cover;
-  background-position: center;
+  background-color: #dad8d8;
 }
 .btn {
     display: inline-block;

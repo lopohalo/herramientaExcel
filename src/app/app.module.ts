@@ -60,6 +60,7 @@ import { FormTaskComponent } from './component/form-task/form-tareas.component';
 import { BasegeneralComponent } from './component/pages/basegeneral/basegeneral.component';
 import { ModalTablaComponents } from './component/modales/modal-tabla/modal-tabla.component';
 import { ChartsModule } from 'ng2-charts';
+import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.component';
 
 
 
@@ -76,6 +77,7 @@ import { ChartsModule } from 'ng2-charts';
     CaculadoraComponent,
     FormTaskComponent,
     TableTareasComponent,
+    ModalTablaGraficaComponent,
     BasegeneralComponent,
   ],
   imports: [

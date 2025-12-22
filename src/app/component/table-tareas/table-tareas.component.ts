@@ -3,6 +3,8 @@ import Swal from 'sweetalert2';
 import { MatDialog } from '@angular/material/dialog';
 import { Tarea } from '../interfas/tarea-modelo';
 import { ModalTablaComponents } from '../modales/modal-tabla/modal-tabla.component';
+import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-table-tareas',
@@ -15,6 +17,7 @@ export class TableTareasComponent implements OnInit {
   @Output() eliminarTarea = new EventEmitter<any>();
   @Output() agregarTarea = new EventEmitter<any>();
   @Output() editarTarea = new EventEmitter<any>();
+  filterValue: string = '';
   displayedColumns: string[] = [
     'id',
     'nemotecnico',
@@ -23,7 +26,7 @@ export class TableTareasComponent implements OnInit {
     'sociedadComisionista',
     'tasaReferencia',
     'spread',
-    'periodicidad',
+    'periocidad',
     'fechaEmision',
     'fechaVcto',
     'fechaCompra',
@@ -31,16 +34,19 @@ export class TableTareasComponent implements OnInit {
     'vrCompra',
     'numeroInterno',
     'uaa',
+    'meses',
   ];
   currentPage = 1;
   pageSize = 5;
   seleccionados: Tarea[] = [];
   dataTareasPaginated: any = [];
+  copiarDataTareas: any = [];
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private router: Router) {}
 
   ngOnInit() {
-      this.consultarTabla();
+    this.copiarDataTareas = this.dataTareas;
+    this.consultarTabla();
   }
 
   consultarTabla() {
@@ -69,6 +75,34 @@ export class TableTareasComponent implements OnInit {
     }
   }
 
+  AgregaraCalculadora() {
+    const tarea: any = {
+      id: this.seleccionados[0].id,
+      idTipoTitulo: this.seleccionados[0].idTipoTitulo,
+      fechaEmision: this.seleccionados[0].fechaEmision,
+      fechaVcto: this.seleccionados[0].fechaVcto,
+      fechaCompra: this.seleccionados[0].fechaCompra, 
+      periocidad: this.seleccionados[0].periocidad,
+      tipoTasa: this.seleccionados[0].tipoTasa,
+      tasaDFT: this.seleccionados[0].spread,
+      tasaFacial: this.seleccionados[0].spread,
+      valorTitulo: this.seleccionados[0].valorNominal,
+      meses: this.seleccionados[0].meses,
+      anios: 0,
+      total: '',
+      totalAcumulado: '',
+    };
+    const dataTareasCalcular = localStorage.getItem('dataTareasCalcular');
+    if (dataTareasCalcular !== null) {
+      const arreglo = JSON.parse(dataTareasCalcular);
+      arreglo.push(tarea);
+      localStorage.setItem('dataTareasCalcular', JSON.stringify(arreglo));
+    } else {
+      localStorage.setItem('dataTareasCalcular', JSON.stringify([tarea]));
+    }
+    this.router.navigate(['/']);
+  }
+
   editTask(task: Tarea): void {}
 
   eliminarSeleccion(): void {
@@ -87,6 +121,19 @@ export class TableTareasComponent implements OnInit {
     });
   }
 
+  applyFilter(valor: any) {
+    console.log(valor);
+    if (valor === '') {
+      this.dataTareas = this.copiarDataTareas;
+    } else {
+      this.dataTareas = this.dataTareas.filter((row) => {
+        return Object.values(row).some((value) => {
+          return value.toString().toLowerCase().includes(valor.toLowerCase());
+        });
+      });
+    }
+    this.consultarTabla();
+  }
   openDialog($event: string) {
     const dialogRef = this.dialog.open(ModalTablaComponents, {
       panelClass: 'my-custom-dialog',
@@ -118,10 +165,17 @@ export class TableTareasComponent implements OnInit {
       let valB = b[col];
       // Try to compare as numbers if possible
       if (!isNaN(Number(valA)) && !isNaN(Number(valB))) {
-        return isAsc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
+        return isAsc
+          ? Number(valA) - Number(valB)
+          : Number(valB) - Number(valA);
       }
       // Otherwise compare as strings
-      if (valA && valB && typeof valA === 'string' && typeof valB === 'string') {
+      if (
+        valA &&
+        valB &&
+        typeof valA === 'string' &&
+        typeof valB === 'string'
+      ) {
         return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
       return 0;

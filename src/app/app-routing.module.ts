@@ -13,7 +13,7 @@ import { BasegeneralComponent } from './component/pages/basegeneral/basegeneral.
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: GastosComponent},
+    {path: "", component: PruebaComponent},
     {path: "tabla", component: BasegeneralComponent},
 
 
