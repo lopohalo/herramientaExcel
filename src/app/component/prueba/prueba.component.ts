@@ -7,6 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import * as XLSX from 'xlsx';
+import * as XLSXStyle from 'xlsx-js-style';
 import { debounceTime } from 'rxjs/operators';
 import { formatNumber } from '@angular/common';
 import { Router } from '@angular/router';
@@ -34,6 +35,10 @@ export class PruebaComponent implements OnInit {
     'tipoDeCuenta',
     'compartidoTipo',
   ];
+  reporteActivo: 'balance' | 'chip' | 'resultados' | 'original' | '' = '';
+  tablaInicialGuardada: any[] = [];
+  reporteChipGuardado: any[] = [];
+  datosReporteActual: any[] = [];
   rowColors: any = {};
   contadorAlert = 0;
   corrientes: any = [];
@@ -26125,6 +26130,17 @@ export class PruebaComponent implements OnInit {
   }
   toggleAllSelection() {
     this.selectAll = !this.selectAll;
+    if (this.baseInformes) {
+      this.seleccionadosNewTable = [];
+      this.dataTareasPaginated.forEach((row: any) => {
+        const editable = this.puedeEditarDistribucion(row);
+        row.tipo = this.selectAll && editable;
+        if (row.tipo) {
+          this.seleccionadosNewTable.push(row);
+        }
+      });
+      return;
+    }
     this.dataTareasPaginated.forEach((row: any) => {
       if (this.selectAll) {
         this.seleccionados.push(row);
@@ -26136,6 +26152,16 @@ export class PruebaComponent implements OnInit {
     }
   }
   fileUpload(event: any) {
+    this.reporteActivo = '';
+    this.tablaInicialGuardada = [];
+    this.reporteChipGuardado = [];
+    this.datosReporteActual = [];
+    localStorage.removeItem('reporteChipModificado');
+    if (!this.displayedColumns.includes('tipo')) {
+      this.displayedColumns = ['tipo', ...this.displayedColumns];
+    }
+    this.currentPage = 1;
+    this.pageSize = 100;
     this.cargandoPaginaSpinner = 0;
     const selectedFile = event.target.files[0];
     const fileReader = new FileReader();
@@ -26444,74 +26470,151 @@ export class PruebaComponent implements OnInit {
     });
   }
   exportexcel() {
+    this.exportarLibroInstitucional();
+    return;
     // Obtener la tabla
     const tabla: any = document.getElementById('excel-table');
 
     // Obtener los datos de la tabla en un arreglo de arreglos
     const datos = this.getTablaData(tabla);
+    if (datos.length === 0) {
+      Swal.fire('Sin información', 'No hay datos para exportar.', 'info');
+      return;
+    }
+
+    datos[0] = [
+      'Código',
+      'Nombre de la cuenta',
+      'Saldo anterior',
+      'Débito',
+      'Crédito',
+      'Saldo actual',
+      'Tipo saldo actual',
+      'Tipo saldo anterior',
+      'Valor corriente',
+      'Valor no corriente',
+      'Es corriente',
+      'Es no corriente',
+    ];
     // Crear una hoja de Excel
-    const hoja: any = XLSX.utils.aoa_to_sheet(datos);
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(datos);
 
     // Configurar el ancho de las columnas
     if (hoja) {
       const anchoColumnas = [
-        { wch: 20 },
-        { wch: 20 },
-        { wch: 40 },
-        { wch: 25 },
-        { wch: 25 },
-        { wch: 20 },
-        { wch: 25 },
-        { wch: 20 },
+        { wch: 18 },
+        { wch: 48 },
+        { wch: 22 },
+        { wch: 22 },
+        { wch: 22 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 22 },
+        { wch: 22 },
         { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
+        { wch: 18 },
       ];
       hoja['!cols'] = anchoColumnas;
+      hoja['!rows'] = datos.map((_fila: any, index: number) => ({
+        hpt: index === 0 ? 28 : 21,
+      }));
+      hoja['!autofilter'] = { ref: hoja['!ref'] };
+      hoja['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2' };
     } else {
       console.error('La hoja de Excel es undefined.');
     }
 
     // Configurar estilo de los encabezados
-    const encabezadosRange = XLSX.utils.decode_range(hoja['!ref']);
+    const encabezadosRange = XLSXStyle.utils.decode_range(hoja['!ref']);
     for (let i = encabezadosRange.s.c; i <= encabezadosRange.e.c; i++) {
-      const ref = XLSX.utils.encode_cell({ r: 0, c: i });
+      const ref = XLSXStyle.utils.encode_cell({ r: 0, c: i });
       hoja[ref].s = {
-        fill: { fgColor: { rgb: '4682B4' } },
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { patternType: 'solid', fgColor: { rgb: '155E75' } },
+        font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 },
+        alignment: { vertical: 'center', horizontal: 'center', wrapText: true },
         border: {
-          top: { style: 'thin', color: { auto: 1 } },
-          bottom: { style: 'thin', color: { auto: 1 } },
-          left: { style: 'thin', color: { auto: 1 } },
-          right: { style: 'thin', color: { auto: 1 } },
+          top: { style: 'thin', color: { rgb: '155E75' } },
+          bottom: { style: 'medium', color: { rgb: '0F766E' } },
+          left: { style: 'thin', color: { rgb: 'D4E4E8' } },
+          right: { style: 'thin', color: { rgb: 'D4E4E8' } },
         },
       };
     }
 
     // Configurar estilo de las celdas de datos
-    const datosRange = XLSX.utils.decode_range(hoja['!ref']);
+    const datosRange = XLSXStyle.utils.decode_range(hoja['!ref']);
     for (let i = datosRange.s.r + 1; i <= datosRange.e.r; i++) {
       for (let j = datosRange.s.c; j <= datosRange.e.c; j++) {
-        const ref = XLSX.utils.encode_cell({ r: i, c: j });
-        hoja[ref].s = {
+        const ref = XLSXStyle.utils.encode_cell({ r: i, c: j });
+        const celda = hoja[ref];
+        if (!celda) {
+          continue;
+        }
+
+        if ([2, 3, 4, 5, 8, 9].includes(j)) {
+          const valorNumerico = Number(String(celda.v ?? 0).replace(/,/g, ''));
+          if (Number.isFinite(valorNumerico)) {
+            celda.t = 'n';
+            celda.v = valorNumerico;
+            celda.z = '#,##0.00;[Red]-#,##0.00;0.00';
+          }
+        }
+
+        celda.s = {
           border: {
-            top: { style: 'thin', color: { auto: 1 } },
-            bottom: { style: 'thin', color: { auto: 1 } },
-            left: { style: 'thin', color: { auto: 1 } },
-            right: { style: 'thin', color: { auto: 1 } },
+            bottom: { style: 'thin', color: { rgb: 'DCE3EA' } },
           },
+          fill: {
+            patternType: 'solid',
+            fgColor: { rgb: i % 2 === 0 ? 'F1F7F8' : 'FFFFFF' },
+          },
+          font: {
+            color: { rgb: j === 0 ? '155E75' : '26374A' },
+            bold: j === 0,
+            sz: 10,
+          },
+          alignment: { vertical: 'center', horizontal: j >= 2 && j <= 9 ? 'right' : 'left' },
+          numFmt: [2, 3, 4, 5, 8, 9].includes(j)
+            ? '#,##0.00;[Red]-#,##0.00;0.00'
+            : undefined,
         };
       }
     }
     // Crear un libro de Excel y agregar la hoja
     if (datos.length > 0) {
       // Crear un libro de Excel y agregar la hoja
-      const libro = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(libro, hoja, 'Tabla');
+      const libro = XLSXStyle.utils.book_new();
+      const nombreHoja = this.reporteActivo === 'chip'
+        ? 'Reporte CHIP'
+        : this.reporteActivo === 'balance'
+          ? 'Balance'
+          : this.reporteActivo === 'resultados'
+            ? 'Resultados'
+            : 'Información procesada';
+      XLSXStyle.utils.book_append_sheet(libro, hoja, nombreHoja);
+      libro.Props = {
+        Title: nombreHoja,
+        Subject: 'Reporte contable',
+        Author: 'Herramienta contable',
+        CreatedDate: new Date(),
+      };
 
       // Descargar el archivo Excel
-      XLSX.writeFile(libro, 'tabla.xlsx');
+      const nombreArchivo = `${nombreHoja.replace(/\s+/g, '_')}.xlsx`;
+      XLSXStyle.writeFile(libro, nombreArchivo, {
+        bookType: 'xlsx',
+        cellStyles: true,
+        compression: true,
+      });
+      Swal.fire({
+        icon: 'success',
+        title: 'Excel generado',
+        text: `${nombreArchivo} se descargó correctamente.`,
+        confirmButtonColor: '#177447',
+        timer: 2200,
+        timerProgressBar: true,
+      });
     } else {
       console.error('No hay datos en la tabla para generar el archivo Excel.');
     }
@@ -27502,33 +27605,53 @@ export class PruebaComponent implements OnInit {
 
   miFuncion(parametro: string) {
     this.mostrarTabla = false;
+    if (this.datosReporteActual.length === 0) {
+      this.datosReporteActual = this.datosTabla;
+    }
+    const datosBase = this.datosReporteActual;
+    const tieneSaldo = (valor: any) => {
+      const numero = Number(String(valor ?? 0).replace(/,/g, ''));
+      return Number.isFinite(numero) && numero !== 0;
+    };
+
     switch (parametro) {
       case 'c':
-        this.datosTabla = this.corrientes;
-        this.mostrarTabla = true;
+        this.datosTabla = datosBase.filter(
+          (item: any) => tieneSaldo(item.tipoDeCuenta)
+        );
         break;
       case 'n':
-        this.datosTabla = this.noCorrientes;
-        this.mostrarTabla = true;
-        break;
-      case 'p':
-        this.datosTabla = this.padres;
-        this.mostrarTabla = true;
+        this.datosTabla = datosBase.filter(
+          (item: any) => tieneSaldo(item.compartidoTipo)
+        );
         break;
       case 'com':
-        this.datosTabla = this.corrientesNoCorrientes;
-        this.mostrarTabla = true;
+        this.datosTabla = datosBase.filter(
+          (item: any) =>
+            tieneSaldo(item.tipoDeCuenta) && tieneSaldo(item.compartidoTipo)
+        );
+        break;
+      case 'd':
+        this.datosTabla = datosBase.filter(
+          (item: any) =>
+            !tieneSaldo(item.tipoDeCuenta) && !tieneSaldo(item.compartidoTipo)
+        );
         break;
       default:
-        this.datosTabla = this.datosTabla334;
-        this.mostrarTabla = true;
+        this.datosTabla = datosBase;
         break;
     }
+    this.currentPage = 1;
+    this.selectAll = false;
+    this.seleccionados = [];
+    this.seleccionadosNewTable = [];
+    this.mostrarTabla = true;
     this.consultarTabla2();
   }
   generarReporteGeneral() {
     this.mostrarTabla = false;
-    this.datosTabla = this.datosTabla334;
+    this.asegurarTablaInicial();
+    this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
     let suma1 = {
       1: JSON.parse(localStorage.getItem('1.1.05') ?? '{}'),
       2: JSON.parse(localStorage.getItem('1.1.10') ?? '{}'),
@@ -28766,13 +28889,336 @@ export class PruebaComponent implements OnInit {
       }
     });
     this.datosTabla = x;
+    this.prepararVistaReporte('balance');
     this.mostrarTabla = true;
     this.consultarTabla();
+    this.mostrarReporteGenerado('Balance de comprobación');
+  }
+
+  exportarLibroInstitucional(): void {
+    const datosReporte = this.clonarDatos(
+      this.datosReporteActual.length > 0
+        ? this.datosReporteActual
+        : this.datosTabla
+    );
+
+    if (datosReporte.length === 0) {
+      Swal.fire('Sin información', 'No hay datos para exportar.', 'info');
+      return;
+    }
+
+    const libro = XLSXStyle.utils.book_new();
+    libro.Props = {
+      Title: 'Informe contable - Universidad Industrial de Santander',
+      Subject: this.nombreReporteActual(),
+      Author: 'Universidad Industrial de Santander',
+      Company: 'Universidad Industrial de Santander',
+      CreatedDate: new Date(),
+    };
+
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaPortada(datosReporte.length),
+      'Portada'
+    );
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaResumen(datosReporte),
+      'Resumen'
+    );
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaContable(datosReporte, this.nombreReporteActual()),
+      'Reporte'
+    );
+
+    const conCorriente = datosReporte.filter(
+      (item: any) => this.valorNumerico(item.tipoDeCuenta) !== 0
+    );
+    const conNoCorriente = datosReporte.filter(
+      (item: any) => this.valorNumerico(item.compartidoTipo) !== 0
+    );
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaContable(conCorriente, 'Cuentas corrientes'),
+      'Corriente'
+    );
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaContable(conNoCorriente, 'Cuentas no corrientes'),
+      'No corriente'
+    );
+
+    const cambios = this.obtenerCambiosChip();
+    if (cambios.length > 0) {
+      XLSXStyle.utils.book_append_sheet(
+        libro,
+        this.crearHojaCambios(cambios),
+        'Cambios CHIP'
+      );
+    }
+
+    if (this.tablaInicialGuardada.length > 0) {
+      XLSXStyle.utils.book_append_sheet(
+        libro,
+        this.crearHojaContable(
+          this.tablaInicialGuardada,
+          'Información procesada original'
+        ),
+        'Información original'
+      );
+    }
+
+    const fecha = new Date();
+    const sello = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+    const archivo = `UIS_${this.nombreReporteActual().replace(/[^a-zA-Z0-9]+/g, '_')}_${sello}.xlsx`;
+    XLSXStyle.writeFile(libro, archivo, {
+      bookType: 'xlsx',
+      cellStyles: true,
+      compression: true,
+    });
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Informe institucional generado',
+      text: `${archivo} se descargó correctamente.`,
+      confirmButtonColor: '#176b4d',
+      timer: 2600,
+      timerProgressBar: true,
+    });
+  }
+
+  nombreReporteActual(): string {
+    switch (this.reporteActivo) {
+      case 'chip': return 'Reporte CHIP';
+      case 'balance': return 'Balance de comprobación';
+      case 'resultados': return 'Estado de resultados';
+      case 'original': return 'Información procesada';
+      default: return 'Informe contable';
+    }
+  }
+
+  valorNumerico(valor: any): number {
+    const numero = Number(String(valor ?? 0).replace(/,/g, ''));
+    return Number.isFinite(numero) ? numero : 0;
+  }
+
+  crearHojaPortada(totalRegistros: number): any {
+    const filas = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['INFORME CONTABLE INSTITUCIONAL'],
+      [''],
+      [this.nombreReporteActual()],
+      [''],
+      ['Fecha de generación', new Date().toLocaleString('es-CO')],
+      ['Registros incluidos', totalRegistros],
+      ['Estado', 'Generado correctamente'],
+      [''],
+      ['Documento generado por la Herramienta de Procesamiento Contable UIS'],
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(filas);
+    hoja['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+      { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+      { s: { r: 9, c: 0 }, e: { r: 9, c: 7 } },
+    ];
+    hoja['!cols'] = [{ wch: 28 }, { wch: 28 }, ...Array(6).fill({ wch: 14 })];
+    hoja['!rows'] = [{ hpt: 42 }, { hpt: 30 }, { hpt: 16 }, { hpt: 34 }];
+    const titulo = hoja['A1'];
+    titulo.s = {
+      fill: { patternType: 'solid', fgColor: { rgb: '146B45' } },
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 22 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    };
+    hoja['A2'].s = {
+      fill: { patternType: 'solid', fgColor: { rgb: 'E5F2EB' } },
+      font: { bold: true, color: { rgb: '174A35' }, sz: 14 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    };
+    hoja['A4'].s = {
+      font: { bold: true, color: { rgb: '174A35' }, sz: 18 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    };
+    ['A6', 'A7', 'A8'].forEach((ref) => hoja[ref].s = {
+      font: { bold: true, color: { rgb: '486457' } },
+      fill: { patternType: 'solid', fgColor: { rgb: 'F1F6F3' } },
+    });
+    hoja['A10'].s = {
+      font: { italic: true, color: { rgb: '6C7D74' }, sz: 10 },
+      alignment: { horizontal: 'center' },
+    };
+    return hoja;
+  }
+
+  crearHojaResumen(datos: any[]): any {
+    const sumar = (campo: string) => datos.reduce(
+      (total: number, item: any) => total + this.valorNumerico(item[campo]), 0
+    );
+    const filas = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['Resumen ejecutivo', this.nombreReporteActual()],
+      [''],
+      ['Indicador', 'Valor'],
+      ['Total de cuentas', datos.length],
+      ['Saldo anterior', sumar('saldoAnterior')],
+      ['Débitos', sumar('debito')],
+      ['Créditos', sumar('credito')],
+      ['Saldo actual', sumar('nuevoSaldo')],
+      ['Total corriente', sumar('tipoDeCuenta')],
+      ['Total no corriente', sumar('compartidoTipo')],
+      ['Cuentas con saldo corriente', datos.filter((x: any) => this.valorNumerico(x.tipoDeCuenta) !== 0).length],
+      ['Cuentas con saldo no corriente', datos.filter((x: any) => this.valorNumerico(x.compartidoTipo) !== 0).length],
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(filas);
+    hoja['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    hoja['!cols'] = [{ wch: 38 }, { wch: 28 }, { wch: 15 }, { wch: 15 }];
+    hoja['A1'].s = this.estiloTituloInstitucional();
+    ['A4', 'B4'].forEach((ref) => hoja[ref].s = this.estiloEncabezado());
+    for (let fila = 4; fila < filas.length; fila++) {
+      const valor = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: 1 })];
+      if (valor && typeof valor.v === 'number' && fila >= 5 && fila <= 10) {
+        valor.z = '#,##0.00;[Red](#,##0.00);-';
+        valor.s = this.estiloCeldaNumerica(fila);
+      }
+    }
+    return hoja;
+  }
+
+  crearHojaContable(datos: any[], titulo: string): any {
+    const encabezados = ['Código', 'Nombre de la cuenta', 'Saldo anterior', 'Débito', 'Crédito', 'Saldo actual', 'Tipo anterior', 'Tipo actual', 'Corriente', 'No corriente'];
+    const filas = datos.map((item: any) => [
+      String(item.codigo ?? ''),
+      String(item.nombre ?? ''),
+      this.valorNumerico(item.saldoAnterior),
+      this.valorNumerico(item.debito),
+      this.valorNumerico(item.credito),
+      this.valorNumerico(item.nuevoSaldo),
+      item.tipoSaldoAnterior ?? '',
+      item.tipoSaldoNuevo ?? '',
+      this.valorNumerico(item.tipoDeCuenta),
+      this.valorNumerico(item.compartidoTipo),
+    ]);
+    const contenido = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      [titulo],
+      [`Generado: ${new Date().toLocaleString('es-CO')}`],
+      [''],
+      encabezados,
+      ...filas,
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(contenido);
+    hoja['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } },
+    ];
+    hoja['!cols'] = [{ wch: 18 }, { wch: 48 }, ...Array(4).fill({ wch: 21 }), { wch: 16 }, { wch: 16 }, { wch: 21 }, { wch: 21 }];
+    hoja['!rows'] = contenido.map((_x: any, i: number) => ({ hpt: i === 0 ? 30 : i === 4 ? 28 : 20 }));
+    hoja['!autofilter'] = { ref: `A5:J${contenido.length}` };
+    hoja['!freeze'] = { xSplit: 0, ySplit: 5, topLeftCell: 'A6' };
+    hoja['A1'].s = this.estiloTituloInstitucional();
+    hoja['A2'].s = { font: { bold: true, color: { rgb: '174A35' }, sz: 15 }, alignment: { horizontal: 'center' } };
+    hoja['A3'].s = { font: { italic: true, color: { rgb: '718078' }, sz: 9 }, alignment: { horizontal: 'center' } };
+    for (let col = 0; col < encabezados.length; col++) {
+      hoja[XLSXStyle.utils.encode_cell({ r: 4, c: col })].s = this.estiloEncabezado();
+    }
+    for (let fila = 5; fila < contenido.length; fila++) {
+      const codigo = String(contenido[fila][0]);
+      const nivel = Math.max(0, codigo.split('.').length - 1);
+      const esPadre = nivel <= 2;
+      for (let col = 0; col < encabezados.length; col++) {
+        const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: col })];
+        if (!celda) continue;
+        celda.s = {
+          fill: { patternType: 'solid', fgColor: { rgb: esPadre ? 'E3F0E9' : fila % 2 === 0 ? 'F6F9F7' : 'FFFFFF' } },
+          font: { bold: esPadre, color: { rgb: esPadre ? '174A35' : '283B32' }, sz: 10 },
+          alignment: { vertical: 'center', horizontal: [2,3,4,5,8,9].includes(col) ? 'right' : 'left', indent: col === 1 ? Math.min(nivel, 5) : 0 },
+          border: { bottom: { style: 'thin', color: { rgb: 'DCE6E0' } } },
+        };
+        if ([2,3,4,5,8,9].includes(col)) {
+          celda.z = '#,##0.00;[Red](#,##0.00);-';
+          celda.s.numFmt = '#,##0.00;[Red](#,##0.00);-';
+        }
+      }
+    }
+    return hoja;
+  }
+
+  obtenerCambiosChip(): any[] {
+    if (this.reporteChipGuardado.length === 0 || this.tablaInicialGuardada.length === 0) return [];
+    return this.reporteChipGuardado.reduce((cambios: any[], actual: any) => {
+      const original = this.tablaInicialGuardada.find(
+        (item: any) => String(item.codigo).trim() === String(actual.codigo).trim()
+      );
+      if (!original) return cambios;
+      const corrienteAntes = this.valorNumerico(original.tipoDeCuenta);
+      const corrienteAhora = this.valorNumerico(actual.tipoDeCuenta);
+      const noCorrienteAntes = this.valorNumerico(original.compartidoTipo);
+      const noCorrienteAhora = this.valorNumerico(actual.compartidoTipo);
+      if (corrienteAntes !== corrienteAhora || noCorrienteAntes !== noCorrienteAhora) {
+        cambios.push([actual.codigo, actual.nombre, corrienteAntes, corrienteAhora, corrienteAhora - corrienteAntes, noCorrienteAntes, noCorrienteAhora, noCorrienteAhora - noCorrienteAntes]);
+      }
+      return cambios;
+    }, []);
+  }
+
+  crearHojaCambios(cambios: any[]): any {
+    const contenido = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['Trazabilidad de modificaciones - Reporte CHIP'],
+      [''],
+      ['Código', 'Cuenta', 'Corriente original', 'Corriente modificada', 'Diferencia corriente', 'No corriente original', 'No corriente modificada', 'Diferencia no corriente'],
+      ...cambios,
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(contenido);
+    hoja['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }];
+    hoja['!cols'] = [{ wch: 18 }, { wch: 45 }, ...Array(6).fill({ wch: 22 })];
+    hoja['!autofilter'] = { ref: `A4:H${contenido.length}` };
+    hoja['A1'].s = this.estiloTituloInstitucional();
+    for (let col = 0; col < 8; col++) hoja[XLSXStyle.utils.encode_cell({ r: 3, c: col })].s = this.estiloEncabezado();
+    for (let fila = 4; fila < contenido.length; fila++) {
+      for (let col = 0; col < 8; col++) {
+        const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: col })];
+        if (!celda) continue;
+        celda.s = col >= 2 ? this.estiloCeldaNumerica(fila) : { border: { bottom: { style: 'thin', color: { rgb: 'DCE6E0' } } } };
+        if (col >= 2) celda.z = '#,##0.00;[Red](#,##0.00);-';
+      }
+    }
+    return hoja;
+  }
+
+  estiloTituloInstitucional(): any {
+    return {
+      fill: { patternType: 'solid', fgColor: { rgb: '146B45' } },
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 16 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    };
+  }
+
+  estiloEncabezado(): any {
+    return {
+      fill: { patternType: 'solid', fgColor: { rgb: '1B5E46' } },
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 10 },
+      alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+      border: { bottom: { style: 'medium', color: { rgb: 'D5A928' } } },
+    };
+  }
+
+  estiloCeldaNumerica(fila: number): any {
+    return {
+      fill: { patternType: 'solid', fgColor: { rgb: fila % 2 === 0 ? 'F2F7F4' : 'FFFFFF' } },
+      font: { color: { rgb: '283B32' }, sz: 10 },
+      alignment: { horizontal: 'right', vertical: 'center' },
+      border: { bottom: { style: 'thin', color: { rgb: 'DCE6E0' } } },
+      numFmt: '#,##0.00;[Red](#,##0.00);-',
+    };
   }
 
   generarReporteSecundario() {
     this.mostrarTabla = false;
-    this.datosTabla = this.datosTabla334;
+    this.asegurarTablaInicial();
+    this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
     let x: any = [];
     this.modeloDatosReporte2.forEach((element) => {
       let y = this.datosTabla.filter(
@@ -28782,13 +29228,19 @@ export class PruebaComponent implements OnInit {
     });
     console.log(x);
     this.datosTabla = x;
+    this.prepararVistaReporte('resultados');
     this.mostrarTabla = true;
     this.consultarTabla();
+    this.mostrarReporteGenerado('Resultados');
   }
 
   generarReporteChip() {
     this.mostrarTabla = false;
-    this.datosTabla = this.datosTabla334;
+    this.asegurarTablaInicial();
+    const chipPersistido = this.reporteChipGuardado.length > 0
+      ? this.reporteChipGuardado
+      : this.tablaInicialGuardada;
+    this.datosTabla = this.clonarDatos(chipPersistido);
     let x: any = [];
     this.modeloReporteChip.forEach((element) => {
       let y = this.datosTabla.filter(
@@ -28798,8 +29250,61 @@ export class PruebaComponent implements OnInit {
     });
     console.log(x);
     this.datosTabla = x;
+    this.prepararVistaReporte('chip');
     this.mostrarTabla = true;
     this.consultarTabla();
+    this.mostrarReporteGenerado('Reporte CHIP');
+  }
+
+  mostrarReporteGenerado(nombreReporte: string): void {
+    Swal.fire({
+      icon: 'success',
+      title: 'Reporte generado',
+      text: `${nombreReporte} se generó correctamente.`,
+      confirmButtonText: 'Ver reporte',
+      confirmButtonColor: '#177447',
+      timer: 2600,
+      timerProgressBar: true,
+    });
+  }
+
+  asegurarTablaInicial(): void {
+    if (this.tablaInicialGuardada.length === 0) {
+      this.tablaInicialGuardada = this.clonarDatos(this.datosTabla);
+    }
+  }
+
+  clonarDatos(datos: any[]): any[] {
+    return JSON.parse(JSON.stringify(datos || []));
+  }
+
+  mostrarInformacionOriginal(): void {
+    if (this.tablaInicialGuardada.length === 0) {
+      return;
+    }
+    this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
+    this.prepararVistaReporte('original');
+    this.mostrarTabla = true;
+    this.consultarTabla();
+  }
+
+  prepararVistaReporte(tipo: 'balance' | 'chip' | 'resultados' | 'original'): void {
+    this.reporteActivo = tipo;
+    this.currentPage = 1;
+    this.pageSize = 100;
+    this.selectAll = false;
+    this.seleccionados = [];
+    this.seleccionadosNewTable = [];
+    this.datosTabla = this.datosTabla.filter((item: any) => !!item);
+    this.datosTabla.forEach((item: any) => (item.tipo = false));
+    this.datosReporteActual = this.datosTabla;
+
+    const columnasSinSeleccion = this.displayedColumns.filter(
+      (columna: string) => columna !== 'tipo'
+    );
+    this.displayedColumns = tipo === 'chip'
+      ? ['tipo', ...columnasSinSeleccion]
+      : columnasSinSeleccion;
   }
   secuenciaDecodigosNuevos() {}
   applyFilter(event: any) {
@@ -28827,6 +29332,9 @@ export class PruebaComponent implements OnInit {
   }
   seleccionadosTabla(row: any) {
     if (this.baseInformes) {
+      if (!this.puedeEditarDistribucion(row)) {
+        return;
+      }
       if (this.seleccionadosNewTable.includes(row)) {
         // Si el row ya está en la lista de seleccionados, lo eliminamos
         this.seleccionadosNewTable = this.seleccionadosNewTable.filter(
@@ -28847,6 +29355,60 @@ export class PruebaComponent implements OnInit {
       // Si el row no está en la lista de seleccionados, lo agregamos
       this.seleccionados.push(row);
     }
+  }
+
+  puedeEditarDistribucion(row: any): boolean {
+    return !!row &&
+      String(row.codigo || '').trim().length === 9 &&
+      Number(row.tipoDeCuenta) !== 0 &&
+      Number(row.compartidoTipo) !== 0;
+  }
+
+  openDialogAjusteReporte() {
+    const dialogRef = this.dialog.open(ModalTablaComponent, {
+      panelClass: ['my-custom-dialog', 'account-adjustment-dialog'],
+      width: 'min(920px, 94vw)',
+      maxWidth: '94vw',
+      maxHeight: '88vh',
+      data: {
+        tipo: 'ajustarCorrienteNoCorriente',
+        data: this.seleccionadosNewTable,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (!result) {
+        return;
+      }
+
+      result.forEach((ajuste: any) => {
+        const cuenta = this.datosTabla.find(
+          (item: any) => item.codigo.trim() === ajuste.codigo.trim()
+        );
+        if (cuenta) {
+          cuenta.tipoDeCuenta = Number(ajuste.tipoDeCuenta) || 0;
+          cuenta.compartidoTipo = Number(ajuste.compartidoTipo) || 0;
+        }
+      });
+
+      this.seleccionadosNewTable = [];
+      this.selectAll = false;
+      this.datosTabla.forEach((item: any) => (item.tipo = false));
+      // Preparación original: recalcular desde las cuentas de este nivel
+      // para que el modelo vuelva a sumar corriente y no corriente hacia arriba.
+      this.datosTabla = this.datosTabla.filter(
+        (item: any) => String(item.codigo || '').trim().length === 9
+      );
+      this.contadormodelo = 18;
+      this.ejecucion = 0;
+      this.ejecutarModeloDeResumidosReporte(this.contadormodelo);
+      this.datosReporteActual = this.datosTabla;
+      this.reporteChipGuardado = this.clonarDatos(this.datosTabla);
+      localStorage.setItem(
+        'reporteChipModificado',
+        JSON.stringify(this.reporteChipGuardado)
+      );
+    });
   }
 
   openDialogAfter() {

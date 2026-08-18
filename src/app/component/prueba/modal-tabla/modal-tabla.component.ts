@@ -148,6 +148,33 @@ export class ModalTablaNuevasComponent implements OnInit {
     );
   }
 
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.datosTabla.length / this.pageSize));
+  }
+
+  get firstVisibleRecord(): number {
+    return this.datosTabla.length === 0
+      ? 0
+      : (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get lastVisibleRecord(): number {
+    return Math.min(this.currentPage * this.pageSize, this.datosTabla.length);
+  }
+
+  changePageSize(event: Event): void {
+    this.pageSize = Number((event.target as HTMLSelectElement).value);
+    this.goToPage(1);
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = Math.min(Math.max(page, 1), this.totalPages);
+    this.dataTareasPaginated = this.datosTabla.slice(
+      (this.currentPage - 1) * this.pageSize,
+      this.currentPage * this.pageSize
+    );
+  }
+
   onCancel() {
     this.dialog.closeAll();
   }

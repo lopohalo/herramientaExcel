@@ -2,3 +2,82 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Los diálogos de Angular Material deben quedar sobre el modal de
+   configuración de códigos, que se renderiza como una capa de página. */
+.cdk-overlay-container {
+  z-index: 20000 !important;
+}
+
+.cdk-overlay-backdrop {
+  z-index: 20000 !important;
+}
+
+.cdk-global-overlay-wrapper,
+.cdk-overlay-pane {
+  z-index: 20001 !important;
+}
+
+/* Diálogo de distribución CHIP. Se declara globalmente porque Angular
+   Material lo monta fuera del árbol del componente, dentro del overlay. */
+.account-adjustment-dialog {
+  width: min(920px, 94vw) !important;
+  max-width: 94vw !important;
+}
+
+.account-adjustment-dialog .mat-dialog-container,
+.account-adjustment-dialog .mat-mdc-dialog-container,
+.account-adjustment-dialog .mdc-dialog__surface {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 70px rgba(7, 25, 42, .34) !important;
+}
+
+.account-adjustment-dialog .adjustment-dialog {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-height: 86vh !important;
+  overflow: hidden !important;
+  color: #1d2b3d !important;
+  font-family: Inter, "Segoe UI", sans-serif !important;
+  background: #f6f8fb !important;
+}
+
+.account-adjustment-dialog .adjustment-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+  padding: 20px 22px !important;
+  color: #fff !important;
+  background: linear-gradient(115deg, #12334f, #17556a 72%, #17736b) !important;
+}
+
+.account-adjustment-dialog .adjustment-title { display: flex !important; align-items: center !important; gap: 13px !important; }
+.account-adjustment-dialog .adjustment-icon { display: grid !important; place-items: center !important; width: 43px !important; height: 43px !important; color: #164c59 !important; background: #7ce0cb !important; border-radius: 12px !important; }
+.account-adjustment-dialog .eyebrow { display: block !important; margin-bottom: 3px !important; color: #80e4d1 !important; font-size: 9px !important; font-weight: 800 !important; letter-spacing: .14em !important; text-transform: uppercase !important; }
+.account-adjustment-dialog .adjustment-header h2 { margin: 0 !important; color: #fff !important; font-size: 19px !important; }
+.account-adjustment-dialog .adjustment-header p { margin: 4px 0 0 !important; color: #c8dbe4 !important; font-size: 11px !important; }
+.account-adjustment-dialog .close-dialog { display: grid !important; place-items: center !important; width: 34px !important; height: 34px !important; padding: 0 !important; color: #fff !important; background: rgba(255,255,255,.1) !important; border: 1px solid rgba(255,255,255,.18) !important; border-radius: 9px !important; }
+.account-adjustment-dialog .adjustment-notice { display: flex !important; align-items: center !important; gap: 8px !important; padding: 10px 20px !important; color: #426178 !important; font-size: 11px !important; background: #eaf4f7 !important; }
+.account-adjustment-dialog .adjustment-list { display: grid !important; gap: 10px !important; min-height: 0 !important; padding: 14px 18px !important; overflow: auto !important; }
+.account-adjustment-dialog .account-adjustment { padding: 14px 15px !important; background: #fff !important; border: 1px solid #e1e7ed !important; border-left: 3px solid #e0a633 !important; border-radius: 12px !important; }
+.account-adjustment-dialog .account-summary { display: grid !important; grid-template-columns: auto 1fr auto !important; align-items: center !important; gap: 12px !important; padding-bottom: 10px !important; border-bottom: 1px solid #edf0f3 !important; }
+.account-adjustment-dialog .account-code { padding: 4px 7px !important; color: #29556b !important; font: 700 10px Consolas, monospace !important; background: #eaf2f6 !important; border-radius: 5px !important; }
+.account-adjustment-dialog .account-name { color: #29384c !important; font-size: 12px !important; font-weight: 650 !important; }
+.account-adjustment-dialog .balance-summary { text-align: right !important; }
+.account-adjustment-dialog .distribution-fields { display: grid !important; grid-template-columns: minmax(160px,1fr) 34px minmax(160px,1fr) minmax(145px,.8fr) !important; align-items: end !important; gap: 10px !important; padding-top: 11px !important; }
+.account-adjustment-dialog .distribution-fields label > span { display: block !important; margin-bottom: 5px !important; color: #647286 !important; font-size: 10px !important; font-weight: 700 !important; }
+.account-adjustment-dialog .money-input { display: flex !important; align-items: center !important; height: 38px !important; overflow: hidden !important; background: #f9fafc !important; border: 1px solid #d8e0e8 !important; border-radius: 8px !important; }
+.account-adjustment-dialog .money-input input { width: 100% !important; height: 100% !important; padding: 0 9px !important; text-align: right !important; background: transparent !important; border: 0 !important; outline: 0 !important; }
+.account-adjustment-dialog .balance-action { width: 32px !important; height: 32px !important; padding: 0 !important; color: #176e68 !important; background: #e6f4f2 !important; border: 0 !important; border-radius: 8px !important; }
+.account-adjustment-dialog .distribution-total { min-height: 38px !important; padding: 4px 9px !important; color: #815d15 !important; background: #fff8e4 !important; border-radius: 8px !important; }
+.account-adjustment-dialog .distribution-total.matches { color: #176540 !important; background: #e7f7ee !important; }
+.account-adjustment-dialog .adjustment-footer { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 15px !important; padding: 11px 18px !important; background: #fff !important; border-top: 1px solid #dfe5eb !important; }
+.account-adjustment-dialog .adjustment-footer > div { display: flex !important; gap: 8px !important; }
+.account-adjustment-dialog .cancel-action,
+.account-adjustment-dialog .save-action { min-height: 38px !important; padding: 0 14px !important; font-size: 11px !important; font-weight: 750 !important; border-radius: 8px !important; }
+.account-adjustment-dialog .cancel-action { color: #536176 !important; background: #fff !important; border: 1px solid #d8dfe7 !important; }
+.account-adjustment-dialog .save-action { color: #fff !important; background: #177447 !important; border: 1px solid #177447 !important; }

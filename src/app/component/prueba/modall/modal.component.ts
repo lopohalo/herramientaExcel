@@ -10,7 +10,7 @@ import { FormatNumberPipe } from './pipe';
 @Component({
   selector: 'app-modal-tabla',
   templateUrl: './modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./modal.component.scss'],
   providers: [FormatNumberPipe],
 })
 export class ModalTablaComponent implements OnInit {
@@ -24,6 +24,11 @@ export class ModalTablaComponent implements OnInit {
   objetosCopia: any = [];
   mostrarSaldoAnterior = false;
   mostrarCompartidosCorriente = false;
+  mostrarAjusteCorrienteNoCorriente = false;
+  valoresCorrientes: number[] = [];
+  valoresNoCorrientes: number[] = [];
+  totalesDistribucion: number[] = [];
+  errorAjuste = '';
   constructor(
     @Inject(MAT_DIALOG_DATA)
     public data: any,
@@ -32,6 +37,21 @@ export class ModalTablaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.data && this.data.tipo === 'ajustarCorrienteNoCorriente') {
+      this.mostrarAjusteCorrienteNoCorriente = true;
+      this.valoresCorrientes = this.data.data.map(
+        (item: any) => Number(item.tipoDeCuenta) || 0
+      );
+      this.valoresNoCorrientes = this.data.data.map(
+        (item: any) => Number(item.compartidoTipo) || 0
+      );
+      this.totalesDistribucion = this.data.data.map(
+        (item: any) =>
+          (Number(item.tipoDeCuenta) || 0) +
+          (Number(item.compartidoTipo) || 0)
+      );
+      return;
+    }
     if (this.data && this.data.tipo === 'compartidoCuenta') {
       this.mostrarCompartidosCorriente = true;
     }
@@ -51,6 +71,43 @@ export class ModalTablaComponent implements OnInit {
       cuentaCorriente: this.cuentaCorriente,
     };
     this.dialogRef1.close(obj);
+  }
+
+  totalDistribuido(index: number): number {
+    return (Number(this.valoresCorrientes[index]) || 0) +
+      (Number(this.valoresNoCorrientes[index]) || 0);
+  }
+
+  diferenciaAjuste(index: number): number {
+    return this.totalesDistribucion[index] - this.totalDistribuido(index);
+  }
+
+  completarNoCorriente(index: number): void {
+    this.valoresNoCorrientes[index] =
+      this.totalesDistribucion[index] -
+      (Number(this.valoresCorrientes[index]) || 0);
+    this.errorAjuste = '';
+  }
+
+  actualizarDesdeCorriente(index: number): void {
+    this.valoresNoCorrientes[index] =
+      this.totalesDistribucion[index] -
+      (Number(this.valoresCorrientes[index]) || 0);
+  }
+
+  actualizarDesdeNoCorriente(index: number): void {
+    this.valoresCorrientes[index] =
+      this.totalesDistribucion[index] -
+      (Number(this.valoresNoCorrientes[index]) || 0);
+  }
+
+  guardarAjustes(): void {
+    const resultado = this.data.data.map((item: any, index: number) => ({
+      ...item,
+      tipoDeCuenta: Number(this.valoresCorrientes[index]) || 0,
+      compartidoTipo: Number(this.valoresNoCorrientes[index]) || 0,
+    }));
+    this.dialogRef1.close(resultado);
   }
 
   verificarCorriente(): void {

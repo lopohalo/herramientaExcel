@@ -1,380 +1,62 @@
-<div class="container" style="margin: 0px !important">
-  <div class="row">
-    <div class="col-12 justify-content-center">
-      <nav
-        class="navbar navbar-light justify-content-between mb-3 bg-light p-3"
-      >
-        <a class="navbar-brand" href="#">
-          <img
-            src="assets\img\logo.png"
-            width="40"
-            height="20"
-            class="d-inline-block align-top"
-            alt=""
-          />
-        </a>
-        <h2>{{ titulo }}</h2>
-      </nav>
+<main class="accounting-workspace">
+  <header class="app-header">
+    <div class="brand-block"><div class="brand-mark"><img src="assets/img/logo.png" alt="Logo" /></div><div><span class="eyebrow">Herramienta contable</span><h1>{{ titulo || 'Procesamiento de balances' }}</h1></div></div>
+    <div class="header-status" [class.is-ready]="mostrarTabla"><span class="status-dot"></span>{{ mostrarTabla ? 'Archivo procesado' : 'Listo para comenzar' }}</div>
+  </header>
 
-      <ng-template [ngIf]="cargandoPaginaSpinner === 0" [ngIfElse]="loading">
-        <div class="container text-center" style="margin-top: 300px">
-          <div class="row">
-            <div class="col-12">
-              <div class="spinner-grow text-primary" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-secondary" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-success" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-danger" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-warning" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-info" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <div class="spinner-grow text-dark" role="status">
-                <span class="sr-only"></span>
-              </div>
-              <p>Cargando Datos....</p>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-
-      <ng-template #loading>
-        <!-- Upload  -->
-        <ng-template [ngIf]="validartabla !== 1">
-          <div class="container">
-            <div class="row">
-              <div [class]="mostrarTabla ? 'col-8' : 'col-12'">
-                <form id="file-upload-form" class="uploader">
-                  <input
-                    id="file-upload"
-                    type="file"
-                    name="fileUpload"
-                    (change)="fileUpload($event)"
-                    accept=".xls,.xlsx"
-                  />
-
-                  <label for="file-upload" id="file-drag">
-                    <img id="file-image" src="#" alt="Preview" class="hidden" />
-                    <div id="start">
-                      <i class="fa fa-download" aria-hidden="true"></i>
-                      <div>Por favor seleccione un archivo xls EXCEL</div>
-                      <div id="notimage" class="hidden">
-                        Por favor seleccione un archivo xls EXCEL
-                      </div>
-                      <span id="file-upload-btn" class="btn btn-primary"
-                        >Seleccione el archivo</span
-                      >
-                    </div>
-                    <div id="response" class="hidden">
-                      <div id="messages"></div>
-                      <progress class="progress" id="file-progress" value="0">
-                        <span>0</span>%
-                      </progress>
-                    </div>
-                  </label>
-                </form>
-              </div>
-              <div
-                class="col-4"
-                style="display: flex; flex-direction: column"
-                *ngIf="mostrarTabla"
-              >
-                <button
-                  (click)="generarReporteGeneral()"
-                  style="margin-bottom: 20px"
-                  class="btn btn-outline-success"
-                  type="button"
-                >
-                  Balance de comprobacion
-                </button>
-                <button
-                  (click)="generarReporteChip()"
-                  style="margin-bottom: 20px"
-                  class="btn btn-outline-success"
-                  type="button"
-                >
-                  Reporte CHIP
-                </button>
-                <button
-                  (click)="generarReporteSecundario()"
-                  class="btn btn-outline-success"
-                  type="button"
-                >
-                  Resultados
-                </button>
-              </div>
-            </div>
-          </div>
-        </ng-template>
-
-        <div class="container mt-5" *ngIf="mostrarTabla">
-          <div class="row" style="justify-content: center">
-            <div class="col-12 mt-5 text-center mb-2">
-              <div class="row">
-                <div class="col-4">
-                  <button
-                    (click)="exportexcel()"
-                    class="btn btn-outline-success"
-                    type="button"
-                  >
-                    Exportar a Excel
-                  </button>
-                </div>
-                <div class="col-1 bg-success1" (click)="miFuncion('c')">
-                  <p style="color: #333; font-weight: bold; text-align: center">
-                    Corriente
-                  </p>
-                </div>
-
-                <div class="col-1 bg-success2" (click)="miFuncion('n')">
-                  <p style="color: #333; font-weight: bold; text-align: center">
-                    No Corriente
-                  </p>
-                </div>
-
-                <!-- <div class="col-1 bg-danger1" (click)="miFuncion('p')">
-               <p style="color: #333; font-weight: bold; text-align: center;">Padres</p>
-             </div> -->
-
-                <div class="col-1 bg-yellow" (click)="miFuncion('com')">
-                  <p style="color: #333; font-weight: bold; text-align: center">
-                    Si/No Corriente
-                  </p>
-                </div>
-                <div
-                  class="col-1"
-                  style="background-color: #e0dcdc"
-                  (click)="miFuncion('d')"
-                >
-                  <p style="color: #333; font-weight: bold; text-align: center">
-                    por Defecto
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12 text-center" style="display: none">
-              <div
-                style="
-                  max-height: 500px;
-                  overflow-x: auto;
-                  overflow-y: auto;
-                  text-align: center;
-                "
-              >
-                <table
-                  #tabla
-                  id="excel-table"
-                  class="table table-bordered border border-3 table-hover"
-                  *ngIf="datosTabla"
-                >
-                  <thead>
-                    <tr>
-                      <th>codigo</th>
-                      <th>nombre</th>
-                      <th>saldo anterior</th>
-                      <th>debito</th>
-                      <th>credito</th>
-                      <th>saldo actual</th>
-                      <th>tipo de saldo actual</th>
-                      <th>tipo de saldo anterior</th>
-                      <th>Corriente</th>
-                      <th>Corriente/no corriente</th>
-                      <th>es corriente</th>
-                      <th>es no corriente</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let x of datosTabla">
-                      <td>{{ x.codigo }}</td>
-                      <td>{{ x.nombre }}</td>
-                      <td>{{ x.saldoAnterior }}</td>
-                      <td>{{ x.debito }}</td>
-                      <td>{{ x.credito }}</td>
-                      <td>{{ x.nuevoSaldo }}</td>
-                      <td>{{ x.tipoSaldoAnterior }}</td>
-                      <td>{{ x.tipoSaldoNuevo }}</td>
-                      <td>{{ x.tipoDeCuenta }}</td>
-                      <td>{{ x.compartidoTipo }}</td>
-                      <td>{{ x.corriente }}</td>
-                      <td>{{ x.noCorriente }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div
-              *ngIf="mostrarTabla"
-              class="col-6"
-              style="text-align: start; align-items: start"
-            >
-              <mat-form-field>
-                <mat-label> Filtrado por codigo </mat-label>
-                <input
-                  matInput
-                  #input
-                  (keyup)="applyFilter($event)"
-                  placeholder="Filter"
-                />
-              </mat-form-field>
-            </div>
-            <div style="min-width: 130px; text-align: right">
-              <ng-container>
-                <button
-                  *ngIf="seleccionados.length > 0"
-                  mat-icon-button
-                  (click)="openDialog()"
-                  matTooltip="editar"
-                >
-                  <mat-icon class="icono">edit</mat-icon>
-                </button>
-              </ng-container>
-                 <ng-container>
-                <button
-                  *ngIf="seleccionadosNewTable.length > 0"
-                  mat-icon-button
-                  (click)="openDialogAfter()"
-                  matTooltip="editar"
-                >
-                  <mat-icon class="icono">edit</mat-icon>
-                </button>
-              </ng-container>
-            </div>
-
-            <table
-              *ngIf="mostrarTabla"
-              mat-table
-              [dataSource]="dataTareasPaginated"
-              matSort
-              (matSortChange)="onSort($event)"
-            >
-              <!-- <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox  (change)="toggleAllSelection()">
-              </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row">
-              <mat-checkbox [checked]="row.tipo" (change)="seleccionadosTabla(row)">
-              </mat-checkbox>
-            </td>
-          </ng-container> -->
-              <ng-container matColumnDef="tipo">
-                <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox (change)="toggleAllSelection()"> </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  <mat-checkbox
-                    [checked]="row.tipo"
-                    (change)="seleccionadosTabla(row)"
-                  >
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="codigo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  codigo
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.codigo }}</td>
-              </ng-container>
-              <ng-container matColumnDef="nombre">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  Nombre
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
-              </ng-container>
-              <ng-container matColumnDef="saldoAnterior">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  saldo anterior
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.saldoAnterior }}</td>
-              </ng-container>
-              <ng-container matColumnDef="debito">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  Debito
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.debito }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="credito">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  Credito
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.credito }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="nuevoSaldo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  Nuevo saldo
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.nuevoSaldo }}</td>
-              </ng-container>
-              <ng-container matColumnDef="tipoSaldoAnterior">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  tipo del saldo anterior
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  {{ row.tipoSaldoAnterior }}
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="tipoSaldoNuevo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  tipo del saldo nuevo
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.tipoSaldoNuevo }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="tipoDeCuenta">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  Corriente
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.tipoDeCuenta }}</td>
-              </ng-container>
-              <ng-container matColumnDef="compartidoTipo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  No corriente
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row.compartidoTipo }}</td>
-              </ng-container>
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumns"
-                [ngClass]="rowColors[row.codigo]"
-              ></tr>
-            </table>
-
-            <mat-paginator
-              *ngIf="mostrarTabla"
-              (page)="onPageChange($event)"
-              [length]="datosTabla.length"
-              [pageSize]="dataTareasPaginated.length"
-              [pageSizeOptions]="[100, 200, 400, 1000]"
-              firstPageLabel="a"
-              itemsPerPageLabel="g"
-              lastPageLabel="h"
-              nextPageLabel="k"
-              previousPageLabel="o"
-              showFirstLastButtons
-            ></mat-paginator>
-          </div>
-        </div>
-      </ng-template>
+  <section class="hero-panel">
+    <div><span class="section-kicker">Flujo de trabajo</span><h2>Convierte tu balance en reportes contables</h2><p>Carga el archivo, revisa las cuentas detectadas, configura los códigos nuevos y genera los informes finales.</p></div>
+    <div class="process-steps" aria-label="Etapas del proceso">
+      <div class="process-step" [class.active]="!mostrarTabla"><span>1</span><div><strong>Cargar</strong><small>Archivo Excel</small></div></div><div class="step-line"></div>
+      <div class="process-step" [class.active]="mostrarTabla"><span>2</span><div><strong>Validar</strong><small>Cuentas y códigos</small></div></div><div class="step-line"></div>
+      <div class="process-step" [class.active]="mostrarTabla"><span>3</span><div><strong>Reportar</strong><small>Resultados finales</small></div></div>
     </div>
-  </div>
-</div>
+  </section>
 
-<app-modal-tabla-nuevos
-  *ngIf="mostrarNuevos"
-  [datosTabla]="codigosNoexistentes"
-  (valorEnviado)="recibirValor($event)"
-></app-modal-tabla-nuevos>
+  <section class="loading-state" *ngIf="cargandoPaginaSpinner === 0; else workspaceContent"><div class="loader-ring"></div><h3>Procesando información</h3><p>Estamos normalizando los códigos y calculando los saldos.</p></section>
+
+  <ng-template #workspaceContent>
+    <div class="top-grid" *ngIf="validartabla !== 1">
+      <section class="card upload-card">
+        <div class="card-heading"><div class="heading-icon"><mat-icon>upload_file</mat-icon></div><div><span class="section-kicker">Fuente de información</span><h3>{{ mostrarTabla ? 'Cargar un archivo diferente' : 'Importar balance de prueba' }}</h3></div></div>
+        <form class="drop-zone"><input id="file-upload" type="file" name="fileUpload" (change)="fileUpload($event)" accept=".xls,.xlsx" /><label for="file-upload"><span class="upload-illustration"><mat-icon>description</mat-icon></span><strong>Selecciona tu archivo Excel</strong><small>Formatos permitidos: .XLS y .XLSX</small><span class="primary-action"><mat-icon>folder_open</mat-icon> Seleccionar archivo</span></label></form>
+      </section>
+      <aside class="card report-card" *ngIf="mostrarTabla">
+        <div class="card-heading"><div class="heading-icon success"><mat-icon>assessment</mat-icon></div><div><span class="section-kicker">Salidas</span><h3>Generar reportes</h3></div></div><p>La información está lista. Selecciona el informe que necesitas.</p>
+        <div class="report-actions">
+          <button type="button" *ngIf="tablaInicialGuardada.length > 0" (click)="mostrarInformacionOriginal()"><mat-icon>history</mat-icon><span><strong>Información procesada original</strong><small>Volver a la tabla anterior a los reportes</small></span><mat-icon>chevron_right</mat-icon></button>
+          <button type="button" (click)="generarReporteGeneral()"><mat-icon>account_balance</mat-icon><span><strong>Balance de comprobación</strong><small>Resumen general de movimientos</small></span><mat-icon>chevron_right</mat-icon></button>
+          <button type="button" (click)="generarReporteChip()"><mat-icon>grid_on</mat-icon><span><strong>Reporte CHIP</strong><small>Formato para consolidación</small></span><mat-icon>chevron_right</mat-icon></button>
+          <button type="button" (click)="generarReporteSecundario()"><mat-icon>analytics</mat-icon><span><strong>Resultados</strong><small>Informe de resultados calculados</small></span><mat-icon>chevron_right</mat-icon></button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card data-card" *ngIf="mostrarTabla">
+      <div class="data-header"><div><span class="section-kicker">Mesa de trabajo</span><h3>Cuentas procesadas</h3><p>{{ datosTabla.length }} registros disponibles para revisión</p></div><div class="data-actions"><button class="secondary-action" type="button" *ngIf="reporteActivo === '' && seleccionados.length > 0" (click)="openDialog()"><mat-icon>edit</mat-icon>Editar selección</button><button class="secondary-action" type="button" *ngIf="reporteActivo === 'chip' && seleccionadosNewTable.length > 0" (click)="openDialogAjusteReporte()"><mat-icon>tune</mat-icon>Ajustar corriente / no corriente</button><button class="export-action" type="button" (click)="exportexcel()"><mat-icon>download</mat-icon>Exportar Excel</button></div></div>
+      <div class="toolbar-row">
+        <mat-form-field appearance="outline" class="search-field"><mat-label>Buscar por código o cuenta</mat-label><mat-icon matPrefix>search</mat-icon><input matInput (keyup)="applyFilter($event)" placeholder="Ej. 1.1.05 o Caja" /></mat-form-field>
+        <div class="legend"><button type="button" (click)="miFuncion('todos')"><mat-icon>view_list</mat-icon>Todos</button><button type="button" (click)="miFuncion('c')"><i class="current"></i>Corriente</button><button type="button" (click)="miFuncion('n')"><i class="non-current"></i>No corriente</button><button type="button" (click)="miFuncion('com')"><i class="shared"></i>Ambas</button><button type="button" (click)="miFuncion('d')"><i class="default"></i>Sin clasificar</button></div>
+      </div>
+      <div class="table-shell">
+        <table mat-table [dataSource]="dataTareasPaginated" matSort (matSortChange)="onSort($event)">
+          <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef><mat-checkbox (change)="toggleAllSelection()"></mat-checkbox></th><td mat-cell *matCellDef="let row"><mat-checkbox [checked]="row.tipo" [disabled]="baseInformes && !puedeEditarDistribucion(row)" (change)="seleccionadosTabla(row)"></mat-checkbox></td></ng-container>
+          <ng-container matColumnDef="codigo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th><td mat-cell *matCellDef="let row"><span class="code-pill">{{ row.codigo }}</span></td></ng-container>
+          <ng-container matColumnDef="nombre"><th mat-header-cell *matHeaderCellDef mat-sort-header>Cuenta</th><td mat-cell *matCellDef="let row" class="account-name">{{ row.nombre }}</td></ng-container>
+          <ng-container matColumnDef="saldoAnterior"><th mat-header-cell *matHeaderCellDef mat-sort-header>Saldo anterior</th><td mat-cell *matCellDef="let row" class="numeric-cell">{{ row.saldoAnterior | number:'1.2-2' }}</td></ng-container>
+          <ng-container matColumnDef="debito"><th mat-header-cell *matHeaderCellDef mat-sort-header>Débito</th><td mat-cell *matCellDef="let row" class="numeric-cell">{{ row.debito | number:'1.2-2' }}</td></ng-container>
+          <ng-container matColumnDef="credito"><th mat-header-cell *matHeaderCellDef mat-sort-header>Crédito</th><td mat-cell *matCellDef="let row" class="numeric-cell">{{ row.credito | number:'1.2-2' }}</td></ng-container>
+          <ng-container matColumnDef="nuevoSaldo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Nuevo saldo</th><td mat-cell *matCellDef="let row" class="numeric-cell strong">{{ row.nuevoSaldo | number:'1.2-2' }}</td></ng-container>
+          <ng-container matColumnDef="tipoSaldoAnterior"><th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo anterior</th><td mat-cell *matCellDef="let row">{{ row.tipoSaldoAnterior }}</td></ng-container>
+          <ng-container matColumnDef="tipoSaldoNuevo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo actual</th><td mat-cell *matCellDef="let row">{{ row.tipoSaldoNuevo }}</td></ng-container>
+          <ng-container matColumnDef="tipoDeCuenta"><th mat-header-cell *matHeaderCellDef mat-sort-header>Corriente</th><td mat-cell *matCellDef="let row" class="numeric-cell classification-value">{{ row.tipoDeCuenta | number:'1.2-2' }}</td></ng-container>
+          <ng-container matColumnDef="compartidoTipo"><th mat-header-cell *matHeaderCellDef mat-sort-header>No corriente</th><td mat-cell *matCellDef="let row" class="numeric-cell classification-value">{{ row.compartidoTipo | number:'1.2-2' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr><tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="rowColors[row.codigo]"></tr>
+        </table>
+      </div>
+      <mat-paginator (page)="onPageChange($event)" [length]="datosTabla.length" [pageIndex]="currentPage - 1" [pageSize]="pageSize" [pageSizeOptions]="[25, 50, 100, 200, 400, 1000]" showFirstLastButtons></mat-paginator>
+      <div class="export-table" aria-hidden="true"><table #tabla id="excel-table"><thead><tr><th>codigo</th><th>nombre</th><th>saldo anterior</th><th>debito</th><th>credito</th><th>saldo actual</th><th>tipo de saldo actual</th><th>tipo de saldo anterior</th><th>Corriente</th><th>Corriente/no corriente</th><th>es corriente</th><th>es no corriente</th></tr></thead><tbody><tr *ngFor="let x of datosTabla"><td>{{ x.codigo }}</td><td>{{ x.nombre }}</td><td>{{ x.saldoAnterior }}</td><td>{{ x.debito }}</td><td>{{ x.credito }}</td><td>{{ x.nuevoSaldo }}</td><td>{{ x.tipoSaldoAnterior }}</td><td>{{ x.tipoSaldoNuevo }}</td><td>{{ x.tipoDeCuenta }}</td><td>{{ x.compartidoTipo }}</td><td>{{ x.corriente }}</td><td>{{ x.noCorriente }}</td></tr></tbody></table></div>
+    </section>
+  </ng-template>
+</main>
+<app-modal-tabla-nuevos *ngIf="mostrarNuevos" [datosTabla]="codigosNoexistentes" (valorEnviado)="recibirValor($event)"></app-modal-tabla-nuevos>

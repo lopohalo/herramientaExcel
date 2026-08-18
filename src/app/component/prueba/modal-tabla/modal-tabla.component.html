@@ -1,112 +1,68 @@
-<div>
-  <div class="container">
-    <div class="row">
-      <div class="col-12" style="text-align: center;" *ngIf="accion2 === 'nuevos'">
-        <h1 class="mt-4">Codigos nuevos</h1>
-        <span class="mt-4">!por favor seleccione los codigos!</span>
+<div class="configuration-overlay">
+  <section class="configuration-panel" role="dialog" aria-modal="true">
+    <header class="panel-header">
+      <div class="title-group">
+        <span class="header-icon"><mat-icon>{{ accion2 === 'nuevos' ? 'new_releases' : 'fact_check' }}</mat-icon></span>
+        <div>
+          <span class="eyebrow">Configuración contable</span>
+          <h2>{{ accion2 === 'nuevos' ? 'Configurar códigos nuevos' : 'Clasificar cuentas corrientes y no corrientes' }}</h2>
+          <p>{{ accion2 === 'nuevos' ? 'Selecciona las cuentas y define cómo deben clasificarse.' : 'Verifica la clasificación asignada antes de continuar.' }}</p>
+        </div>
       </div>
-      <div class="col-12" style="text-align: center;" *ngIf="accion2 === 'corrientes'">
-        <h1 class="mt-4">Codigos corrientes y no corrientes</h1>
-        <span class="mt-4">!por favor verifique la informacion!</span>
-      </div>
-    </div>
-  </div>
-  <div style="min-width: 130px; text-align: right">
-    <ng-container>
-      <button
-        *ngIf="seleccionados.length > 0"
-        mat-icon-button
-        (click)="openDialog()"
-        matTooltip="editar"
-      >
-        <mat-icon class="icono">edit</mat-icon>
-      </button>
-    </ng-container>
-  </div>
-  
-  
-  <table
-  #tabla
-    mat-table
-    [dataSource]="dataTareasPaginated"
-    matSort
-    (matSortChange)="onSort($event)"
-  >
-  
-  <ng-container matColumnDef="tipo">
-    <th mat-header-cell *matHeaderCellDef>
-      <mat-checkbox  (change)="toggleAllSelection()">
-      </mat-checkbox>
-    </th>
-    <td mat-cell *matCellDef="let row">
-      <mat-checkbox [checked]="row.tipo" (change)="seleccionadosTabla(row)">
-      </mat-checkbox>
-    </td>
-  </ng-container>
-    <ng-container matColumnDef="codigo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>codigo</th>
-      <td mat-cell *matCellDef="let row">{{ row.codigo }}</td>
-    </ng-container>
-    <ng-container matColumnDef="nombre">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-      <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
-    </ng-container>
-    <ng-container matColumnDef="saldoAnterior">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>saldo anterior</th>
-      <td mat-cell *matCellDef="let row">{{ row.saldoAnterior }}</td>
-    </ng-container>
-  
-    <ng-container matColumnDef="credito">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Credito</th>
-      <td mat-cell *matCellDef="let row">{{ row.credito }}</td>
-    </ng-container>
-  
-    <ng-container matColumnDef="debito">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Debito</th>
-      <td mat-cell *matCellDef="let row">{{ row.debito }}</td>
-    </ng-container>
-  
-    <ng-container matColumnDef="nuevoSaldo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nuevo saldo</th>
-      <td mat-cell *matCellDef="let row">{{ row.nuevoSaldo }}</td>
-    </ng-container>
-    <ng-container matColumnDef="tipoSaldoAnterior">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo anterior</th>
-      <td mat-cell *matCellDef="let row">{{ row.tipoSaldoAnterior }}</td>
-    </ng-container>
-    <ng-container matColumnDef="tipoSaldoNuevo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>tipo del saldo nuevo</th>
-      <td mat-cell *matCellDef="let row">{{ row.tipoSaldoNuevo }}</td>
-    </ng-container>
-    
-  
-  
-    <ng-container matColumnDef="corriente">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Corriente</th>
-      <td mat-cell *matCellDef="let row">{{ row.corriente }}</td>
-    </ng-container>
-    <ng-container matColumnDef="noCorriente">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>No corriente</th>
-      <td mat-cell *matCellDef="let row">{{ row.noCorriente }}</td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"    [ngClass]="rowColors[row.codigo]"></tr>
-  </table>
-  
-  <mat-paginator
-    (page)="onPageChange($event)"
-    [length]="datosTabla.length"
-    [pageSize]="dataTareasPaginated.length"
-    [pageSizeOptions]="[100, 200, 400, 1000]"
-    firstPageLabel="a"
-    itemsPerPageLabel="g"
-    lastPageLabel="h"
-    nextPageLabel="k"
-    previousPageLabel="o"
-    showFirstLastButtons
-  ></mat-paginator>
-</div>
-<div style="text-align: center;">
-  <button (click)="aceptar()">Aceptar</button>
-</div>
+      <div class="record-counter"><strong>{{ datosTabla?.length || 0 }}</strong><span>cuentas</span></div>
+    </header>
 
+    <div class="selection-toolbar">
+      <div class="selection-info">
+        <mat-icon>checklist</mat-icon>
+        <span><strong>{{ seleccionados.length }}</strong> {{ seleccionados.length === 1 ? 'cuenta seleccionada' : 'cuentas seleccionadas' }}</span>
+      </div>
+      <button class="configure-button" type="button" [disabled]="seleccionados.length === 0" (click)="openDialog()">
+        <mat-icon>tune</mat-icon>Configurar selección
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table #tabla mat-table [dataSource]="dataTareasPaginated" matSort (matSortChange)="onSort($event)">
+        <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef><mat-checkbox (change)="toggleAllSelection()" aria-label="Seleccionar todas"></mat-checkbox></th><td mat-cell *matCellDef="let row"><mat-checkbox [checked]="row.tipo" (change)="seleccionadosTabla(row)" aria-label="Seleccionar cuenta"></mat-checkbox></td></ng-container>
+        <ng-container matColumnDef="codigo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th><td mat-cell *matCellDef="let row"><span class="code-badge">{{ row.codigo }}</span></td></ng-container>
+        <ng-container matColumnDef="nombre"><th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la cuenta</th><td mat-cell *matCellDef="let row" class="name-cell" [title]="row.nombre">{{ row.nombre }}</td></ng-container>
+        <ng-container matColumnDef="saldoAnterior"><th mat-header-cell *matHeaderCellDef mat-sort-header>Saldo anterior</th><td mat-cell *matCellDef="let row" class="number-cell">{{ row.saldoAnterior }}</td></ng-container>
+        <ng-container matColumnDef="credito"><th mat-header-cell *matHeaderCellDef mat-sort-header>Crédito</th><td mat-cell *matCellDef="let row" class="number-cell">{{ row.credito }}</td></ng-container>
+        <ng-container matColumnDef="debito"><th mat-header-cell *matHeaderCellDef mat-sort-header>Débito</th><td mat-cell *matCellDef="let row" class="number-cell">{{ row.debito }}</td></ng-container>
+        <ng-container matColumnDef="nuevoSaldo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Nuevo saldo</th><td mat-cell *matCellDef="let row" class="number-cell balance">{{ row.nuevoSaldo }}</td></ng-container>
+        <ng-container matColumnDef="tipoSaldoAnterior"><th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo anterior</th><td mat-cell *matCellDef="let row"><span class="type-badge" *ngIf="row.tipoSaldoAnterior">{{ row.tipoSaldoAnterior }}</span><span class="empty-value" *ngIf="!row.tipoSaldoAnterior">—</span></td></ng-container>
+        <ng-container matColumnDef="tipoSaldoNuevo"><th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo actual</th><td mat-cell *matCellDef="let row"><span class="type-badge" *ngIf="row.tipoSaldoNuevo">{{ row.tipoSaldoNuevo }}</span><span class="empty-value" *ngIf="!row.tipoSaldoNuevo">—</span></td></ng-container>
+        <ng-container matColumnDef="corriente"><th mat-header-cell *matHeaderCellDef mat-sort-header>Corriente</th><td mat-cell *matCellDef="let row"><span class="status-badge" [class.yes]="row.corriente === true || row.corriente === 'true'" [class.no]="row.corriente === false || row.corriente === 'false'">{{ row.corriente === true || row.corriente === 'true' ? 'Sí' : row.corriente === false || row.corriente === 'false' ? 'No' : 'Pendiente' }}</span></td></ng-container>
+        <ng-container matColumnDef="noCorriente"><th mat-header-cell *matHeaderCellDef mat-sort-header>No corriente</th><td mat-cell *matCellDef="let row"><span class="status-badge" [class.yes]="row.noCorriente === true || row.noCorriente === 'true'" [class.no]="row.noCorriente === false || row.noCorriente === 'false'">{{ row.noCorriente === true || row.noCorriente === 'true' ? 'Sí' : row.noCorriente === false || row.noCorriente === 'false' ? 'No' : 'Pendiente' }}</span></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" [ngClass]="rowColors[row.codigo]"></tr>
+      </table>
+    </div>
+
+    <footer class="panel-footer">
+      <div class="page-size-control">
+        <label for="modal-page-size">Filas por página</label>
+        <select id="modal-page-size" [value]="pageSize" (change)="changePageSize($event)">
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+          <option [value]="200">200</option>
+        </select>
+      </div>
+
+      <nav class="pagination-controls" aria-label="Paginación de cuentas">
+        <span class="page-range">{{ firstVisibleRecord }}–{{ lastVisibleRecord }} de {{ datosTabla.length }}</span>
+        <div class="page-buttons">
+          <button type="button" (click)="goToPage(1)" [disabled]="currentPage === 1" aria-label="Primera página"><mat-icon>first_page</mat-icon></button>
+          <button type="button" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" aria-label="Página anterior"><mat-icon>chevron_left</mat-icon></button>
+          <span class="page-indicator">Página <strong>{{ currentPage }}</strong> de {{ totalPages }}</span>
+          <button type="button" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" aria-label="Página siguiente"><mat-icon>chevron_right</mat-icon></button>
+          <button type="button" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" aria-label="Última página"><mat-icon>last_page</mat-icon></button>
+        </div>
+      </nav>
+
+      <button class="accept-button" type="button" (click)="aceptar()"><mat-icon>check</mat-icon>Guardar y continuar</button>
+    </footer>
+  </section>
+</div>

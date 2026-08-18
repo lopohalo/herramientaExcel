@@ -3,7 +3,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import localeEsCo from '@angular/common/locales/es-CO';
+import { LOCALE_ID } from '@angular/core';
 import { NavbarComponent } from './component/navbar/navbar.component';
 import { IngresosComponent } from './component/ingresos/ingresos.component';
 import { GastosComponent } from './component/gastos/gastos.component';
@@ -61,6 +63,8 @@ import { BasegeneralComponent } from './component/pages/basegeneral/basegeneral.
 import { ModalTablaComponents } from './component/modales/modal-tabla/modal-tabla.component';
 import { ChartsModule } from 'ng2-charts';
 import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.component';
+
+registerLocaleData(localeEsCo);
 
 
 
@@ -152,7 +156,7 @@ import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.comp
     ChartsModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [  ],
+  providers: [{ provide: LOCALE_ID, useValue: 'es-CO' }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
