@@ -520,6 +520,10 @@ export class PruebaComponent implements OnInit {
       codigo: '1.6.40.19 ',
       nombre: 'INSTALACIONES DEPORTIVAS Y RECREACIONALES ',
     },
+     {
+      codigo: '1.6.40.24 ',
+      nombre: 'TANQUES DE ALMACENAMIENTO',
+    },
     {
       codigo: '1.6.40.90 ',
       nombre: 'OTRAS EDIFICACIONES ',
@@ -1476,6 +1480,10 @@ export class PruebaComponent implements OnInit {
     {
       codigo: '3.1.10 ',
       nombre: 'RESULTADO DEL EJERCICIO',
+    },
+      {
+      codigo: '3.1.10.01 ',
+      nombre: 'UTILIDAD O EXCEDENTE DEL EJERCICIO ',
     },
     {
       codigo: '3.1.45 ',
@@ -7655,7 +7663,7 @@ export class PruebaComponent implements OnInit {
       noCorriente: 'true',
     },
     {
-      codigo: '1.6.25.03.00',
+      codigo: '1.6.25.03',
       nombre: 'MAQUINARIA Y EQUIPO',
       corriente: 'false',
       noCorriente: 'true',
@@ -7678,9 +7686,10 @@ export class PruebaComponent implements OnInit {
       corriente: 'false',
       noCorriente: 'true',
     },
-    {
-      codigo: '1.6.25.05.00',
-      nombre: 'EQUIPOS DE COMUNICACI Y COMPUTACI',
+
+       {
+      codigo: '1.6.25.05',
+      nombre: 'EQUIPO DE COMUNICACION Y COMPUTACION',
       corriente: 'false',
       noCorriente: 'true',
     },
@@ -7715,7 +7724,7 @@ export class PruebaComponent implements OnInit {
       noCorriente: 'true',
     },
     {
-      codigo: '1.6.25.12.00',
+      codigo: '1.6.25.12',
       nombre: 'COMPONENTES DE PROPIEDADES, PLANTA Y EQUIPO',
       corriente: 'false',
       noCorriente: 'true',
@@ -7945,6 +7954,12 @@ export class PruebaComponent implements OnInit {
     {
       codigo: '1.6.40.19.01',
       nombre: 'INSTALACIONES DEPORTIVAS Y RECREACIONALES',
+      corriente: 'false',
+      noCorriente: 'true',
+    },
+      {
+      codigo: '1.6.40.24',
+      nombre: 'TANQUES DE ALMACENAMIENTO',
       corriente: 'false',
       noCorriente: 'true',
     },
@@ -22606,9 +22621,33 @@ export class PruebaComponent implements OnInit {
       porcentajeCorriente: 0,
       porcentajeNoCorriente: 1,
     },
+     {
+      codigo: '1.6.25.03 ',
+      NOMBRE: 'EQUIPO MÉDICO Y CIENTÍFICO ',
+      ' SALDO INICIAL(Pesos) ': 52254864,
+      ' MOVIMIENTO DEBITO(Pesos) ': 2067760,
+      ' MOVIMIENTO CREDITO(Pesos) ': 10505629,
+      ' SALDO FINAL(Pesos) ': 43816995,
+      ' SALDO FINAL CORRIENTE(Pesos) ': 0,
+      ' SALDO FINAL NO CORRIENTE(Pesos) ': 43816995,
+      porcentajeCorriente: 0,
+      porcentajeNoCorriente: 1,
+    },
     {
       codigo: '1.6.25.04 ',
       NOMBRE: 'EQUIPO MÉDICO Y CIENTÍFICO ',
+      ' SALDO INICIAL(Pesos) ': 52254864,
+      ' MOVIMIENTO DEBITO(Pesos) ': 2067760,
+      ' MOVIMIENTO CREDITO(Pesos) ': 10505629,
+      ' SALDO FINAL(Pesos) ': 43816995,
+      ' SALDO FINAL CORRIENTE(Pesos) ': 0,
+      ' SALDO FINAL NO CORRIENTE(Pesos) ': 43816995,
+      porcentajeCorriente: 0,
+      porcentajeNoCorriente: 1,
+    },
+     {
+      codigo: '1.6.25.05 ',
+      NOMBRE: 'EQUIPO DE COMUNICACION Y COMPUTACION',
       ' SALDO INICIAL(Pesos) ': 52254864,
       ' MOVIMIENTO DEBITO(Pesos) ': 2067760,
       ' MOVIMIENTO CREDITO(Pesos) ': 10505629,
@@ -22717,6 +22756,18 @@ export class PruebaComponent implements OnInit {
     {
       codigo: '1.6.40.19 ',
       NOMBRE: 'INSTALACIONES DEPORTIVAS Y RECREACIONALES ',
+      ' SALDO INICIAL(Pesos) ': 19669698869,
+      ' MOVIMIENTO DEBITO(Pesos) ': 0,
+      ' MOVIMIENTO CREDITO(Pesos) ': 0,
+      ' SALDO FINAL(Pesos) ': 19669698869,
+      ' SALDO FINAL CORRIENTE(Pesos) ': 0,
+      ' SALDO FINAL NO CORRIENTE(Pesos) ': 19669698869,
+      porcentajeCorriente: 0,
+      porcentajeNoCorriente: 1,
+    },
+     {
+      codigo: '1.6.40.24 ',
+      NOMBRE: 'TANQUES DE ALMACENAMIENTO ',
       ' SALDO INICIAL(Pesos) ': 19669698869,
       ' MOVIMIENTO DEBITO(Pesos) ': 0,
       ' MOVIMIENTO CREDITO(Pesos) ': 0,
@@ -24583,10 +24634,19 @@ export class PruebaComponent implements OnInit {
       codigo: '1.6.25 ',
     },
     {
+      codigo: '1.6.25.03 ',
+    },
+    {
       codigo: '1.6.25.04 ',
+    },
+     {
+      codigo: '1.6.25.05 ',
     },
     {
       codigo: '1.6.25.07 ',
+    },
+    {
+      codigo: '1.6.25.12',
     },
     {
       codigo: '1.6.25.90 ',
@@ -24608,6 +24668,9 @@ export class PruebaComponent implements OnInit {
     },
     {
       codigo: '1.6.40.19 ',
+    },
+      {
+      codigo: '1.6.40.24 ',
     },
     {
       codigo: '1.6.40.90 ',
@@ -24915,12 +24978,12 @@ export class PruebaComponent implements OnInit {
     {
       codigo: '2.4.40.75 ',
     },
-    {
-      codigo: '2.4.60 ',
-    },
-    {
-      codigo: '2.4.60.02 ',
-    },
+    // {
+    //   codigo: '2.4.60 ',
+    // },
+    // {
+    //   codigo: '2.4.60.02 ',
+    // },
     {
       codigo: '2.4.81 ',
     },
@@ -25042,11 +25105,11 @@ export class PruebaComponent implements OnInit {
       codigo: '2.9.10 ',
     },
     {
-      codigo: '2.9.10.05 ',
-    },
-    {
       codigo: '2.9.10.26 ',
     },
+    // {
+    //   codigo: '2.9.10.05 ',
+    // },
     {
       codigo: '2.9.10.90 ',
     },
@@ -25073,6 +25136,12 @@ export class PruebaComponent implements OnInit {
     },
     {
       codigo: '3.1.09.01 ',
+    },
+      {
+      codigo: '3.1.10 ',
+    },
+      {
+      codigo: '3.1.10.01 ',
     },
     {
       codigo: '3.1.51 ',
@@ -25136,9 +25205,6 @@ export class PruebaComponent implements OnInit {
     },
     {
       codigo: '4.4.28 ',
-    },
-    {
-      codigo: '4.4.28.02 ',
     },
     {
       codigo: '4.4.28.03 ',
