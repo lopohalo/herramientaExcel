@@ -35,9 +35,11 @@ export class PruebaComponent implements OnInit {
     'tipoDeCuenta',
     'compartidoTipo',
   ];
-  reporteActivo: 'balance' | 'chip' | 'resultados' | 'original' | '' = '';
+  reporteActivo: 'balance' | 'chip' | 'resultados' | 'situacion' | 'original' | '' = '';
   tablaInicialGuardada: any[] = [];
   reporteChipGuardado: any[] = [];
+  reportesIndependientes: { [tipo: string]: any[] } = {};
+  reporteEnRecalculo: string = '';
   datosReporteActual: any[] = [];
   rowColors: any = {};
   contadorAlert = 0;
@@ -26086,117 +26088,84 @@ export class PruebaComponent implements OnInit {
       this.cuadrarSaldosCorrientesyNoCorrientes(1);
     }
   }
+
+  aplicarDistribucionAutomaticaInicial(): void {
+    this.datosTabla.forEach((cuenta: any) => {
+      const esCorriente = String(cuenta.corriente) === 'true';
+      const esNoCorriente = String(cuenta.noCorriente) === 'true';
+      const saldo = this.valorNumerico(cuenta.nuevoSaldo);
+
+      if (esCorriente && !esNoCorriente) {
+        cuenta.tipoDeCuenta = saldo;
+        cuenta.compartidoTipo = 0;
+        cuenta.clasificacionPendiente = false;
+        return;
+      }
+      if (!esCorriente && esNoCorriente) {
+        cuenta.tipoDeCuenta = 0;
+        cuenta.compartidoTipo = saldo;
+        cuenta.clasificacionPendiente = false;
+        return;
+      }
+      if (!esCorriente || !esNoCorriente) return;
+
+      const distribuido =
+        this.valorNumerico(cuenta.tipoDeCuenta) +
+        this.valorNumerico(cuenta.compartidoTipo);
+      if (Math.abs(distribuido - saldo) < 0.01 && distribuido !== 0) {
+        cuenta.clasificacionPendiente = false;
+        return;
+      }
+
+      const codigo = String(cuenta.codigo || '').trim();
+      const nombre = String(cuenta.nombre || '').toUpperCase();
+      const porcentaje = this.modeloPorcentajes.find(
+        (item: any) => String(item.codigo || '').trim() === codigo
+      );
+      let porcentajeCorriente: number | null = porcentaje
+        ? Number(porcentaje.porcentajeCorriente)
+        : null;
+
+      if (codigo.startsWith('1.1') || codigo.startsWith('1.5') || nombre.includes('CORTO PLAZO')) {
+        porcentajeCorriente = 1;
+      } else if (
+        codigo.startsWith('1.6') ||
+        codigo.startsWith('1.7') ||
+        nombre.includes('LARGO PLAZO') ||
+        nombre.includes('INTANGIBLE') ||
+        nombre.includes('PROPIEDAD, PLANTA')
+      ) {
+        porcentajeCorriente = 0;
+      }
+
+      if (porcentajeCorriente !== null && Number.isFinite(porcentajeCorriente)) {
+        const proporcion = Math.min(1, Math.max(0, porcentajeCorriente));
+        cuenta.tipoDeCuenta = saldo * proporcion;
+        cuenta.compartidoTipo = saldo - cuenta.tipoDeCuenta;
+        cuenta.clasificacionPendiente = false;
+        cuenta.clasificacionAutomatica = true;
+      } else {
+        // Sin plazo o vencimiento no es correcto inventar una proporción.
+        // Se conserva el total como no corriente y queda marcado para revisión.
+        cuenta.tipoDeCuenta = 0;
+        cuenta.compartidoTipo = saldo;
+        cuenta.clasificacionPendiente = true;
+      }
+    });
+  }
+
   cuadrarSaldosCorrientesyNoCorrientes(numero = 0) {
-    console.log('recorrido2', this.recorrido2);
     if (this.recorrido2 === 0) {
       this.ejecutarModeloDeResumidos(this.contadormodelo);
     } else {
-      //cambiar condicion recordar que es mayor a
-      //  0 no menor
-      console.log('corrientesNoCorrientes', this.corrientesNoCorrientes);
-      if (this.corrientesNoCorrientes.length > 0) {
-        if (numero === 0) {
-          let obj2 = {
-            accion: 'corrientes',
-            data: this.corrientesNoCorrientes,
-          };
-          this.mostrarNuevos = true;
-          this.codigosNoexistentes = obj2;
-          console.log('askd hola', this.codigosNoexistentes);
-        } else {
-          let obj = {
-            data: this.corrientesNoCorrientes.filter(
-              (item: any) => item.nuevoSaldo !== 0
-            ),
-            configuracion: true,
-          };
-          console.log(obj.data.length);
-          if (obj.data.length > 0) {
-            const dialogRef = this.dialog.open(ModalTablaComponent, {
-              panelClass: 'my-custom-dialog',
-              data: obj,
-            });
-
-            dialogRef.afterClosed().subscribe((result: any) => {
-              if (result) {
-                result.forEach((obj: any, index: any) => {
-                  const objetoNuevo = this.datosTabla.map((nuevo: any) =>
-                    nuevo.codigo.trim() === obj.codigo.trim() ? obj : nuevo
-                  );
-                });
-                for (let i = 0; i < this.datosTabla.length; i++) {
-                  const corrienteCopia = this.corrientesCopia.find(
-                    (c: any) => c.codigo === this.datosTabla[i].codigo
-                  );
-                  if (corrienteCopia) {
-                    if (
-                      this.datosTabla[i].corriente === 'true' &&
-                      this.datosTabla[i].noCorriente === 'false'
-                    ) {
-                      this.datosTabla[i].tipoDeCuenta =
-                        this.datosTabla[i].nuevoSaldo;
-                    } else if (
-                      this.datosTabla[i].corriente === 'false' &&
-                      this.datosTabla[i].noCorriente === 'true'
-                    ) {
-                      this.datosTabla[i].compartidoTipo =
-                        this.datosTabla[i].nuevoSaldo;
-                    }
-                  }
-                }
-                this.ejecutarModeloDeResumidos(this.contadormodelo);
-              }
-            });
-          } else {
-            for (let i = 0; i < this.datosTabla.length; i++) {
-              const corrienteCopia = this.corrientesCopia.find(
-                (c: any) => c.codigo === this.datosTabla[i].codigo
-              );
-              if (corrienteCopia) {
-                if (
-                  this.datosTabla[i].corriente === 'true' &&
-                  this.datosTabla[i].noCorriente === 'false'
-                ) {
-                  this.datosTabla[i].tipoDeCuenta =
-                    this.datosTabla[i].nuevoSaldo;
-                } else if (
-                  this.datosTabla[i].corriente === 'false' &&
-                  this.datosTabla[i].noCorriente === 'true'
-                ) {
-                  this.datosTabla[i].compartidoTipo =
-                    this.datosTabla[i].nuevoSaldo;
-                }
-              }
-            }
-            this.ejecutarModeloDeResumidos(this.contadormodelo);
-          }
-        }
-      } else {
-        for (let i = 0; i < this.datosTabla.length; i++) {
-          const corrienteCopia = this.corrientesCopia.find(
-            (c: any) => c.codigo === this.datosTabla[i].codigo
-          );
-          if (corrienteCopia) {
-            if (
-              this.datosTabla[i].corriente === 'true' &&
-              this.datosTabla[i].noCorriente === 'false'
-            ) {
-              this.datosTabla[i].tipoDeCuenta = this.datosTabla[i].nuevoSaldo;
-            } else if (
-              this.datosTabla[i].corriente === 'false' &&
-              this.datosTabla[i].noCorriente === 'true'
-            ) {
-              this.datosTabla[i].compartidoTipo = this.datosTabla[i].nuevoSaldo;
-            }
-          }
-        }
-        this.ejecutarModeloDeResumidos(this.contadormodelo);
-      }
+      this.mostrarNuevos = false;
+      this.aplicarDistribucionAutomaticaInicial();
+      this.ejecutarModeloDeResumidos(this.contadormodelo);
     }
   }
   toggleAllSelection() {
     this.selectAll = !this.selectAll;
-    if (this.baseInformes) {
+    if (['', 'original', 'chip', 'balance', 'situacion'].includes(this.reporteActivo)) {
       this.seleccionadosNewTable = [];
       this.dataTareasPaginated.forEach((row: any) => {
         const editable = this.puedeEditarDistribucion(row);
@@ -26223,6 +26192,11 @@ export class PruebaComponent implements OnInit {
     this.reporteChipGuardado = [];
     this.datosReporteActual = [];
     localStorage.removeItem('reporteChipModificado');
+    ['original', 'chip', 'balance', 'situacion'].forEach((tipo: string) => {
+      localStorage.removeItem(`reporteIndependiente_${tipo}`);
+    });
+    this.reportesIndependientes = {};
+    this.reporteEnRecalculo = '';
     if (!this.displayedColumns.includes('tipo')) {
       this.displayedColumns = ['tipo', ...this.displayedColumns];
     }
@@ -26283,11 +26257,68 @@ export class PruebaComponent implements OnInit {
     });
     let codigosSeparados = this.separarPrimerGrupoCodigoConPunto(objetos);
     codigosSeparados = this.procesarSaldo(codigosSeparados);
+    // Las cuentas cuyo último nivel es 00 son padres auxiliares del Excel.
+    // Los padres reales ya existen en modeloDeDatosSistemaContaduria, por lo
+    // que no deben pasar a clasificación ni participar como cuentas hijas.
+    codigosSeparados = codigosSeparados.filter((objeto: any) => {
+      const partesCodigo = String(objeto.codigo || '').trim().split('.');
+      return partesCodigo[partesCodigo.length - 1] !== '00';
+    });
     this.datosTabla = codigosSeparados;
     this.elementosUnificados = codigosSeparados;
     this.datosTabla2Recorrido = codigosSeparados;
     this.siguientepasoAgregarEstructura();
   }
+
+  buscarClasificacionEnAncestro(codigo: string): any | null {
+    const partes = codigo.trim().split('.');
+
+    for (let cantidad = partes.length - 1; cantidad >= 2; cantidad--) {
+      const codigoPadre = partes.slice(0, cantidad).join('.');
+      const codigoPadreConCeros = [
+        ...partes.slice(0, cantidad),
+        ...Array(partes.length - cantidad).fill('00'),
+      ].join('.');
+
+      const padre = this.modeloDeDatosContabilidad.find((item: any) => {
+        const codigoModelo = String(item.codigo || '').trim();
+        return (
+          codigoModelo === codigoPadre ||
+          codigoModelo === codigoPadreConCeros
+        );
+      });
+
+      if (!padre) {
+        continue;
+      }
+
+      const corriente = String(padre.corriente) === 'true';
+      const noCorriente = String(padre.noCorriente) === 'true';
+
+      // Un padre compartido no se puede heredar: el contador debe clasificarlo.
+      if (corriente && noCorriente) {
+        return {
+          compartido: true,
+          codigoPadre: String(padre.codigo).trim(),
+        };
+      }
+
+      // Los padres sin clasificación no sirven como referencia; buscamos el siguiente.
+      if (!corriente && !noCorriente) {
+        continue;
+      }
+
+      return {
+        compartido: false,
+        corriente,
+        noCorriente,
+        codigoPadre: String(padre.codigo).trim(),
+      };
+    }
+
+    return null;
+  }
+
   siguientepasoAgregarEstructura() {
     let modeloCodigo: any = [];
     let datosCodigos: any = [];
@@ -26376,9 +26407,54 @@ export class PruebaComponent implements OnInit {
     }
     if (this.recorrido2 === 0) {
       if (this.codigosNoexistentes.length > 0) {
+        const codigosPendientes: any[] = [];
+        let huboClasificacionesAutomaticas = false;
+
+        codigosNuevos.forEach((cuenta: any) => {
+          if (!cuenta) {
+            return;
+          }
+
+          const clasificacion = this.buscarClasificacionEnAncestro(
+            cuenta.codigo
+          );
+
+          if (clasificacion && !clasificacion.compartido) {
+            cuenta.corriente = clasificacion.corriente ? 'true' : 'false';
+            cuenta.noCorriente = clasificacion.noCorriente ? 'true' : 'false';
+            cuenta.clasificacionAutomatica = true;
+            cuenta.clasificacionHeredadaDe = clasificacion.codigoPadre;
+
+            const yaExiste = this.modeloDeDatosContabilidad.some(
+              (item: any) => item.codigo.trim() === cuenta.codigo.trim()
+            );
+            if (!yaExiste) {
+              this.modeloDeDatosContabilidad.push(cuenta);
+            }
+            huboClasificacionesAutomaticas = true;
+          } else {
+            // Un padre compartido (o la ausencia de un padre clasificable)
+            // conserva el flujo manual para no tomar una decisión contable insegura.
+            codigosPendientes.push(cuenta);
+          }
+        });
+
+        if (huboClasificacionesAutomaticas) {
+          localStorage.setItem(
+            'modeloDeDatosContabilidad',
+            JSON.stringify(this.modeloDeDatosContabilidad)
+          );
+        }
+
+        if (codigosPendientes.length === 0) {
+          this.codigosNoexistentes = [];
+          this.cuadrarSaldosCorrientesyNoCorrientes();
+          return;
+        }
+
         let obj2 = {
           accion: 'nuevos',
-          data: codigosNuevos,
+          data: codigosPendientes,
         };
         this.mostrarNuevos = true;
         this.codigosNoexistentes = obj2;
@@ -27714,10 +27790,44 @@ export class PruebaComponent implements OnInit {
     this.mostrarTabla = true;
     this.consultarTabla2();
   }
+  asegurarCuentasParaBalanceDeComprobacion(): void {
+    const cuentaEnCero = (codigo: string): any => ({
+      codigo,
+      credito: 0,
+      debito: 0,
+      saldoAnterior: 0,
+      nuevoSaldo: 0,
+      corriente: 0,
+      noCorriente: 0,
+    });
+    const codigos = new Set<string>([
+      '1', '2', '3', '4', '5', '6', '7', '8', '9',
+      ...this.modeloDeDatosSistemaContaduria.map((item: any) =>
+        String(item.codigo || '').trim()
+      ),
+    ]);
+
+    codigos.forEach((codigo: string) => {
+      if (!codigo) return;
+      let almacenada: any = {};
+      try {
+        almacenada = JSON.parse(localStorage.getItem(codigo) || '{}') || {};
+      } catch (_error) {
+        almacenada = {};
+      }
+      localStorage.setItem(
+        codigo,
+        JSON.stringify({ ...cuentaEnCero(codigo), ...almacenada })
+      );
+    });
+  }
+
   generarReporteGeneral() {
     this.mostrarTabla = false;
+    if (this.mostrarReporteIndependienteSiExiste('balance')) return;
     this.asegurarTablaInicial();
     this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
+    this.asegurarCuentasParaBalanceDeComprobacion();
     let suma1 = {
       1: JSON.parse(localStorage.getItem('1.1.05') ?? '{}'),
       2: JSON.parse(localStorage.getItem('1.1.10') ?? '{}'),
@@ -28012,7 +28122,7 @@ export class PruebaComponent implements OnInit {
               };
               x.push(obj);
             } else {
-              if (element.codigo === '1.9.8.7.5.7.8.9' && element.tipo == 'C') {
+              if (element.codigo === '1.9' && element.tipo == 'C') {
                 obj = {
                   codigo: '1.9',
                   nombre: 'OTROS ACTIVOS',
@@ -28954,11 +29064,338 @@ export class PruebaComponent implements OnInit {
         // console.log(x);
       }
     });
-    this.datosTabla = x;
+    const camposNumericos = [
+      'credito',
+      'debito',
+      'saldoAnterior',
+      'nuevoSaldo',
+      'tipoDeCuenta',
+      'compartidoTipo',
+    ];
+    this.datosTabla = x
+      .filter((item: any) => !!item)
+      .map((item: any) => {
+        const fila = { ...item };
+        camposNumericos.forEach((campo: string) => {
+          fila[campo] = this.valorNumerico(fila[campo]);
+        });
+        return fila;
+      });
     this.prepararVistaReporte('balance');
     this.mostrarTabla = true;
     this.consultarTabla();
     this.mostrarReporteGenerado('Balance de comprobación');
+  }
+
+  construirEstadoSituacionFinanciera(): any[] {
+    const fuente = this.tablaInicialGuardada.length
+      ? this.tablaInicialGuardada
+      : this.datosTabla;
+    const buscar = (codigo: string): any =>
+      fuente.find(
+        (item: any) => String(item?.codigo || '').trim() === codigo
+      ) || {};
+    const corriente = (codigo: string): number =>
+      this.valorNumerico(buscar(codigo).tipoDeCuenta);
+    const noCorriente = (codigo: string): number =>
+      this.valorNumerico(buscar(codigo).compartidoTipo);
+    const saldo = (codigo: string): number =>
+      this.valorNumerico(buscar(codigo).nuevoSaldo);
+    const sumar = (items: any[], campo: string): number =>
+      items.reduce(
+        (total: number, item: any) => total + this.valorNumerico(item[campo]),
+        0
+      );
+    const fila = (
+      codigo: string,
+      nombre: string,
+      valorCorriente: number,
+      valorNoCorriente: number,
+      total: number,
+      seccion: string,
+      esTotal = false
+    ): any => ({
+      codigo,
+      nombre,
+      saldoAnterior: 0,
+      debito: 0,
+      credito: 0,
+      nuevoSaldo: total,
+      tipoDeCuenta: valorCorriente,
+      compartidoTipo: valorNoCorriente,
+      seccion,
+      esTotal,
+    });
+    const filaCorriente = (codigo: string, nombre: string, seccion: string) =>
+      fila(codigo, nombre, corriente(codigo), 0, corriente(codigo), seccion);
+    const filaNoCorriente = (codigo: string, nombre: string, seccion: string) =>
+      fila(codigo, nombre, 0, noCorriente(codigo), noCorriente(codigo), seccion);
+
+    const ac = [
+      filaCorriente('1.1', 'EFECTIVO Y EQUIVALENTES AL EFECTIVO', 'Activo corriente'),
+      filaCorriente('1.2', 'INVERSIONES E INSTRUMENTOS DERIVADOS', 'Activo corriente'),
+      filaCorriente('1.3', 'CUENTAS POR COBRAR', 'Activo corriente'),
+      filaCorriente('1.5', 'INVENTARIOS', 'Activo corriente'),
+      filaCorriente('1.9', 'OTROS ACTIVOS CORRIENTES', 'Activo corriente'),
+    ];
+    const totalAC = sumar(ac, 'tipoDeCuenta');
+
+    const propiedadInversion = noCorriente('1.9.51') + noCorriente('1.9.52');
+    const intangibles = noCorriente('1.9.70');
+    const otrosANC = noCorriente('1.9') - propiedadInversion - intangibles;
+    const anc = [
+      filaNoCorriente('1.2', 'INVERSIONES E INSTRUMENTOS DERIVADOS', 'Activo no corriente'),
+      filaNoCorriente('1.3', 'CUENTAS POR COBRAR', 'Activo no corriente'),
+      filaNoCorriente('1.6', 'PROPIEDADES, PLANTA Y EQUIPO', 'Activo no corriente'),
+      filaNoCorriente('1.7', 'BIENES DE USO PUBLICO, HISTORICOS Y CULTURALES', 'Activo no corriente'),
+      fila('1.9.51', 'PROPIEDADES DE INVERSION', 0, propiedadInversion, propiedadInversion, 'Activo no corriente'),
+      fila('1.9.70', 'ACTIVOS INTANGIBLES', 0, intangibles, intangibles, 'Activo no corriente'),
+      fila('1.9', 'OTROS ACTIVOS NO CORRIENTES', 0, otrosANC, otrosANC, 'Activo no corriente'),
+    ];
+    const totalANC = sumar(anc, 'compartidoTipo');
+    const totalActivos = totalAC + totalANC;
+
+    const pc = [
+      filaCorriente('2.4', 'CUENTAS POR PAGAR', 'Pasivo corriente'),
+      filaCorriente('2.5.11', 'BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO', 'Pasivo corriente'),
+      filaCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo corriente'),
+      filaCorriente('2.7', 'PROVISIONES', 'Pasivo corriente'),
+      filaCorriente('2.9', 'OTROS PASIVOS CORRIENTES', 'Pasivo corriente'),
+    ];
+    const totalPC = sumar(pc, 'tipoDeCuenta');
+    const pnc = [
+      filaNoCorriente('2.5.14', 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO', 'Pasivo no corriente'),
+      filaNoCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo no corriente'),
+      filaNoCorriente('2.7', 'PROVISIONES', 'Pasivo no corriente'),
+      filaNoCorriente('2.9', 'OTROS PASIVOS NO CORRIENTES', 'Pasivo no corriente'),
+    ];
+    const totalPNC = sumar(pnc, 'compartidoTipo');
+    const totalPasivos = totalPC + totalPNC;
+
+    const patrimonio = [
+      fila('3.1.05', 'CAPITAL FISCAL', 0, 0, saldo('3.1.05'), 'Patrimonio'),
+      fila('3.1.09', 'RESULTADOS DE EJERCICIOS ANTERIORES', 0, 0, saldo('3.1.09'), 'Patrimonio'),
+      fila('3.1.10', 'RESULTADO DEL EJERCICIO', 0, 0, saldo('3.1.10'), 'Patrimonio'),
+      fila('3.1.45', 'IMPACTOS POR LA TRANSICION AL NUEVO MARCO', 0, 0, saldo('3.1.45'), 'Patrimonio'),
+      fila('3.1.51', 'GANANCIAS O PERDIDAS POR PLANES DE BENEFICIOS', 0, 0, saldo('3.1.51'), 'Patrimonio'),
+    ];
+    const totalPatrimonio = sumar(patrimonio, 'nuevoSaldo');
+    const totalPasivoPatrimonio = totalPasivos + totalPatrimonio;
+
+    return [
+      ...ac,
+      fila('TOTAL-AC', 'TOTAL ACTIVO CORRIENTE', totalAC, 0, totalAC, 'Activo corriente', true),
+      ...anc,
+      fila('TOTAL-ANC', 'TOTAL ACTIVO NO CORRIENTE', 0, totalANC, totalANC, 'Activo no corriente', true),
+      fila('TOTAL-A', 'TOTAL ACTIVOS', totalAC, totalANC, totalActivos, 'Activos', true),
+      ...pc,
+      fila('TOTAL-PC', 'TOTAL PASIVO CORRIENTE', totalPC, 0, totalPC, 'Pasivo corriente', true),
+      ...pnc,
+      fila('TOTAL-PNC', 'TOTAL PASIVO NO CORRIENTE', 0, totalPNC, totalPNC, 'Pasivo no corriente', true),
+      fila('TOTAL-P', 'TOTAL PASIVOS', totalPC, totalPNC, totalPasivos, 'Pasivos', true),
+      ...patrimonio,
+      fila('TOTAL-PAT', 'TOTAL PATRIMONIO', 0, 0, totalPatrimonio, 'Patrimonio', true),
+      fila('TOTAL-PP', 'TOTAL PASIVO Y PATRIMONIO', 0, 0, totalPasivoPatrimonio, 'Comprobacion', true),
+      fila('DIFERENCIA', 'DIFERENCIA ACTIVOS - PASIVO Y PATRIMONIO', 0, 0, totalActivos - totalPasivoPatrimonio, 'Comprobacion', true),
+      fila('8', 'CUENTAS DE ORDEN DEUDORAS', 0, 0, saldo('8'), 'Cuentas de orden'),
+      fila('9', 'CUENTAS DE ORDEN ACREEDORAS', 0, 0, saldo('9'), 'Cuentas de orden'),
+    ];
+  }
+
+  generarEstadoSituacionFinanciera(): void {
+    this.mostrarTabla = false;
+    if (this.mostrarReporteIndependienteSiExiste('situacion')) return;
+    this.asegurarTablaInicial();
+    this.datosTabla = this.construirEstadoSituacionFinanciera();
+    this.prepararVistaReporte('situacion');
+    this.mostrarTabla = true;
+    this.consultarTabla();
+    this.mostrarReporteGenerado('Estado de situacion financiera');
+  }
+
+  construirEstadoResultadosFinancieros(): any[] {
+    const fuente = this.tablaInicialGuardada.length
+      ? this.tablaInicialGuardada
+      : this.datosTabla;
+    const saldo = (codigo: string): number => {
+      const item = fuente.find(
+        (cuenta: any) => String(cuenta?.codigo || '').trim() === codigo
+      );
+      return this.valorNumerico(item?.nuevoSaldo);
+    };
+    const fila = (
+      codigo: string,
+      nombre: string,
+      valor: number,
+      seccion: string,
+      esTotal = false
+    ): any => ({ codigo, nombre, valor, seccion, esTotal });
+
+    const ingresos = saldo('4');
+    const gastos = saldo('5');
+    const costosVenta = saldo('6');
+    const costosTransformacion = saldo('7');
+    const costosYGastos = gastos + costosVenta + costosTransformacion;
+    const resultado = ingresos - costosYGastos;
+    const resultadoPatrimonio = saldo('3.1.10');
+
+    return [
+      fila('4.2', 'VENTA DE BIENES', saldo('4.2'), 'Ingresos'),
+      fila('4.3.05', 'SERVICIOS EDUCATIVOS', saldo('4.3.05'), 'Venta de servicios'),
+      fila('4.3.11', 'ADMINISTRACION DEL SISTEMA DE SEGURIDAD SOCIAL EN SALUD', saldo('4.3.11'), 'Venta de servicios'),
+      fila('4.3.90', 'OTROS SERVICIOS', saldo('4.3.90'), 'Venta de servicios'),
+      fila('4.3.95', 'DEVOLUCIONES, REBAJAS Y DESCUENTOS EN VENTA DE SERVICIOS', saldo('4.3.95'), 'Venta de servicios'),
+      fila('4.3', 'TOTAL VENTA DE SERVICIOS', saldo('4.3'), 'Venta de servicios', true),
+      fila('4.4', 'TRANSFERENCIAS Y SUBVENCIONES', saldo('4.4'), 'Ingresos'),
+      fila('4.8', 'OTROS INGRESOS', saldo('4.8'), 'Ingresos'),
+      fila('TOTAL-I', 'TOTAL INGRESOS', ingresos, 'Ingresos', true),
+
+      fila('5.1', 'GASTOS DE ADMINISTRACION Y OPERACION', saldo('5.1'), 'Gastos'),
+      fila('5.3', 'DETERIORO, DEPRECIACIONES, AMORTIZACIONES Y PROVISIONES', saldo('5.3'), 'Gastos'),
+      fila('5.4', 'TRANSFERENCIAS Y SUBVENCIONES', saldo('5.4'), 'Gastos'),
+      fila('5.8', 'OTROS GASTOS', saldo('5.8'), 'Gastos'),
+      fila('TOTAL-G', 'TOTAL GASTOS', gastos, 'Gastos', true),
+
+      fila('6.2', 'COSTO DE VENTA DE BIENES', saldo('6.2'), 'Costos de venta'),
+      fila('6.3', 'COSTO DE VENTA DE SERVICIOS', saldo('6.3'), 'Costos de venta'),
+      fila('TOTAL-CV', 'TOTAL COSTOS DE VENTA', costosVenta, 'Costos de venta', true),
+
+      fila('7.2', 'COSTOS DE TRANSFORMACION - SERVICIOS EDUCATIVOS', saldo('7.2'), 'Costos de transformacion'),
+      fila('7.3', 'COSTOS DE TRANSFORMACION - SERVICIOS DE SALUD', saldo('7.3'), 'Costos de transformacion'),
+      fila('7.9', 'COSTOS DE TRANSFORMACION - OTROS SERVICIOS', saldo('7.9'), 'Costos de transformacion'),
+      fila('TOTAL-CT', 'TOTAL COSTOS DE TRANSFORMACION', costosTransformacion, 'Costos de transformacion', true),
+
+      fila('TOTAL-CG', 'TOTAL COSTOS Y GASTOS', costosYGastos, 'Resultado', true),
+      fila('RESULTADO', 'RESULTADO DEL EJERCICIO', resultado, 'Resultado', true),
+      fila('3.1.10', 'RESULTADO REGISTRADO EN EL PATRIMONIO', resultadoPatrimonio, 'Comprobacion'),
+      fila('DIFERENCIA', 'DIFERENCIA RESULTADO - PATRIMONIO', resultado - resultadoPatrimonio, 'Comprobacion', true),
+    ];
+  }
+
+  crearHojaEstadoResultadosFinancieros(): any {
+    const datos = this.construirEstadoResultadosFinancieros();
+    const filas = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['ESTADO DE RESULTADOS'],
+      [`Generado: ${new Date().toLocaleString('es-CO')}`],
+      ['Cifras en pesos colombianos'],
+      [],
+      ['Seccion', 'Codigo', 'Concepto', 'Valor del periodo'],
+      ...datos.map((item: any) => [
+        item.seccion,
+        item.codigo,
+        item.nombre,
+        this.valorNumerico(item.valor),
+      ]),
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(filas);
+    hoja['!merges'] = [0, 1, 2, 3].map((r: number) => ({
+      s: { r, c: 0 }, e: { r, c: 3 },
+    }));
+    hoja['!cols'] = [
+      { wch: 27 }, { wch: 15 }, { wch: 68 }, { wch: 24 },
+    ];
+    hoja['!freeze'] = { xSplit: 0, ySplit: 6, topLeftCell: 'A7' };
+    hoja['!autofilter'] = { ref: `A6:D${filas.length}` };
+    ['A1', 'A2', 'A3', 'A4'].forEach((ref: string, index: number) => {
+      hoja[ref].s = {
+        fill: { patternType: 'solid', fgColor: { rgb: index < 2 ? '155E75' : 'E8F3F0' } },
+        font: { bold: index < 2, color: { rgb: index < 2 ? 'FFFFFF' : '31584D' }, sz: index === 0 ? 16 : 11 },
+        alignment: { horizontal: 'center', vertical: 'center' },
+      };
+    });
+    for (let col = 0; col < 4; col++) {
+      hoja[XLSXStyle.utils.encode_cell({ r: 5, c: col })].s =
+        this.estiloEncabezado();
+    }
+    datos.forEach((item: any, index: number) => {
+      for (let col = 0; col < 4; col++) {
+        const ref = XLSXStyle.utils.encode_cell({ r: index + 6, c: col });
+        if (!hoja[ref]) continue;
+        const diferenciaIncorrecta =
+          item.codigo === 'DIFERENCIA' && this.valorNumerico(item.valor) !== 0;
+        hoja[ref].s = {
+          fill: { patternType: 'solid', fgColor: { rgb: item.esTotal ? 'DCEDE5' : index % 2 === 0 ? 'F7FAF8' : 'FFFFFF' } },
+          font: { bold: !!item.esTotal, color: { rgb: diferenciaIncorrecta ? 'B4232F' : '283B32' }, sz: 10 },
+          alignment: { vertical: 'center', horizontal: col === 3 ? 'right' : 'left', wrapText: col === 2 },
+          border: { bottom: { style: 'thin', color: { rgb: 'DCE6E0' } } },
+          numFmt: col === 3 ? '#,##0.00;[Red](#,##0.00);-' : undefined,
+        };
+        if (col === 3) hoja[ref].z = '#,##0.00;[Red](#,##0.00);-';
+      }
+    });
+    return hoja;
+  }
+
+  exportarEstadoSituacionFinanciera(): void {
+    this.asegurarTablaInicial();
+    const estadoGuardado = this.obtenerReporteIndependiente('situacion');
+    const datos = estadoGuardado.length
+      ? estadoGuardado
+      : this.construirEstadoSituacionFinanciera();
+    const filas = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['ESTADO DE SITUACION FINANCIERA'],
+      [`Generado: ${new Date().toLocaleString('es-CO')}`],
+      ['Cifras en pesos colombianos'],
+      [],
+      ['Seccion', 'Codigo', 'Concepto', 'Corriente', 'No corriente', 'Total'],
+      ...datos.map((item: any) => [
+        item.seccion,
+        item.codigo,
+        item.nombre,
+        this.valorNumerico(item.tipoDeCuenta),
+        this.valorNumerico(item.compartidoTipo),
+        this.valorNumerico(item.nuevoSaldo),
+      ]),
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(filas);
+    hoja['!merges'] = [0, 1, 2, 3].map((r: number) => ({
+      s: { r, c: 0 }, e: { r, c: 5 },
+    }));
+    hoja['!cols'] = [
+      { wch: 24 }, { wch: 15 }, { wch: 62 },
+      { wch: 22 }, { wch: 22 }, { wch: 22 },
+    ];
+    hoja['!freeze'] = { xSplit: 0, ySplit: 6, topLeftCell: 'A7' };
+    hoja['!autofilter'] = { ref: `A6:F${filas.length}` };
+    ['A1', 'A2', 'A3', 'A4'].forEach((ref: string, index: number) => {
+      hoja[ref].s = {
+        fill: { patternType: 'solid', fgColor: { rgb: index < 2 ? '155E75' : 'E8F3F0' } },
+        font: { bold: index < 2, color: { rgb: index < 2 ? 'FFFFFF' : '31584D' }, sz: index === 0 ? 16 : 11 },
+        alignment: { horizontal: 'center', vertical: 'center' },
+      };
+    });
+    for (let col = 0; col < 6; col++) {
+      hoja[XLSXStyle.utils.encode_cell({ r: 5, c: col })].s =
+        this.estiloEncabezado();
+    }
+    datos.forEach((item: any, index: number) => {
+      for (let col = 0; col < 6; col++) {
+        const ref = XLSXStyle.utils.encode_cell({ r: index + 6, c: col });
+        if (!hoja[ref]) continue;
+        hoja[ref].s = {
+          fill: { patternType: 'solid', fgColor: { rgb: item.esTotal ? 'DCEDE5' : index % 2 === 0 ? 'F7FAF8' : 'FFFFFF' } },
+          font: { bold: !!item.esTotal, color: { rgb: item.codigo === 'DIFERENCIA' && item.nuevoSaldo !== 0 ? 'B4232F' : '283B32' }, sz: 10 },
+          alignment: { vertical: 'center', horizontal: col >= 3 ? 'right' : 'left', wrapText: col === 2 },
+          border: { bottom: { style: 'thin', color: { rgb: 'DCE6E0' } } },
+          numFmt: col >= 3 ? '#,##0.00;[Red](#,##0.00);-' : undefined,
+        };
+        if (col >= 3) hoja[ref].z = '#,##0.00;[Red](#,##0.00);-';
+      }
+    });
+    const libro = XLSXStyle.utils.book_new();
+    XLSXStyle.utils.book_append_sheet(libro, hoja, 'Situacion financiera');
+    XLSXStyle.utils.book_append_sheet(
+      libro,
+      this.crearHojaEstadoResultadosFinancieros(),
+      'Estado de resultados'
+    );
+    const fecha = new Date();
+    const sello = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+    XLSXStyle.writeFile(libro, `UIS_Estados_Financieros_${sello}.xlsx`, {
+      bookType: 'xlsx', cellStyles: true, compression: true,
+    });
   }
 
   exportarLibroInstitucional(): void {
@@ -29059,6 +29496,7 @@ export class PruebaComponent implements OnInit {
       case 'chip': return 'Reporte CHIP';
       case 'balance': return 'Balance de comprobación';
       case 'resultados': return 'Estado de resultados';
+      case 'situacion': return 'Estado de situación financiera';
       case 'original': return 'Información procesada';
       default: return 'Informe contable';
     }
@@ -29302,6 +29740,7 @@ export class PruebaComponent implements OnInit {
 
   generarReporteChip() {
     this.mostrarTabla = false;
+    if (this.mostrarReporteIndependienteSiExiste('chip')) return;
     this.asegurarTablaInicial();
     const chipPersistido = this.reporteChipGuardado.length > 0
       ? this.reporteChipGuardado
@@ -29344,7 +29783,50 @@ export class PruebaComponent implements OnInit {
     return JSON.parse(JSON.stringify(datos || []));
   }
 
+  guardarReporteIndependiente(tipo: string, datos: any[] = this.datosTabla): void {
+    if (!tipo || tipo === 'resultados') return;
+    const copia = this.clonarDatos(datos);
+    this.reportesIndependientes[tipo] = copia;
+    localStorage.setItem(
+      `reporteIndependiente_${tipo}`,
+      JSON.stringify(copia)
+    );
+    if (tipo === 'chip') {
+      this.reporteChipGuardado = copia;
+      localStorage.setItem('reporteChipModificado', JSON.stringify(copia));
+    }
+  }
+
+  obtenerReporteIndependiente(tipo: string): any[] {
+    if (this.reportesIndependientes[tipo]?.length) {
+      return this.clonarDatos(this.reportesIndependientes[tipo]);
+    }
+    const persistido = localStorage.getItem(`reporteIndependiente_${tipo}`);
+    if (!persistido) return [];
+    try {
+      const datos = JSON.parse(persistido);
+      if (Array.isArray(datos)) {
+        this.reportesIndependientes[tipo] = datos;
+        return this.clonarDatos(datos);
+      }
+    } catch (_error) {}
+    return [];
+  }
+
+  mostrarReporteIndependienteSiExiste(
+    tipo: 'balance' | 'chip' | 'situacion' | 'original'
+  ): boolean {
+    const guardado = this.obtenerReporteIndependiente(tipo);
+    if (!guardado.length) return false;
+    this.datosTabla = guardado;
+    this.prepararVistaReporte(tipo);
+    this.mostrarTabla = true;
+    this.consultarTabla();
+    return true;
+  }
+
   mostrarInformacionOriginal(): void {
+    if (this.mostrarReporteIndependienteSiExiste('original')) return;
     if (this.tablaInicialGuardada.length === 0) {
       return;
     }
@@ -29354,7 +29836,7 @@ export class PruebaComponent implements OnInit {
     this.consultarTabla();
   }
 
-  prepararVistaReporte(tipo: 'balance' | 'chip' | 'resultados' | 'original'): void {
+  prepararVistaReporte(tipo: 'balance' | 'chip' | 'resultados' | 'situacion' | 'original'): void {
     this.reporteActivo = tipo;
     this.currentPage = 1;
     this.pageSize = 100;
@@ -29368,7 +29850,7 @@ export class PruebaComponent implements OnInit {
     const columnasSinSeleccion = this.displayedColumns.filter(
       (columna: string) => columna !== 'tipo'
     );
-    this.displayedColumns = tipo === 'chip'
+    this.displayedColumns = ['original', 'chip', 'balance', 'situacion'].includes(tipo)
       ? ['tipo', ...columnasSinSeleccion]
       : columnasSinSeleccion;
   }
@@ -29397,7 +29879,7 @@ export class PruebaComponent implements OnInit {
     );
   }
   seleccionadosTabla(row: any) {
-    if (this.baseInformes) {
+    if (['', 'original', 'chip', 'balance', 'situacion'].includes(this.reporteActivo)) {
       if (!this.puedeEditarDistribucion(row)) {
         return;
       }
@@ -29424,10 +29906,104 @@ export class PruebaComponent implements OnInit {
   }
 
   puedeEditarDistribucion(row: any): boolean {
-    return !!row &&
-      String(row.codigo || '').trim().length === 9 &&
-      Number(row.tipoDeCuenta) !== 0 &&
-      Number(row.compartidoTipo) !== 0;
+    if (!row) return false;
+    const codigo = String(row.codigo || '').trim();
+    const clase = codigo.split('.')[0];
+    const esCuentaEstadoSituacion =
+      this.reporteActivo !== 'situacion' ||
+      String(row.seccion || '').startsWith('Activo') ||
+      String(row.seccion || '').startsWith('Pasivo');
+    const tieneHijos = this.datosTabla.some((item: any) => {
+      const otroCodigo = String(item?.codigo || '').trim();
+      return otroCodigo !== codigo && otroCodigo.startsWith(`${codigo}.`);
+    });
+    return (clase === '1' || clase === '2') &&
+      !codigo.startsWith('TOTAL') &&
+      this.valorNumerico(row.nuevoSaldo) !== 0 &&
+      esCuentaEstadoSituacion &&
+      !tieneHijos;
+  }
+
+  recalcularTotalesSituacionFinanciera(datos: any[]): void {
+    const filasBase = datos.filter(
+      (item: any) => !String(item.codigo || '').startsWith('TOTAL') &&
+        item.codigo !== 'DIFERENCIA'
+    );
+    const sumar = (clase: string, campo: string): number =>
+      filasBase
+        .filter((item: any) => String(item.codigo || '').split('.')[0] === clase)
+        .reduce(
+          (total: number, item: any) => total + this.valorNumerico(item[campo]),
+          0
+        );
+    const asignar = (
+      codigo: string,
+      valorCorriente: number,
+      valorNoCorriente: number,
+      total = valorCorriente + valorNoCorriente
+    ) => {
+      const fila = datos.find((item: any) => item.codigo === codigo);
+      if (!fila) return;
+      fila.tipoDeCuenta = valorCorriente;
+      fila.compartidoTipo = valorNoCorriente;
+      fila.nuevoSaldo = total;
+    };
+    const ac = sumar('1', 'tipoDeCuenta');
+    const anc = sumar('1', 'compartidoTipo');
+    const pc = sumar('2', 'tipoDeCuenta');
+    const pnc = sumar('2', 'compartidoTipo');
+    const patrimonio = this.valorNumerico(
+      datos.find((item: any) => item.codigo === 'TOTAL-PAT')?.nuevoSaldo
+    );
+    asignar('TOTAL-AC', ac, 0, ac);
+    asignar('TOTAL-ANC', 0, anc, anc);
+    asignar('TOTAL-A', ac, anc, ac + anc);
+    asignar('TOTAL-PC', pc, 0, pc);
+    asignar('TOTAL-PNC', 0, pnc, pnc);
+    asignar('TOTAL-P', pc, pnc, pc + pnc);
+    asignar('TOTAL-PP', 0, 0, pc + pnc + patrimonio);
+    asignar('DIFERENCIA', 0, 0, ac + anc - pc - pnc - patrimonio);
+  }
+
+  aplicarAjustesDirectosAlReporte(resultados: any[]): void {
+    resultados.forEach((ajuste: any) => {
+      const cuenta = this.datosTabla.find(
+        (item: any) =>
+          String(item.codigo || '').trim() === String(ajuste.codigo || '').trim() &&
+          String(item.seccion || '') === String(ajuste.seccion || '')
+      ) || this.datosTabla.find(
+        (item: any) =>
+          String(item.codigo || '').trim() === String(ajuste.codigo || '').trim()
+      );
+      if (!cuenta) return;
+      const diferenciaCorriente =
+        this.valorNumerico(ajuste.tipoDeCuenta) -
+        this.valorNumerico(cuenta.tipoDeCuenta);
+      const diferenciaNoCorriente =
+        this.valorNumerico(ajuste.compartidoTipo) -
+        this.valorNumerico(cuenta.compartidoTipo);
+      cuenta.tipoDeCuenta = this.valorNumerico(ajuste.tipoDeCuenta);
+      cuenta.compartidoTipo = this.valorNumerico(ajuste.compartidoTipo);
+      cuenta.clasificacionPendiente = false;
+
+      const codigoCuenta = String(cuenta.codigo || '').trim();
+      this.datosTabla.forEach((padre: any) => {
+        const codigoPadre = String(padre.codigo || '').trim();
+        if (
+          codigoPadre !== codigoCuenta &&
+          codigoCuenta.startsWith(`${codigoPadre}.`) &&
+          !codigoPadre.startsWith('TOTAL')
+        ) {
+          padre.tipoDeCuenta =
+            this.valorNumerico(padre.tipoDeCuenta) + diferenciaCorriente;
+          padre.compartidoTipo =
+            this.valorNumerico(padre.compartidoTipo) + diferenciaNoCorriente;
+        }
+      });
+    });
+    if (this.reporteActivo === 'situacion') {
+      this.recalcularTotalesSituacionFinanciera(this.datosTabla);
+    }
   }
 
   openDialogAjusteReporte() {
@@ -29447,19 +30023,18 @@ export class PruebaComponent implements OnInit {
         return;
       }
 
-      result.forEach((ajuste: any) => {
-        const cuenta = this.datosTabla.find(
-          (item: any) => item.codigo.trim() === ajuste.codigo.trim()
-        );
-        if (cuenta) {
-          cuenta.tipoDeCuenta = Number(ajuste.tipoDeCuenta) || 0;
-          cuenta.compartidoTipo = Number(ajuste.compartidoTipo) || 0;
-        }
-      });
+      const tipoReporte = this.reporteActivo || 'original';
+      this.aplicarAjustesDirectosAlReporte(result);
 
       this.seleccionadosNewTable = [];
       this.selectAll = false;
       this.datosTabla.forEach((item: any) => (item.tipo = false));
+      if (tipoReporte !== 'chip') {
+        this.guardarReporteIndependiente(tipoReporte, this.datosTabla);
+        this.datosReporteActual = this.datosTabla;
+        this.consultarTabla();
+        return;
+      }
       // Preparación original: recalcular desde las cuentas de este nivel
       // para que el modelo vuelva a sumar corriente y no corriente hacia arriba.
       this.datosTabla = this.datosTabla.filter(
@@ -29467,13 +30042,8 @@ export class PruebaComponent implements OnInit {
       );
       this.contadormodelo = 18;
       this.ejecucion = 0;
+      this.reporteEnRecalculo = tipoReporte;
       this.ejecutarModeloDeResumidosReporte(this.contadormodelo);
-      this.datosReporteActual = this.datosTabla;
-      this.reporteChipGuardado = this.clonarDatos(this.datosTabla);
-      localStorage.setItem(
-        'reporteChipModificado',
-        JSON.stringify(this.reporteChipGuardado)
-      );
     });
   }
 
@@ -30099,6 +30669,14 @@ export class PruebaComponent implements OnInit {
       console.log('hola aca acaba todo??????????');
       if (this.recorrido2 === 1) {
         this.actualizarTabla();
+        if (this.reporteEnRecalculo) {
+          this.guardarReporteIndependiente(
+            this.reporteEnRecalculo,
+            this.datosTabla
+          );
+          this.datosReporteActual = this.datosTabla;
+          this.reporteEnRecalculo = '';
+        }
       } else {
         for (let i = 0; i < this.datosTabla.length; i++) {
           if (this.datosTabla[i].corriente && !this.datosTabla[i].noCorriente) {

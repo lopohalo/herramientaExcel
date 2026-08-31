@@ -9,21 +9,23 @@
 >
   <h6>Cambio de propiedades</h6>
 
-  <mat-form-field>
-    <mat-label>Cuenta corriente:</mat-label>
-    <mat-select [(ngModel)]="cuentaCorriente">
-      <mat-option value="si">Si</mat-option>
-      <mat-option value="no">No</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div class="classification-selects">
+    <label>
+      <span>Cuenta corriente:</span>
+      <select [(ngModel)]="cuentaCorriente">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </label>
 
-  <mat-form-field>
-    <mat-label>Cuenta no corriente:</mat-label>
-    <mat-select [(ngModel)]="cuentaCorrienteNoCorriente">
-      <mat-option value="si">Si</mat-option>
-      <mat-option value="no">No</mat-option>
-    </mat-select>
-  </mat-form-field>
+    <label>
+      <span>Cuenta no corriente:</span>
+      <select [(ngModel)]="cuentaCorrienteNoCorriente">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+  </div>
 
   <div class="container">
     <div class="row">
