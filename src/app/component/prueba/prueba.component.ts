@@ -26192,6 +26192,7 @@ export class PruebaComponent implements OnInit {
     this.reporteChipGuardado = [];
     this.datosReporteActual = [];
     localStorage.removeItem('reporteChipModificado');
+    localStorage.removeItem('reporteFuenteOriginal');
     ['original', 'chip', 'balance', 'situacion'].forEach((tipo: string) => {
       localStorage.removeItem(`reporteIndependiente_${tipo}`);
     });
@@ -27824,7 +27825,6 @@ export class PruebaComponent implements OnInit {
 
   generarReporteGeneral() {
     this.mostrarTabla = false;
-    if (this.mostrarReporteIndependienteSiExiste('balance')) return;
     this.asegurarTablaInicial();
     this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
     this.asegurarCuentasParaBalanceDeComprobacion();
@@ -29204,7 +29204,6 @@ export class PruebaComponent implements OnInit {
 
   generarEstadoSituacionFinanciera(): void {
     this.mostrarTabla = false;
-    if (this.mostrarReporteIndependienteSiExiste('situacion')) return;
     this.asegurarTablaInicial();
     this.datosTabla = this.construirEstadoSituacionFinanciera();
     this.prepararVistaReporte('situacion');
@@ -29329,10 +29328,7 @@ export class PruebaComponent implements OnInit {
 
   exportarEstadoSituacionFinanciera(): void {
     this.asegurarTablaInicial();
-    const estadoGuardado = this.obtenerReporteIndependiente('situacion');
-    const datos = estadoGuardado.length
-      ? estadoGuardado
-      : this.construirEstadoSituacionFinanciera();
+    const datos = this.construirEstadoSituacionFinanciera();
     const filas = [
       ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
       ['ESTADO DE SITUACION FINANCIERA'],
@@ -29740,12 +29736,8 @@ export class PruebaComponent implements OnInit {
 
   generarReporteChip() {
     this.mostrarTabla = false;
-    if (this.mostrarReporteIndependienteSiExiste('chip')) return;
     this.asegurarTablaInicial();
-    const chipPersistido = this.reporteChipGuardado.length > 0
-      ? this.reporteChipGuardado
-      : this.tablaInicialGuardada;
-    this.datosTabla = this.clonarDatos(chipPersistido);
+    this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
     let x: any = [];
     this.modeloReporteChip.forEach((element) => {
       let y = this.datosTabla.filter(
@@ -29775,8 +29767,56 @@ export class PruebaComponent implements OnInit {
 
   asegurarTablaInicial(): void {
     if (this.tablaInicialGuardada.length === 0) {
+      const persistida = localStorage.getItem('reporteFuenteOriginal');
+      if (persistida) {
+        try {
+          const datos = JSON.parse(persistida);
+          if (Array.isArray(datos) && datos.length) {
+            this.tablaInicialGuardada = this.clonarDatos(datos);
+            return;
+          }
+        } catch (_error) {}
+      }
       this.tablaInicialGuardada = this.clonarDatos(this.datosTabla);
     }
+  }
+
+  guardarFuenteOriginal(datos: any[] = this.tablaInicialGuardada): void {
+    const copia = this.clonarDatos(datos);
+    this.tablaInicialGuardada = copia;
+    localStorage.setItem('reporteFuenteOriginal', JSON.stringify(copia));
+
+    copia.forEach((cuenta: any) => {
+      const codigo = String(cuenta.codigo || '').trim();
+      if (!codigo || codigo.startsWith('TOTAL')) return;
+      let almacenada: any = {};
+      try {
+        almacenada = JSON.parse(localStorage.getItem(codigo) || '{}') || {};
+      } catch (_error) {
+        almacenada = {};
+      }
+      localStorage.setItem(codigo, JSON.stringify({
+        ...almacenada,
+        codigo,
+        credito: this.valorNumerico(cuenta.credito),
+        debito: this.valorNumerico(cuenta.debito),
+        saldoAnterior: this.valorNumerico(cuenta.saldoAnterior),
+        nuevoSaldo: this.valorNumerico(cuenta.nuevoSaldo),
+        corriente: this.valorNumerico(cuenta.tipoDeCuenta),
+        noCorriente: this.valorNumerico(cuenta.compartidoTipo),
+      }));
+    });
+
+    this.invalidarReportesDerivados();
+  }
+
+  invalidarReportesDerivados(): void {
+    ['original', 'chip', 'balance', 'situacion'].forEach((tipo: string) => {
+      delete this.reportesIndependientes[tipo];
+      localStorage.removeItem(`reporteIndependiente_${tipo}`);
+    });
+    this.reporteChipGuardado = [];
+    localStorage.removeItem('reporteChipModificado');
   }
 
   clonarDatos(datos: any[]): any[] {
@@ -29826,7 +29866,7 @@ export class PruebaComponent implements OnInit {
   }
 
   mostrarInformacionOriginal(): void {
-    if (this.mostrarReporteIndependienteSiExiste('original')) return;
+    this.asegurarTablaInicial();
     if (this.tablaInicialGuardada.length === 0) {
       return;
     }
@@ -29982,6 +30022,14 @@ export class PruebaComponent implements OnInit {
       const diferenciaNoCorriente =
         this.valorNumerico(ajuste.compartidoTipo) -
         this.valorNumerico(cuenta.compartidoTipo);
+      const diferenciaSaldoAnterior =
+        this.valorNumerico(ajuste.saldoAnterior) -
+        this.valorNumerico(cuenta.saldoAnterior);
+      const diferenciaNuevoSaldo =
+        this.valorNumerico(ajuste.nuevoSaldo) -
+        this.valorNumerico(cuenta.nuevoSaldo);
+      cuenta.saldoAnterior = this.valorNumerico(ajuste.saldoAnterior);
+      cuenta.nuevoSaldo = this.valorNumerico(ajuste.nuevoSaldo);
       cuenta.tipoDeCuenta = this.valorNumerico(ajuste.tipoDeCuenta);
       cuenta.compartidoTipo = this.valorNumerico(ajuste.compartidoTipo);
       cuenta.clasificacionPendiente = false;
@@ -29998,6 +30046,10 @@ export class PruebaComponent implements OnInit {
             this.valorNumerico(padre.tipoDeCuenta) + diferenciaCorriente;
           padre.compartidoTipo =
             this.valorNumerico(padre.compartidoTipo) + diferenciaNoCorriente;
+          padre.saldoAnterior =
+            this.valorNumerico(padre.saldoAnterior) + diferenciaSaldoAnterior;
+          padre.nuevoSaldo =
+            this.valorNumerico(padre.nuevoSaldo) + diferenciaNuevoSaldo;
         }
       });
     });
@@ -30024,26 +30076,34 @@ export class PruebaComponent implements OnInit {
       }
 
       const tipoReporte = this.reporteActivo || 'original';
-      this.aplicarAjustesDirectosAlReporte(result);
+      if (tipoReporte === 'original') {
+        this.aplicarAjustesDirectosAlReporte(result);
+        this.guardarFuenteOriginal(this.datosTabla);
+      } else {
+        const vistaActual = this.datosTabla;
+        this.asegurarTablaInicial();
+        this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
+        this.aplicarAjustesDirectosAlReporte(result);
+        this.guardarFuenteOriginal(this.datosTabla);
+        this.datosTabla = vistaActual;
+      }
 
       this.seleccionadosNewTable = [];
       this.selectAll = false;
       this.datosTabla.forEach((item: any) => (item.tipo = false));
-      if (tipoReporte !== 'chip') {
-        this.guardarReporteIndependiente(tipoReporte, this.datosTabla);
+      if (tipoReporte === 'original') {
         this.datosReporteActual = this.datosTabla;
         this.consultarTabla();
         return;
       }
-      // Preparación original: recalcular desde las cuentas de este nivel
-      // para que el modelo vuelva a sumar corriente y no corriente hacia arriba.
-      this.datosTabla = this.datosTabla.filter(
-        (item: any) => String(item.codigo || '').trim().length === 9
-      );
-      this.contadormodelo = 18;
-      this.ejecucion = 0;
-      this.reporteEnRecalculo = tipoReporte;
-      this.ejecutarModeloDeResumidosReporte(this.contadormodelo);
+      // La vista activa se vuelve a construir desde la fuente ya actualizada.
+      if (tipoReporte === 'chip') {
+        this.generarReporteChip();
+      } else if (tipoReporte === 'balance') {
+        this.generarReporteGeneral();
+      } else if (tipoReporte === 'situacion') {
+        this.generarEstadoSituacionFinanciera();
+      }
     });
   }
 

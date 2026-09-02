@@ -68,6 +68,10 @@
         <div class="account-name">{{ item.nombre }}</div>
         <div class="balance-summary"><small>Total clasificado</small><strong>{{ totalesDistribucion[i] | number:'1.2-2' }}</strong></div>
       </div>
+      <div class="previous-balance-row">
+        <label class="previous-balance-input"><span>Saldo anterior</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="saldosAnteriores[i]" (ngModelChange)="actualizarSaldoAnterior(i)" /></div></label>
+        <div class="calculated-balance"><div><small>Nuevo saldo calculado</small><span>Débito y crédito se conservan</span></div><strong>{{ nuevosSaldos[i] | number:'1.2-2' }}</strong></div>
+      </div>
       <div class="distribution-fields">
         <label><span>Valor corriente</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="valoresCorrientes[i]" (ngModelChange)="actualizarDesdeCorriente(i)" /></div></label>
         <button type="button" class="balance-action" (click)="completarNoCorriente(i)" matTooltip="Calcular el valor no corriente"><mat-icon>sync_alt</mat-icon></button>

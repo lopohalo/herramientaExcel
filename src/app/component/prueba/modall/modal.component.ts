@@ -27,6 +27,10 @@ export class ModalTablaComponent implements OnInit {
   mostrarAjusteCorrienteNoCorriente = false;
   valoresCorrientes: number[] = [];
   valoresNoCorrientes: number[] = [];
+  saldosAnteriores: number[] = [];
+  nuevosSaldos: number[] = [];
+  saldosAnterioresOriginales: number[] = [];
+  nuevosSaldosOriginales: number[] = [];
   totalesDistribucion: number[] = [];
   errorAjuste = '';
   constructor(
@@ -45,10 +49,16 @@ export class ModalTablaComponent implements OnInit {
       this.valoresNoCorrientes = this.data.data.map(
         (item: any) => Number(item.compartidoTipo) || 0
       );
+      this.saldosAnteriores = this.data.data.map(
+        (item: any) => Number(item.saldoAnterior) || 0
+      );
+      this.nuevosSaldos = this.data.data.map(
+        (item: any) => Number(item.nuevoSaldo) || 0
+      );
+      this.saldosAnterioresOriginales = [...this.saldosAnteriores];
+      this.nuevosSaldosOriginales = [...this.nuevosSaldos];
       this.totalesDistribucion = this.data.data.map(
-        (item: any) =>
-          (Number(item.tipoDeCuenta) || 0) +
-          (Number(item.compartidoTipo) || 0)
+        (item: any) => Number(item.nuevoSaldo) || 0
       );
       return;
     }
@@ -101,9 +111,29 @@ export class ModalTablaComponent implements OnInit {
       (Number(this.valoresNoCorrientes[index]) || 0);
   }
 
+  actualizarSaldoAnterior(index: number): void {
+    const saldoAnterior = Number(this.saldosAnteriores[index]) || 0;
+    const diferencia = saldoAnterior - this.saldosAnterioresOriginales[index];
+    const nuevoSaldo = this.nuevosSaldosOriginales[index] + diferencia;
+    const totalAnterior = this.totalesDistribucion[index];
+    const corrienteAnterior = Number(this.valoresCorrientes[index]) || 0;
+    const proporcionCorriente = totalAnterior !== 0
+      ? corrienteAnterior / totalAnterior
+      : 0;
+
+    this.nuevosSaldos[index] = nuevoSaldo;
+    this.totalesDistribucion[index] = nuevoSaldo;
+    this.valoresCorrientes[index] = nuevoSaldo * proporcionCorriente;
+    this.valoresNoCorrientes[index] =
+      nuevoSaldo - this.valoresCorrientes[index];
+    this.errorAjuste = '';
+  }
+
   guardarAjustes(): void {
     const resultado = this.data.data.map((item: any, index: number) => ({
       ...item,
+      saldoAnterior: Number(this.saldosAnteriores[index]) || 0,
+      nuevoSaldo: Number(this.nuevosSaldos[index]) || 0,
       tipoDeCuenta: Number(this.valoresCorrientes[index]) || 0,
       compartidoTipo: Number(this.valoresNoCorrientes[index]) || 0,
     }));
