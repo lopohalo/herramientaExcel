@@ -6,31 +6,47 @@
   <section class="upload-card">
     <input #pdfInput id="pdf-file" type="file" accept="application/pdf,.pdf" multiple (change)="seleccionarArchivo($event)" />
     <input id="pdf-folder" type="file" webkitdirectory directory multiple (change)="seleccionarArchivo($event)" />
+    <input id="pdf-multiple-folders" type="file" webkitdirectory directory multiple (change)="seleccionarArchivo($event, true)" />
     <label for="pdf-file"><mat-icon>picture_as_pdf</mat-icon><strong>{{ analizando ? 'Analizando documentos…' : 'Seleccionar uno o varios PDF' }}</strong><span>Los archivos se procesan únicamente en este navegador</span></label>
     <label class="folder-action" for="pdf-folder"><mat-icon>folder_open</mat-icon><strong>Seleccionar carpeta completa</strong><span>Se conserva la ruta y se ignoran archivos que no sean PDF.</span></label>
+    <div class="multiple-folder-option">
+      <div><strong>Procesar varios contratos</strong><span>Selecciona una carpeta madre con sus subcarpetas o pulsa nuevamente para agregar otra carpeta al mismo lote.</span></div>
+      <label class="multi-folder-button" for="pdf-multiple-folders"><mat-icon>create_new_folder</mat-icon>Agregar carpeta al lote</label>
+    </div>
     <mat-progress-bar *ngIf="analizando" mode="determinate" [value]="progresoPorcentaje"></mat-progress-bar>
     <p class="progress-text" *ngIf="progreso">{{ progreso }}</p>
     <p class="error" *ngIf="error"><mat-icon>error_outline</mat-icon>{{ error }}</p>
     <div class="download-row" *ngIf="resultados.length">
-      <div><strong>{{ resultados.length }} documentos listos</strong><span>Se generarán metadatos, orden y paginación acumulada.</span></div>
-      <button type="button" [disabled]="analizando" (click)="exportarInventarioArchivistico()"><mat-icon>download</mat-icon>Descargar inventario Excel</button>
+      <div><strong>{{ resultados.length }} documentos listos</strong><span>{{ modoVariasCarpetas ? 'Se generará un inventario independiente por cada carpeta de contrato.' : 'Se generarán metadatos, orden y paginación acumulada.' }}</span></div>
+      <button type="button" [disabled]="analizando" (click)="exportarInventarioArchivistico()"><mat-icon>download</mat-icon>{{ modoVariasCarpetas ? 'Descargar inventarios Excel' : 'Descargar inventario Excel' }}</button>
     </div>
   </section>
 
-  <ng-container *ngFor="let pdf of resultados; let indice = index">
-    <h2 class="file-title"><span>{{ indice + 1 }}</span>{{ pdf.archivo['nombre'] }}</h2>
-    <section class="summary-grid">
-      <article><mat-icon>description</mat-icon><span>Páginas</span><strong>{{ pdf.paginas['total'] }}</strong></article>
-      <article><mat-icon>storage</mat-icon><span>Tamaño</span><strong>{{ pdf.archivo['kilobytes'] | number:'1.0-2' }} KB</strong></article>
-      <article><mat-icon>image</mat-icon><span>Imágenes</span><strong>{{ pdf.recursos['imagenesDetectadas'] }}</strong></article>
-      <article><mat-icon>text_fields</mat-icon><span>Texto detectable</span><strong>{{ pdf.contenido['tieneSeñalesDeTexto'] ? 'Sí' : 'No' }}</strong></article>
-      <article><mat-icon>document_scanner</mat-icon><span>Requiere OCR</span><strong>{{ pdf.contenido['recomiendaOcr'] ? 'Probablemente' : 'No parece' }}</strong></article>
-      <article><mat-icon>lock_open</mat-icon><span>Cifrado</span><strong>{{ pdf.seguridad['cifrado'] ? 'Sí' : 'No' }}</strong></article>
-    </section>
+  <mat-accordion class="folder-results" multi *ngIf="resultadosPorCarpeta.length">
+    <mat-expansion-panel *ngFor="let grupo of resultadosPorCarpeta; let grupoIndice = index" [expanded]="grupoIndice === 0">
+      <mat-expansion-panel-header>
+        <mat-panel-title><mat-icon>folder</mat-icon>{{ grupo.nombre }}</mat-panel-title>
+        <mat-panel-description>{{ grupo.documentos.length }} PDF{{ grupo.documentos.length === 1 ? '' : 's' }}</mat-panel-description>
+      </mat-expansion-panel-header>
 
-    <section class="result-card">
-      <header><div><span class="eyebrow">Resultado técnico y contenido</span><h2>Objeto extraído</h2></div><span>También disponible en la consola</span></header>
-      <pre>{{ pdf | json }}</pre>
-    </section>
-  </ng-container>
+      <div class="folder-content">
+        <ng-container *ngFor="let pdf of grupo.documentos; let indice = index">
+          <h2 class="file-title"><span>{{ indice + 1 }}</span>{{ pdf.archivo['nombre'] }}</h2>
+          <section class="summary-grid">
+            <article><mat-icon>description</mat-icon><span>Páginas</span><strong>{{ pdf.paginas['total'] }}</strong></article>
+            <article><mat-icon>storage</mat-icon><span>Tamaño</span><strong>{{ pdf.archivo['kilobytes'] | number:'1.0-2' }} KB</strong></article>
+            <article><mat-icon>image</mat-icon><span>Imágenes</span><strong>{{ pdf.recursos['imagenesDetectadas'] }}</strong></article>
+            <article><mat-icon>text_fields</mat-icon><span>Texto detectable</span><strong>{{ pdf.contenido['tieneSeñalesDeTexto'] ? 'Sí' : 'No' }}</strong></article>
+            <article><mat-icon>document_scanner</mat-icon><span>Requiere OCR</span><strong>{{ pdf.contenido['recomiendaOcr'] ? 'Probablemente' : 'No parece' }}</strong></article>
+            <article><mat-icon>lock_open</mat-icon><span>Cifrado</span><strong>{{ pdf.seguridad['cifrado'] ? 'Sí' : 'No' }}</strong></article>
+          </section>
+
+          <section class="result-card">
+            <header><div><span class="eyebrow">Resultado técnico y contenido</span><h2>Objeto extraído</h2></div><span>También disponible en la consola</span></header>
+            <pre>{{ pdf | json }}</pre>
+          </section>
+        </ng-container>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
 </main>

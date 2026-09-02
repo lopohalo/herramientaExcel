@@ -27,19 +27,39 @@ export class PdfAnalyzerComponent {
   resultados: PdfAnalysis[] = [];
   progreso = '';
   progresoPorcentaje = 0;
+  modoVariasCarpetas = false;
+  resultadosPorCarpeta: Array<{ nombre: string; documentos: PdfAnalysis[] }> = [];
   private trabajadorOcr: any = null;
 
-  async seleccionarArchivo(event: Event): Promise<void> {
+  async seleccionarArchivo(event: Event, variasCarpetas = false): Promise<void> {
     const input = event.target as HTMLInputElement;
     const seleccionados = Array.from(input.files || []);
-    const archivos = seleccionados.filter(
+    let archivos = seleccionados.filter(
       (archivo) => archivo.type === 'application/pdf' || archivo.name.toLowerCase().endsWith('.pdf')
     );
     if (!archivos.length) return;
 
+    const agregarALote = variasCarpetas && this.modoVariasCarpetas && this.resultados.length > 0;
+    if (agregarALote) {
+      const existentes = new Set(this.resultados.map((pdf) =>
+        `${pdf.archivo['rutaRelativa']}|${pdf.archivo['bytes']}`
+      ));
+      archivos = archivos.filter((archivo) => !existentes.has(
+        `${(archivo as any).webkitRelativePath || archivo.name}|${archivo.size}`
+      ));
+      if (!archivos.length) {
+        this.progreso = 'Esa carpeta ya estaba agregada al lote.';
+        input.value = '';
+        return;
+      }
+    }
     this.error = '';
-    this.resultado = null;
-    this.resultados = [];
+    this.modoVariasCarpetas = variasCarpetas;
+    if (!agregarALote) {
+      this.resultado = null;
+      this.resultados = [];
+      this.resultadosPorCarpeta = [];
+    }
     const ignorados = seleccionados.length - archivos.length;
     if (ignorados > 0) this.progreso = `${ignorados} archivo(s) no PDF serán ignorados.`;
 
@@ -63,8 +83,11 @@ export class PdfAnalyzerComponent {
         console.groupEnd();
       }
       this.resultado = this.resultados[0] || null;
+      this.resultadosPorCarpeta = Array.from(this.agruparPorExpediente(this.resultados).entries()).map(
+        ([nombre, documentos]) => ({ nombre, documentos })
+      );
       this.progresoPorcentaje = 100;
-      this.progreso = `${this.resultados.length} archivo(s) procesado(s)`;
+      this.progreso = `${this.resultados.length} archivo(s) procesado(s) en ${this.resultadosPorCarpeta.length} carpeta(s)`;
       console.log('Resultado conjunto de PDFs:', this.resultados);
     } catch (error: any) {
       this.error = error?.message || 'No fue posible analizar el PDF.';
@@ -172,7 +195,19 @@ export class PdfAnalyzerComponent {
 
   exportarInventarioArchivistico(): void {
     if (!this.resultados.length || this.analizando) return;
-    const documentos = [...this.resultados].sort(
+    const grupos = this.modoVariasCarpetas
+      ? this.agruparPorExpediente(this.resultados)
+      : new Map<string, PdfAnalysis[]>([['seleccion_actual', this.resultados]]);
+    if (this.modoVariasCarpetas && grupos.size > 1) {
+      this.generarInventarioConsolidado(grupos);
+      return;
+    }
+    const [nombreCarpeta, documentos] = Array.from(grupos.entries())[0];
+    this.generarInventarioExpediente(documentos, nombreCarpeta);
+  }
+
+  private generarInventarioExpediente(documentosGrupo: PdfAnalysis[], nombreCarpeta: string): void {
+    const documentos = [...documentosGrupo].sort(
       (a, b) => this.ordenArchivo(a.archivo['nombre']) - this.ordenArchivo(b.archivo['nombre'])
     );
     let paginaAcumulada = 1;
@@ -230,18 +265,149 @@ export class PdfAnalyzerComponent {
       'Metadato 1', 'Metadato 2',
     ];
     const listas = this.construirListasArchivisticas();
+    const persona = String(expediente[8] || '').replace(/^Nombre\s+/i, '').trim() || 'Contratista no identificado';
+    const tituloContratista = `CONTRATISTA: ${persona}`;
     const libro = XLSXStyle.utils.book_new();
     const hojaExpediente = XLSXStyle.utils.aoa_to_sheet([encabezadosExpediente, expediente]);
-    const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet([encabezadosDocumentos, ...filasDocumentales]);
-    const hojaListas = XLSXStyle.utils.aoa_to_sheet(listas);
+    const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], encabezadosDocumentos, ...filasDocumentales]);
+    const hojaListas = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], ...listas]);
+    hojaDocumentos['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
+    hojaListas['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
     this.estilizarHoja(hojaExpediente, encabezadosExpediente.length, 2, 24);
-    this.estilizarHoja(hojaDocumentos, encabezadosDocumentos.length, filasDocumentales.length + 1, 25);
-    this.estilizarHoja(hojaListas, 7, listas.length, 24);
+    this.estilizarHoja(hojaDocumentos, encabezadosDocumentos.length, filasDocumentales.length + 2, 25, 1, tituloContratista);
+    this.estilizarHoja(hojaListas, 7, listas.length + 1, 24, 1, tituloContratista);
     XLSXStyle.utils.book_append_sheet(libro, hojaExpediente, 'metadatos_expediente');
     XLSXStyle.utils.book_append_sheet(libro, hojaDocumentos, 'metadatos_tipos_documentales');
     XLSXStyle.utils.book_append_sheet(libro, hojaListas, 'Listas');
-    const nombreExpediente = String(expediente[6] || 'inventario_expediente').replace(/[^\w.-]+/g, '_');
+    const nombreExpediente = String(expediente[6] || nombreCarpeta || 'inventario_expediente').replace(/[^\w.-]+/g, '_');
     XLSXStyle.writeFile(libro, `${nombreExpediente}.xlsx`, { bookType: 'xlsx' });
+  }
+
+  private generarInventarioConsolidado(grupos: Map<string, PdfAnalysis[]>): void {
+    const encabezadosExpediente = [
+      'Código unidad', 'Nombre unidad', 'Código serie', 'Nombre serie', 'Código subserie',
+      'Nombre subserie', 'Nombre del expediente', 'Descripción del contenido 1',
+      'Descripción del contenido 2', 'Descripción del contenido 3', 'Fecha cierre expediente',
+      'Orden de expediente', 'Total páginas', 'Objeto inventario', 'Fecha inicial', 'Fecha final',
+      'Frecuencia consulta', 'Soporte', 'Nombre responsable entrega', 'Cargo responsable Entrega',
+      'Fecha entrega', 'Nombre responsable recibido', 'Cargo responsable recibido',
+      'Fecha de recibido', 'Nombre unidad que recibe', 'Tipo de expediente', 'Acceso', 'Observaciones',
+    ];
+    const encabezadosDocumentos = [
+      'Nombre del archivo', 'Nombre del documento', 'Tipología documental',
+      'Fecha de creación del documento', 'Fecha incorporación expediente',
+      'Orden documento expediente', 'Página inicio', 'Página fin', 'Origen', 'Acceso',
+      'Idioma', 'Autor', 'Código calidad', 'Numero', 'Año', 'Metadato 1', 'Metadato 2',
+    ];
+    const filasExpedientes: any[][] = [];
+    const filasDocumentos: any[][] = [];
+    const filasListas: any[][] = [];
+    const mergesDocumentos: any[] = [];
+    const mergesListas: any[] = [];
+    const encabezadosDocumentales: number[] = [];
+    const encabezadosListas: number[] = [];
+    const titulosDocumentales: number[] = [];
+    const titulosListas: number[] = [];
+
+    Array.from(grupos.entries()).forEach(([nombreCarpeta, documentosGrupo]) => {
+      const documentos = [...documentosGrupo].sort(
+        (a, b) => this.ordenArchivo(a.archivo['nombre']) - this.ordenArchivo(b.archivo['nombre'])
+      );
+      let paginaAcumulada = 1;
+      let fechaAnterior: string | null = null;
+      const detalle = documentos.map((pdf, indice) => {
+        const nombre = String(pdf.archivo['nombre'] || '');
+        const totalPaginas = Number(pdf.paginas['total']) || Number(pdf.contenido['paginas']?.length) || 0;
+        const paginaInicio = paginaAcumulada;
+        const paginaFin = totalPaginas ? paginaInicio + totalPaginas - 1 : paginaInicio;
+        paginaAcumulada = paginaFin + 1;
+        const fechaDirecta = this.fechaDesdeNombre(nombre);
+        const fecha = fechaDirecta || fechaAnterior;
+        if (fechaDirecta) fechaAnterior = fechaDirecta;
+        const codigoCalidad = nombre.match(/\b(F[A-Z]{1,3}[._-]?\d+(?:\.\d+)?)\b/i)?.[1]?.replace('_', '.') || null;
+        return [nombre, this.nombreDocumentoDesdeArchivo(nombre), this.clasificarTipologia(nombre), fecha, fecha,
+          this.ordenArchivo(nombre) || indice + 1, paginaInicio, paginaFin, 'Electrónico', 'Pública',
+          'Español', this.autorDetectado(pdf), codigoCalidad, null, fecha ? fecha.slice(0, 4) : null, null, null];
+      });
+      const expediente = this.construirMetadatosExpediente(documentos, paginaAcumulada - 1);
+      filasExpedientes.push(expediente);
+      const persona = String(expediente[8] || '').replace(/^Nombre\s+/i, '').trim() || 'Contratista no identificado';
+      const titulo = `CONTRATISTA: ${persona} — EXPEDIENTE: ${nombreCarpeta}`;
+
+      const filaTituloDocumento = filasDocumentos.length;
+      titulosDocumentales.push(filaTituloDocumento);
+      filasDocumentos.push([titulo]);
+      mergesDocumentos.push({ s: { r: filaTituloDocumento, c: 0 }, e: { r: filaTituloDocumento, c: 5 } });
+      encabezadosDocumentales.push(filasDocumentos.length);
+      filasDocumentos.push(encabezadosDocumentos, ...detalle, []);
+
+      const lista = this.construirListasArchivisticas();
+      const filaTituloLista = filasListas.length;
+      titulosListas.push(filaTituloLista);
+      filasListas.push([titulo]);
+      mergesListas.push({ s: { r: filaTituloLista, c: 0 }, e: { r: filaTituloLista, c: 5 } });
+      encabezadosListas.push(filasListas.length);
+      filasListas.push(['Frecuencia consulta', 'Soporte', 'Tipo expediente', 'Acceso', 'Tipología', 'Origen', 'Idioma'], ...lista, []);
+    });
+
+    const libro = XLSXStyle.utils.book_new();
+    const hojaExpediente = XLSXStyle.utils.aoa_to_sheet([encabezadosExpediente, ...filasExpedientes]);
+    const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet(filasDocumentos);
+    const hojaListas = XLSXStyle.utils.aoa_to_sheet(filasListas);
+    hojaDocumentos['!merges'] = mergesDocumentos;
+    hojaListas['!merges'] = mergesListas;
+    this.estilizarHoja(hojaExpediente, encabezadosExpediente.length, filasExpedientes.length + 1, 24);
+    hojaDocumentos['!cols'] = Array.from({ length: encabezadosDocumentos.length }, () => ({ wch: 25 }));
+    hojaListas['!cols'] = Array.from({ length: 7 }, () => ({ wch: 24 }));
+    titulosDocumentales.forEach((fila) => this.estilizarFilaTitulo(hojaDocumentos, fila));
+    titulosListas.forEach((fila) => this.estilizarFilaTitulo(hojaListas, fila));
+    encabezadosDocumentales.forEach((fila) => this.estilizarFilaEncabezado(hojaDocumentos, fila, encabezadosDocumentos.length));
+    encabezadosListas.forEach((fila) => this.estilizarFilaEncabezado(hojaListas, fila, 7));
+    XLSXStyle.utils.book_append_sheet(libro, hojaExpediente, 'metadatos_expediente');
+    XLSXStyle.utils.book_append_sheet(libro, hojaDocumentos, 'metadatos_tipos_documentales');
+    XLSXStyle.utils.book_append_sheet(libro, hojaListas, 'Listas');
+    XLSXStyle.writeFile(libro, `inventario_consolidado_${grupos.size}_contratos.xlsx`, { bookType: 'xlsx' });
+  }
+
+  private estilizarFilaTitulo(hoja: any, fila: number): void {
+    const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: 0 })];
+    if (!celda) return;
+    celda.s = {
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 13 },
+      fill: { fgColor: { rgb: '174A35' } },
+      alignment: { horizontal: 'left', vertical: 'center' },
+    };
+    hoja['!rows'] = hoja['!rows'] || [];
+    hoja['!rows'][fila] = { hpt: 26 };
+  }
+
+  private estilizarFilaEncabezado(hoja: any, fila: number, columnas: number): void {
+    for (let columna = 0; columna < columnas; columna++) {
+      const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: columna })];
+      if (celda) celda.s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '176B55' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+      };
+    }
+  }
+
+  private agruparPorExpediente(documentos: PdfAnalysis[]): Map<string, PdfAnalysis[]> {
+    const grupos = new Map<string, PdfAnalysis[]>();
+    documentos.forEach((pdf) => {
+      const ruta = String(pdf.archivo['rutaRelativa'] || pdf.archivo['nombre'] || '');
+      const segmentos = ruta.split(/[\\/]/).filter(Boolean);
+      // webkitRelativePath tiene la forma carpetaMadre/contrato/archivo.pdf.
+      // En modo lote se debe separar por el hijo directo de la carpeta madre,
+      // incluso cuando la propia carpeta madre parece tener código de contrato.
+      const carpetaContrato = this.modoVariasCarpetas
+        ? (segmentos.length >= 3 ? segmentos[1] : segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual')
+        : (segmentos.find((segmento) => /^\d{6,}_\d{2,6}$/i.test(segmento)) ||
+          (segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual'));
+      if (!grupos.has(carpetaContrato)) grupos.set(carpetaContrato, []);
+      grupos.get(carpetaContrato)!.push(pdf);
+    });
+    return grupos;
   }
 
   private construirMetadatosExpediente(documentos: PdfAnalysis[], totalPaginas: number): any[] {
@@ -270,7 +436,8 @@ export class PdfAnalyzerComponent {
       return valor && Number.isFinite(numero) ? numero : null;
     };
     const rutas = documentos.map((pdf) => String(pdf.archivo['rutaRelativa'] || ''));
-    const expedienteRuta = rutas.map((ruta) => ruta.split(/[\\/]/)[0]).find((valor) => /\d{6,}/.test(valor));
+    const expedienteRuta = rutas.flatMap((ruta) => ruta.split(/[\\/]/))
+      .find((valor) => /^\d{6,}_\d{2,6}$/i.test(valor));
     const contrato = textosPrioritarios.match(/\b(20\d{8})\b/)?.[1] ||
       todosLosTextos.match(/\b(20\d{8})\b/)?.[1] ||
       expedienteRuta?.match(/\d{6,}/)?.[0] || '';
@@ -346,12 +513,28 @@ export class PdfAnalyzerComponent {
     ]);
   }
 
-  private estilizarHoja(hoja: any, columnas: number, filas: number, ancho: number): void {
+  private estilizarHoja(
+    hoja: any,
+    columnas: number,
+    filas: number,
+    ancho: number,
+    filaEncabezado = 0,
+    titulo = ''
+  ): void {
     hoja['!cols'] = Array.from({ length: columnas }, () => ({ wch: ancho }));
-    hoja['!autofilter'] = { ref: `A1:${XLSXStyle.utils.encode_col(columnas - 1)}${filas}` };
-    hoja['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2' };
+    const numeroFilaEncabezado = filaEncabezado + 1;
+    hoja['!autofilter'] = { ref: `A${numeroFilaEncabezado}:${XLSXStyle.utils.encode_col(columnas - 1)}${filas}` };
+    hoja['!freeze'] = { xSplit: 0, ySplit: filaEncabezado + 1, topLeftCell: `A${filaEncabezado + 2}` };
+    if (titulo && hoja['A1']) {
+      hoja['A1'].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 14 },
+        fill: { fgColor: { rgb: '174A35' } },
+        alignment: { horizontal: 'left', vertical: 'center' },
+      };
+      hoja['!rows'] = [{ hpt: 28 }];
+    }
     for (let columna = 0; columna < columnas; columna++) {
-      const celda = hoja[XLSXStyle.utils.encode_cell({ r: 0, c: columna })];
+      const celda = hoja[XLSXStyle.utils.encode_cell({ r: filaEncabezado, c: columna })];
       if (celda) celda.s = {
         font: { bold: true, color: { rgb: 'FFFFFF' } },
         fill: { fgColor: { rgb: '176B55' } },
