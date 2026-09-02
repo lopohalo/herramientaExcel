@@ -22,7 +22,27 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "pdf.worker.min.js",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "assets/pdfjs"
+              },
+              {
+                "glob": "worker.min.js",
+                "input": "node_modules/tesseract.js/dist",
+                "output": "assets/tesseract"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/tesseract.js-core",
+                "output": "assets/tesseract/core"
+              },
+              {
+                "glob": "spa.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/spa/4.0.0",
+                "output": "assets/tesseract/lang"
+              }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -37,11 +57,18 @@
              "allowedCommonJsDependencies": [
               "chart.js",
               "sweetalert2",
-              "xlsx-js-style"
+              "xlsx-js-style",
+              "pdfjs-dist",
+              "tesseract.js"
             ]
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": false
+              },
               "budgets": [
                 {
                   "type": "initial",

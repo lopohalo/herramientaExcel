@@ -63,6 +63,7 @@ import { BasegeneralComponent } from './component/pages/basegeneral/basegeneral.
 import { ModalTablaComponents } from './component/modales/modal-tabla/modal-tabla.component';
 import { ChartsModule } from 'ng2-charts';
 import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.component';
+import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.component';
 
 registerLocaleData(localeEsCo);
 
@@ -83,6 +84,7 @@ registerLocaleData(localeEsCo);
     TableTareasComponent,
     ModalTablaGraficaComponent,
     BasegeneralComponent,
+    PdfAnalyzerComponent,
   ],
   imports: [
     BrowserModule,
