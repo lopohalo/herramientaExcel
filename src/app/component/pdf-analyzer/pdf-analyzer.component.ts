@@ -122,7 +122,10 @@ export class PdfAnalyzerComponent {
     const operadoresTexto = /(?:^|\s)BT(?:\s|$)[\s\S]*?(?:^|\s)ET(?:\s|$)/m.test(pdf);
     const tieneTextoDetectable = textos.length > 0 || fuentes > 0 || operadoresTexto;
 
-    const extraccion = await this.extraerContenidoCompleto(bytes, archivo.name);
+    const extraccionProfunda = this.esDocumentoContractualPrioritario(archivo.name);
+    const extraccion = extraccionProfunda
+      ? await this.extraerContenidoCompleto(bytes, archivo.name)
+      : await this.obtenerResumenPaginas(bytes);
     const textoCompleto = extraccion.paginas.map((pagina: any) => pagina.texto).join('\n\n');
     const camposDetectados = this.detectarCampos(textoCompleto);
 
@@ -146,7 +149,7 @@ export class PdfAnalyzerComponent {
         productorEstructural: this.valorLiteral(pdf, 'Producer'),
       },
       paginas: {
-        total: totalPaginas,
+        total: extraccion.totalPaginas || totalPaginas,
         objetosPaginaDetectados: paginaObjetos,
         conteosArbolPaginas: conteosArbol,
         cajasPagina: cajas,
@@ -171,9 +174,10 @@ export class PdfAnalyzerComponent {
         textoCompleto,
         paginas: extraccion.paginas,
         camposDetectados,
-        observacion: textos.length
-          ? 'Se encontraron fragmentos sin descomprimir. Para extracción completa conviene usar un motor PDF.'
-          : 'No se encontró texto simple. El contenido puede estar comprimido o ser un escaneo y requerir OCR.',
+        extraccionProfunda,
+        observacion: extraccionProfunda
+          ? 'Documento contractual prioritario procesado con extracción de texto y OCR cuando fue necesario.'
+          : 'Procesamiento optimizado: se conservaron los metadatos y el número de páginas sin extraer el contenido interno.',
       },
       seguridad: {
         cifrado: /\/Encrypt\b/.test(pdf),
@@ -413,7 +417,7 @@ export class PdfAnalyzerComponent {
   private construirMetadatosExpediente(documentos: PdfAnalysis[], totalPaginas: number): any[] {
     const todosLosTextos = documentos.map((pdf) => String(pdf.contenido['textoCompleto'] || '')).join('\n');
     const documentoFocal = (codigo: string): PdfAnalysis | undefined => documentos.find(
-      (pdf) => new RegExp(`FCO[._\\s-]*${codigo}\\b`, 'i').test(
+      (pdf) => new RegExp(`FCO[._\\s-]*${codigo}(?=$|[^0-9])`, 'i').test(
         `${pdf.archivo['nombre']} ${pdf.contenido['textoCompleto'] || ''}`
       )
     );
@@ -421,7 +425,10 @@ export class PdfAnalyzerComponent {
     const texto66 = String(documentoFocal('66')?.contenido['textoCompleto'] || '');
     const texto67 = String(documentoFocal('67')?.contenido['textoCompleto'] || '');
     const texto70 = String(documentoFocal('70')?.contenido['textoCompleto'] || '');
-    const textosPrioritarios = [texto55, texto66, texto67, texto70].filter(Boolean).join('\n');
+    const textoFth146 = String(documentos.find((pdf) => /FTH[._\s-]*146(?=$|[^0-9])/i.test(
+      String(pdf.archivo['nombre'] || '')
+    ))?.contenido['textoCompleto'] || '');
+    const textosPrioritarios = [texto55, texto66, texto67, texto70, textoFth146].filter(Boolean).join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
@@ -441,9 +448,14 @@ export class PdfAnalyzerComponent {
     const contrato = textosPrioritarios.match(/\b(20\d{8})\b/)?.[1] ||
       todosLosTextos.match(/\b(20\d{8})\b/)?.[1] ||
       expedienteRuta?.match(/\d{6,}/)?.[0] || '';
+    const codigoUnidadFth = buscar(textoFth146, /C[oó]digo\s+de\s+la\s+unidad\s*:?\s*(\d{3,6})/i);
     const centroCosto = buscar(texto55, /Centro\s+de\s+Costo\s+(\d{3,6})/i);
-    const unidad = centroCosto || expedienteRuta?.match(/_(\d{3,5})\b/)?.[1] || '';
-    const nombreUnidad = buscar(texto55, /Proyecto\s+(.+?)\s+Centro\s+de\s+Costo/i);
+    const unidad = codigoUnidadFth || centroCosto || expedienteRuta?.match(/_(\d{3,5})\b/)?.[1] || '';
+    const nombreUnidadFth = buscar(
+      textoFth146,
+      /Nombre\s+de\s+la\s+unidad\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{3,100}?)(?=\s+B\.|\s+IDENTIFICACI)/i
+    );
+    const nombreUnidad = nombreUnidadFth || buscar(texto55, /Proyecto\s+(.+?)\s+Centro\s+de\s+Costo/i);
     const cedula = soloDigitos(
       buscar(`${texto55}\n${texto66}\n${texto67}`, /(?:Identificaci[oó]n|C\.C\.\s*o\s*Nit\.)\s*([\d.]+)/i)
     );
@@ -476,7 +488,7 @@ export class PdfAnalyzerComponent {
       'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
       'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
       'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
-      `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67 y FCO.70. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
+      `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67, FCO.70 y FTH.146. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
     ];
   }
 
@@ -577,10 +589,21 @@ export class PdfAnalyzerComponent {
     return pdf.metadatos['autor'] || null;
   }
 
+  private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
+    return /FCO[._\s-]*(?:55|66|67|70)(?=$|[^0-9])|FTH[._\s-]*146(?=$|[^0-9])/i.test(nombreArchivo);
+  }
+
+  private async obtenerResumenPaginas(bytes: Uint8Array): Promise<{ paginas: any[]; totalPaginas: number }> {
+    const documento: any = await getDocument({ data: bytes.slice() }).promise;
+    const totalPaginas = documento.numPages;
+    await documento.destroy();
+    return { paginas: [], totalPaginas };
+  }
+
   private async extraerContenidoCompleto(
     bytes: Uint8Array,
     nombreArchivo: string
-  ): Promise<{ paginas: any[] }> {
+  ): Promise<{ paginas: any[]; totalPaginas: number }> {
     const documento: any = await getDocument({ data: bytes.slice() }).promise;
     const paginas: any[] = [];
 
@@ -627,8 +650,9 @@ export class PdfAnalyzerComponent {
         texto,
       });
     }
+    const totalPaginas = documento.numPages;
     await documento.destroy();
-    return { paginas };
+    return { paginas, totalPaginas };
   }
 
   private async aplicarOcr(pagina: any): Promise<{ texto: string; confianza: number }> {
