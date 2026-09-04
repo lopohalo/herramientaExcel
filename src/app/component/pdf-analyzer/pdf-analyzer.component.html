@@ -16,7 +16,11 @@
     <mat-progress-bar *ngIf="analizando" mode="determinate" [value]="progresoPorcentaje"></mat-progress-bar>
     <p class="progress-text" *ngIf="progreso">{{ progreso }}</p>
     <p class="error" *ngIf="error"><mat-icon>error_outline</mat-icon>{{ error }}</p>
-    <p class="error" *ngIf="erroresProcesamiento.length"><mat-icon>warning_amber</mat-icon>{{ erroresProcesamiento.length }} PDF no pudieron procesarse; los demás continuaron normalmente.</p>
+    <mat-expansion-panel class="failed-files" *ngIf="erroresProcesamiento.length">
+      <mat-expansion-panel-header><mat-panel-title><mat-icon>warning_amber</mat-icon>{{ erroresProcesamiento.length }} PDF con inconvenientes</mat-panel-title><mat-panel-description>Ver archivos</mat-panel-description></mat-expansion-panel-header>
+      <div class="failed-file" *ngFor="let incidencia of erroresProcesamiento"><mat-icon>picture_as_pdf</mat-icon><div><strong>{{ incidencia.archivo }}</strong><span>{{ incidencia.mensaje }}</span></div></div>
+      <p class="failure-note">Estos archivos no detuvieron el procesamiento de los demás documentos.</p>
+    </mat-expansion-panel>
     <div class="download-row" *ngIf="resultados.length">
       <div><strong>{{ resultados.length }} documentos listos</strong><span>{{ modoVariasCarpetas ? 'Se generará un inventario independiente por cada carpeta de contrato.' : 'Se generarán metadatos, orden y paginación acumulada.' }}</span></div>
       <button type="button" [disabled]="analizando" (click)="exportarInventarioArchivistico()"><mat-icon>download</mat-icon>{{ modoVariasCarpetas ? 'Descargar inventarios Excel' : 'Descargar inventario Excel' }}</button>

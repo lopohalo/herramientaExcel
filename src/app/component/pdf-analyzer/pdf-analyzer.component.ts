@@ -89,7 +89,7 @@ export class PdfAnalyzerComponent {
         } catch (errorArchivo: any) {
           this.erroresProcesamiento.push({
             archivo: (archivo as any).webkitRelativePath || archivo.name,
-            mensaje: errorArchivo?.message || 'No fue posible procesar el PDF.',
+            mensaje: this.describirErrorPdf(errorArchivo),
           });
         }
       }
@@ -442,7 +442,14 @@ export class PdfAnalyzerComponent {
     const textoFth146 = String(documentos.find((pdf) => /FTH[._\s-]*146(?=$|[^0-9])/i.test(
       String(pdf.archivo['nombre'] || '')
     ))?.contenido['textoCompleto'] || '');
-    const textosPrioritarios = [texto55, texto66, texto67, texto70, textoFth146].filter(Boolean).join('\n');
+    const textoPrestacionServicios = documentos
+      .filter((pdf) => this.esOrdenPrestacionServicios(String(pdf.archivo['nombre'] || '')))
+      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
+      .filter(Boolean)
+      .join('\n');
+    const textosPrioritarios = [
+      texto55, texto66, texto67, texto70, textoFth146, textoPrestacionServicios,
+    ].filter(Boolean).join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
@@ -453,7 +460,8 @@ export class PdfAnalyzerComponent {
     };
     const moneda = (texto: string, etiqueta: string): number | null => {
       const valor = buscar(texto, new RegExp(`${etiqueta}\\s*\\$?\\s*([\\d.,]+)`, 'i'));
-      const numero = Number(valor.replace(/\D/g, ''));
+      const valorSinDecimales = valor.replace(/([.,]\d{2})$/, '');
+      const numero = Number(valorSinDecimales.replace(/\D/g, ''));
       return valor && Number.isFinite(numero) ? numero : null;
     };
     const rutas = documentos.map((pdf) => String(pdf.archivo['rutaRelativa'] || ''));
@@ -470,15 +478,27 @@ export class PdfAnalyzerComponent {
       /Nombre\s+de\s+la\s+unidad\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{3,100}?)(?=\s+B\.|\s+IDENTIFICACI)/i
     );
     const nombreUnidad = nombreUnidadFth || buscar(texto55, /Proyecto\s+(.+?)\s+Centro\s+de\s+Costo/i);
-    const cedula = soloDigitos(
+    const cedulaFuentesPrincipales = soloDigitos(
       buscar(`${texto55}\n${texto66}\n${texto67}`, /(?:Identificaci[oó]n|C\.C\.\s*o\s*Nit\.)\s*([\d.]+)/i)
     );
+    const cedulaPrestacion = soloDigitos(buscar(
+      textoPrestacionServicios,
+      /NIT\.?\s*O\s*C\.?\s*C\.?\s*:?\s*([\d.,]+)/i
+    ));
+    const cedulaValida = (valor: string): string =>
+      /^\d{6,12}$/.test(valor) ? valor : '';
+    const cedula = cedulaValida(cedulaPrestacion) || cedulaValida(cedulaFuentesPrincipales);
     const contratista = buscar(texto55, /Nombre\s+o\s+Raz[oó]n\s+Social\s+(.+?)\s+Identificaci[oó]n/i) ||
       buscar(`${texto66}\n${texto67}`, /Nombre\s+Completo\s+(Willman.+?)\s+(?:Cargo|C\.C\.)/i) ||
-      buscar(texto70, /([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ ]{8,80})\s+Proveedor/i);
+      buscar(texto70, /([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ ]{8,80})\s+Proveedor/i) ||
+      buscar(textoPrestacionServicios, /SE[ÑN]ORES\s*:?\s*(.+?)(?=\s+NIT\.?\s*O\s*C\.?\s*C\.?)/i);
     const valorEjecutado = moneda(`${texto66}\n${texto67}`, 'VALOR\\s+TOTAL\\s+EJECUTADO');
     const valorInicial = moneda(`${texto55}\n${texto66}\n${texto67}`, '(?:Valor\\s+del\\s+Contrato|VALOR\\s+INICIAL)');
-    const valorContrato = valorEjecutado ?? valorInicial;
+    const valorOrdenPrestacion = moneda(
+      textoPrestacionServicios,
+      '(?:TOTAL\\s+ORDEN|VALOR\\s+TOTAL|SUBTOTAL)\\s*:'
+    );
+    const valorContrato = valorOrdenPrestacion ?? valorInicial ?? valorEjecutado;
     const objeto = buscar(texto55, /Objeto\s+del\s+Contrato\s+([\s\S]{20,700}?)\s+Valor\s+del\s+Contrato/i) ||
       buscar(`${texto66}\n${texto67}`, /OBJETO\s+([\s\S]{20,700}?)\s+FECHA\s+DE/i);
     const fechaInicio = fechaNumerica(texto66, 'FECHA\\s+DE\\s+INICIO\\s+DEL\\s+CONTRATO') ||
@@ -502,7 +522,7 @@ export class PdfAnalyzerComponent {
       'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
       'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
       'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
-      `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67, FCO.70 y FTH.146. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
+      `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67, FCO.70, FTH.146 y la orden de prestación de servicios. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
     ];
   }
 
@@ -604,7 +624,31 @@ export class PdfAnalyzerComponent {
   }
 
   private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
-    return /FCO[._\s-]*(?:55|66|67|70)(?=$|[^0-9])|FTH[._\s-]*146(?=$|[^0-9])/i.test(nombreArchivo);
+    return /FCO[._\s-]*(?:55|66|67|70)(?=$|[^0-9])|FTH[._\s-]*146(?=$|[^0-9])/i.test(nombreArchivo) ||
+      this.esOrdenPrestacionServicios(nombreArchivo);
+  }
+
+  private describirErrorPdf(error: any): string {
+    const detalle = `${error?.name || ''} ${error?.message || ''}`.toLocaleLowerCase('es-CO');
+    if (detalle.includes('password') || detalle.includes('contraseña')) {
+      return 'PDF protegido con contraseña; no fue posible leerlo.';
+    }
+    if (detalle.includes('invalid pdf') || detalle.includes('invalidpdf')) {
+      return 'El archivo PDF está dañado o su estructura no es válida.';
+    }
+    if (detalle.includes('missing pdf') || detalle.includes('unexpected response')) {
+      return 'No fue posible acceder al contenido del archivo.';
+    }
+    return error?.message || 'No fue posible procesar el PDF.';
+  }
+
+  private esOrdenPrestacionServicios(nombreArchivo: string): boolean {
+    const nombreNormalizado = nombreArchivo
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('es-CO')
+      .replace(/[^a-z0-9]+/g, '_');
+    return /(?:^|_)(?:orden|contrato)(?:_de)?_prestacion(?:_de)?_servicios(?:_|$)/.test(nombreNormalizado);
   }
 
   private async obtenerResumenPaginas(bytes: Uint8Array): Promise<{ paginas: any[]; totalPaginas: number }> {
