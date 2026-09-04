@@ -473,8 +473,9 @@ export class PdfAnalyzerComponent {
       fechaCierre || fechaFinal || fechas.at(-1) || '', '', totalPaginas, 'Inventario Archivo de Gestión',
       this.fechaTextoACompacta(fechaInicio) || fechaInicio || fechas[0] || '',
       this.fechaTextoACompacta(fechaFinal) || fechaFinal || fechas.at(-1) || '',
-      'Media', 'Electrónico', responsableEntrega, cargoEntrega, '', '', '', '', '',
-      'Electrónico', 'Pública',
+      'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
+      'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
+      'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
       `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67 y FCO.70. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
     ];
   }
