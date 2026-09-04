@@ -92,10 +92,11 @@ export class ModalTablaComponent implements OnInit {
     return this.totalesDistribucion[index] - this.totalDistribuido(index);
   }
 
-  completarNoCorriente(index: number): void {
-    this.valoresNoCorrientes[index] =
-      this.totalesDistribucion[index] -
-      (Number(this.valoresCorrientes[index]) || 0);
+  intercambiarDistribucion(index: number): void {
+    const valorCorriente = Number(this.valoresCorrientes[index]) || 0;
+    const valorNoCorriente = Number(this.valoresNoCorrientes[index]) || 0;
+    this.valoresCorrientes[index] = valorNoCorriente;
+    this.valoresNoCorrientes[index] = valorCorriente;
     this.errorAjuste = '';
   }
 

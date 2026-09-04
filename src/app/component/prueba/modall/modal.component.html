@@ -74,7 +74,7 @@
       </div>
       <div class="distribution-fields">
         <label><span>Valor corriente</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="valoresCorrientes[i]" (ngModelChange)="actualizarDesdeCorriente(i)" /></div></label>
-        <button type="button" class="balance-action" (click)="completarNoCorriente(i)" matTooltip="Calcular el valor no corriente"><mat-icon>sync_alt</mat-icon></button>
+        <button type="button" class="balance-action" (click)="intercambiarDistribucion(i)" matTooltip="Intercambiar corriente y no corriente" aria-label="Intercambiar los valores corriente y no corriente"><mat-icon>sync_alt</mat-icon></button>
         <label><span>Valor no corriente</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="valoresNoCorrientes[i]" (ngModelChange)="actualizarDesdeNoCorriente(i)" /></div></label>
         <div class="distribution-total" [class.matches]="diferenciaAjuste(i) === 0"><small>Total distribuido</small><strong>{{ totalDistribuido(i) | number:'1.2-2' }}</strong><span *ngIf="diferenciaAjuste(i) !== 0">Diferencia informativa: {{ diferenciaAjuste(i) | number:'1.2-2' }}</span><span *ngIf="diferenciaAjuste(i) === 0"><mat-icon>check_circle</mat-icon>Coincide</span></div>
       </div>

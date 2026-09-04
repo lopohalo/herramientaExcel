@@ -22,7 +22,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./prueba.component.scss'],
 })
 export class PruebaComponent implements OnInit {
-  displayedColumns: string[] = [
+  private readonly columnasTablaBase: string[] = [
     'tipo',
     'codigo',
     'nombre',
@@ -35,6 +35,9 @@ export class PruebaComponent implements OnInit {
     'tipoDeCuenta',
     'compartidoTipo',
   ];
+  displayedColumns: string[] = this.columnasTablaBase.filter(
+    (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
+  );
   reporteActivo: 'balance' | 'chip' | 'resultados' | 'situacion' | 'original' | '' = '';
   tablaInicialGuardada: any[] = [];
   reporteChipGuardado: any[] = [];
@@ -53,6 +56,7 @@ export class PruebaComponent implements OnInit {
   padres: any = [];
   currentPage = 1;
   pageSize = 100;
+  totalRegistrosTabla = 0;
   corrientesCopia: any = [];
   seleccionados: any = [];
   filterValue: string = '';
@@ -83,6 +87,7 @@ export class PruebaComponent implements OnInit {
   elementosUnificados: any;
   private filterSubject = new Subject<string>();
   @ViewChild('tabla', { static: false }) tablaFiltro: ElementRef<any> | null;
+  @ViewChild('tableShell', { static: false }) tableShell?: ElementRef<HTMLElement>;
 
   modeloDeDatosSistemaContaduria = [
     {
@@ -26029,19 +26034,9 @@ export class PruebaComponent implements OnInit {
       }
     }
     this.filterSubject.pipe(debounceTime(500)).subscribe((value) => {
-      this.filterValue = value.replace(/\./g, '\\.');
-      const filterSequence = this.filterValue.split('\\.');
-      if (value.length === 0) {
-        this.dataTareasPaginated = [...this.datosTabla.slice(0, this.pageSize)];
-      } else {
-        this.dataTareasPaginated = this.datosTabla.filter((tarea: any) => {
-          const tareaSequence = tarea.codigo.split('.');
-          return (
-            tareaSequence.slice(0, filterSequence.length).join('.') ===
-            filterSequence.join('.')
-          );
-        });
-      }
+      this.filterValue = value.trim().toLocaleLowerCase('es-CO');
+      this.currentPage = 1;
+      this.actualizarPaginacionTabla();
       this.selectAll = false;
       this.seleccionados = [];
       this.dataTareasPaginated.forEach((row: any) => {
@@ -26876,9 +26871,7 @@ export class PruebaComponent implements OnInit {
                   (codigoArray[0] === '3' ||
                     codigoArray[0] === '2' ||
                     codigoArray[0] === '4' ||
-                    codigoArray[0] === '5' ||
-                    codigoArray[0] === '6' ||
-                    codigoArray[0] === '7') &&
+                    codigoArray[0] === '6') &&
                   element.tipoSaldoAnterior === 'DB'
                 ) {
                   p = p - Math.round(element.saldoAnterior);
@@ -26918,9 +26911,7 @@ export class PruebaComponent implements OnInit {
                   (codigoArray[0] === '3' ||
                     codigoArray[0] === '2' ||
                     codigoArray[0] === '4' ||
-                    codigoArray[0] === '5' ||
-                    codigoArray[0] === '6' ||
-                    codigoArray[0] === '7') &&
+                    codigoArray[0] === '6' ) &&
                   element.tipoSaldoAnterior === 'DB'
                 ) {
                   p = p - Math.round(element.saldoAnterior);
@@ -27641,22 +27632,14 @@ export class PruebaComponent implements OnInit {
     // for (let index = 0; index < this.datosTabla.length; index++) {
     //   this.datosTabla[index].tipo = false;
     // }
-    this.dataTareasPaginated = this.datosTabla.slice(0, this.pageSize);
-    this.onPageChange({
-      pageIndex: this.currentPage - 1,
-      pageSize: this.pageSize,
-    });
+    this.actualizarPaginacionTabla();
     this.secuenciaDecodigosExistentes();
   }
   consultarTabla2() {
     // for (let index = 0; index < this.datosTabla.length; index++) {
     //   this.datosTabla[index].tipo = false;
     // }
-    this.dataTareasPaginated = this.datosTabla.slice(0, this.pageSize);
-    this.onPageChange({
-      pageIndex: this.currentPage - 1,
-      pageSize: this.pageSize,
-    });
+    this.actualizarPaginacionTabla();
   }
 
   secuenciaDecodigosExistentes() {
@@ -27752,10 +27735,7 @@ export class PruebaComponent implements OnInit {
       this.datosReporteActual = this.datosTabla;
     }
     const datosBase = this.datosReporteActual;
-    const tieneSaldo = (valor: any) => {
-      const numero = Number(String(valor ?? 0).replace(/,/g, ''));
-      return Number.isFinite(numero) && numero !== 0;
-    };
+    const tieneSaldo = (valor: any) => this.valorNumerico(valor) !== 0;
 
     switch (parametro) {
       case 'c':
@@ -29503,6 +29483,15 @@ export class PruebaComponent implements OnInit {
     return Number.isFinite(numero) ? numero : 0;
   }
 
+  claseVisualCuenta(fila: any): string {
+    const tieneCorriente = this.valorNumerico(fila?.tipoDeCuenta) !== 0;
+    const tieneNoCorriente = this.valorNumerico(fila?.compartidoTipo) !== 0;
+    if (tieneCorriente && tieneNoCorriente) return 'fila-ambas';
+    if (tieneCorriente) return 'fila-corriente';
+    if (tieneNoCorriente) return 'fila-no-corriente';
+    return 'fila-sin-clasificar';
+  }
+
   crearHojaPortada(totalRegistros: number): any {
     const filas = [
       ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
@@ -29887,9 +29876,12 @@ export class PruebaComponent implements OnInit {
     this.datosTabla.forEach((item: any) => (item.tipo = false));
     this.datosReporteActual = this.datosTabla;
 
-    const columnasSinSeleccion = this.displayedColumns.filter(
-      (columna: string) => columna !== 'tipo'
-    );
+    const columnasReporte = tipo === 'original'
+      ? this.columnasTablaBase.filter(
+        (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
+      )
+      : [...this.columnasTablaBase];
+    const columnasSinSeleccion = columnasReporte.filter((columna: string) => columna !== 'tipo');
     this.displayedColumns = ['original', 'chip', 'balance', 'situacion'].includes(tipo)
       ? ['tipo', ...columnasSinSeleccion]
       : columnasSinSeleccion;
@@ -29913,10 +29905,7 @@ export class PruebaComponent implements OnInit {
       ) {
       }
     });
-    this.dataTareasPaginated = this.datosTabla.slice(
-      (this.currentPage - 1) * this.pageSize,
-      this.currentPage * this.pageSize
-    );
+    this.actualizarPaginacionTabla();
   }
   seleccionadosTabla(row: any) {
     if (['', 'original', 'chip', 'balance', 'situacion'].includes(this.reporteActivo)) {
@@ -30226,12 +30215,38 @@ export class PruebaComponent implements OnInit {
     });
   }
   onPageChange(event: any) {
-    this.currentPage = event.pageIndex + 1;
-    this.pageSize = event.pageSize;
-    this.dataTareasPaginated = this.datosTabla.slice(
-      (this.currentPage - 1) * this.pageSize,
-      this.currentPage * this.pageSize
-    );
+    const nuevoTamano = Number(event?.pageSize) || 100;
+    const cambioTamano = nuevoTamano !== this.pageSize;
+    this.pageSize = nuevoTamano;
+    this.currentPage = cambioTamano ? 1 : (Number(event?.pageIndex) || 0) + 1;
+    this.actualizarPaginacionTabla(true);
+    if (this.tableShell?.nativeElement) this.tableShell.nativeElement.scrollTop = 0;
+  }
+
+  cambiarTamanoPagina(valor: any): void {
+    const nuevoTamano = Number(valor);
+    if (![25, 50, 100, 200, 400, 1000].includes(nuevoTamano)) return;
+    this.pageSize = nuevoTamano;
+    this.currentPage = 1;
+    this.actualizarPaginacionTabla(true);
+    if (this.tableShell?.nativeElement) this.tableShell.nativeElement.scrollTop = 0;
+  }
+
+  private actualizarPaginacionTabla(ajustarPagina = true): void {
+    const termino = String(this.filterValue || '').trim().toLocaleLowerCase('es-CO');
+    const datosVisibles = termino
+      ? this.datosTabla.filter((fila: any) => {
+        const codigo = String(fila?.codigo || '').toLocaleLowerCase('es-CO');
+        const nombre = String(fila?.nombre || '').toLocaleLowerCase('es-CO');
+        return codigo.includes(termino) || nombre.includes(termino);
+      })
+      : this.datosTabla;
+
+    this.totalRegistrosTabla = datosVisibles.length;
+    const ultimaPagina = Math.max(1, Math.ceil(this.totalRegistrosTabla / this.pageSize));
+    if (ajustarPagina && this.currentPage > ultimaPagina) this.currentPage = ultimaPagina;
+    const inicio = (this.currentPage - 1) * this.pageSize;
+    this.dataTareasPaginated = datosVisibles.slice(inicio, inicio + this.pageSize);
   }
   openDialog() {
     const dialogRef = this.dialog.open(ModalTablaComponent, {
