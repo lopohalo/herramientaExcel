@@ -16,6 +16,7 @@
     <mat-progress-bar *ngIf="analizando" mode="determinate" [value]="progresoPorcentaje"></mat-progress-bar>
     <p class="progress-text" *ngIf="progreso">{{ progreso }}</p>
     <p class="error" *ngIf="error"><mat-icon>error_outline</mat-icon>{{ error }}</p>
+    <p class="error" *ngIf="erroresProcesamiento.length"><mat-icon>warning_amber</mat-icon>{{ erroresProcesamiento.length }} PDF no pudieron procesarse; los demás continuaron normalmente.</p>
     <div class="download-row" *ngIf="resultados.length">
       <div><strong>{{ resultados.length }} documentos listos</strong><span>{{ modoVariasCarpetas ? 'Se generará un inventario independiente por cada carpeta de contrato.' : 'Se generarán metadatos, orden y paginación acumulada.' }}</span></div>
       <button type="button" [disabled]="analizando" (click)="exportarInventarioArchivistico()"><mat-icon>download</mat-icon>{{ modoVariasCarpetas ? 'Descargar inventarios Excel' : 'Descargar inventario Excel' }}</button>
@@ -29,23 +30,11 @@
         <mat-panel-description>{{ grupo.documentos.length }} PDF{{ grupo.documentos.length === 1 ? '' : 's' }}</mat-panel-description>
       </mat-expansion-panel-header>
 
-      <div class="folder-content">
-        <ng-container *ngFor="let pdf of grupo.documentos; let indice = index">
-          <h2 class="file-title"><span>{{ indice + 1 }}</span>{{ pdf.archivo['nombre'] }}</h2>
-          <section class="summary-grid">
-            <article><mat-icon>description</mat-icon><span>Páginas</span><strong>{{ pdf.paginas['total'] }}</strong></article>
-            <article><mat-icon>storage</mat-icon><span>Tamaño</span><strong>{{ pdf.archivo['kilobytes'] | number:'1.0-2' }} KB</strong></article>
-            <article><mat-icon>image</mat-icon><span>Imágenes</span><strong>{{ pdf.recursos['imagenesDetectadas'] }}</strong></article>
-            <article><mat-icon>text_fields</mat-icon><span>Texto detectable</span><strong>{{ pdf.contenido['tieneSeñalesDeTexto'] ? 'Sí' : 'No' }}</strong></article>
-            <article><mat-icon>document_scanner</mat-icon><span>Requiere OCR</span><strong>{{ pdf.contenido['recomiendaOcr'] ? 'Probablemente' : 'No parece' }}</strong></article>
-            <article><mat-icon>lock_open</mat-icon><span>Cifrado</span><strong>{{ pdf.seguridad['cifrado'] ? 'Sí' : 'No' }}</strong></article>
-          </section>
-
-          <section class="result-card">
-            <header><div><span class="eyebrow">Resultado técnico y contenido</span><h2>Objeto extraído</h2></div><span>También disponible en la consola</span></header>
-            <pre>{{ pdf | json }}</pre>
-          </section>
-        </ng-container>
+      <div class="folder-overview">
+        <article><mat-icon>description</mat-icon><span>Documentos inventariados</span><strong>{{ grupo.documentos.length }}</strong></article>
+        <article><mat-icon>auto_stories</mat-icon><span>Total de páginas</span><strong>{{ grupo.paginas }}</strong></article>
+        <article><mat-icon>manage_search</mat-icon><span>Documentos con extracción profunda</span><strong>{{ grupo.prioritarios }}</strong></article>
+        <div class="folder-ready"><mat-icon>check_circle</mat-icon><div><strong>Contrato listo para exportar</strong><span>Los detalles completos estarán disponibles en el inventario Excel.</span></div></div>
       </div>
     </mat-expansion-panel>
   </mat-accordion>

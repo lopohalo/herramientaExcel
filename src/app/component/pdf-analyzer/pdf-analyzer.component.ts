@@ -23,12 +23,17 @@ interface PdfAnalysis {
 export class PdfAnalyzerComponent {
   analizando = false;
   error = '';
-  resultado: PdfAnalysis | null = null;
   resultados: PdfAnalysis[] = [];
+  erroresProcesamiento: Array<{ archivo: string; mensaje: string }> = [];
   progreso = '';
   progresoPorcentaje = 0;
   modoVariasCarpetas = false;
-  resultadosPorCarpeta: Array<{ nombre: string; documentos: PdfAnalysis[] }> = [];
+  resultadosPorCarpeta: Array<{
+    nombre: string;
+    documentos: PdfAnalysis[];
+    prioritarios: number;
+    paginas: number;
+  }> = [];
   private trabajadorOcr: any = null;
 
   async seleccionarArchivo(event: Event, variasCarpetas = false): Promise<void> {
@@ -56,9 +61,9 @@ export class PdfAnalyzerComponent {
     this.error = '';
     this.modoVariasCarpetas = variasCarpetas;
     if (!agregarALote) {
-      this.resultado = null;
       this.resultados = [];
       this.resultadosPorCarpeta = [];
+      this.erroresProcesamiento = [];
     }
     const ignorados = seleccionados.length - archivos.length;
     if (ignorados > 0) this.progreso = `${ignorados} archivo(s) no PDF serán ignorados.`;
@@ -69,29 +74,39 @@ export class PdfAnalyzerComponent {
         const archivo = archivos[indice];
         this.progreso = `Procesando ${indice + 1} de ${archivos.length}: ${archivo.name}`;
         this.progresoPorcentaje = Math.round((indice / archivos.length) * 100);
-        const buffer = await archivo.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        const contenidoBinario = new TextDecoder('latin1').decode(bytes);
-        if (!contenidoBinario.startsWith('%PDF-')) {
-          throw new Error(`${archivo.name} no contiene una cabecera PDF válida.`);
+        try {
+          const buffer = await archivo.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+          const cabecera = new TextDecoder('latin1').decode(bytes.subarray(0, 5));
+          if (!cabecera.startsWith('%PDF-')) {
+            throw new Error('No contiene una cabecera PDF válida.');
+          }
+          const contenidoBinario = this.esDocumentoContractualPrioritario(archivo.name)
+            ? new TextDecoder('latin1').decode(bytes)
+            : cabecera;
+          const resultado = await this.analizarPdf(archivo, bytes, contenidoBinario);
+          this.resultados.push(resultado);
+        } catch (errorArchivo: any) {
+          this.erroresProcesamiento.push({
+            archivo: (archivo as any).webkitRelativePath || archivo.name,
+            mensaje: errorArchivo?.message || 'No fue posible procesar el PDF.',
+          });
         }
-        const resultado = await this.analizarPdf(archivo, bytes, contenidoBinario);
-        this.resultados.push(resultado);
-        console.group(`Análisis completo: ${archivo.name}`);
-        console.log(resultado);
-        console.log('Objeto JSON:', JSON.stringify(resultado, null, 2));
-        console.groupEnd();
       }
-      this.resultado = this.resultados[0] || null;
       this.resultadosPorCarpeta = Array.from(this.agruparPorExpediente(this.resultados).entries()).map(
-        ([nombre, documentos]) => ({ nombre, documentos })
+        ([nombre, documentos]) => ({
+          nombre,
+          documentos,
+          prioritarios: documentos.filter((pdf) =>
+            this.esDocumentoContractualPrioritario(String(pdf.archivo['nombre'] || ''))
+          ).length,
+          paginas: documentos.reduce((total, pdf) => total + Number(pdf.paginas['total'] || 0), 0),
+        })
       );
       this.progresoPorcentaje = 100;
       this.progreso = `${this.resultados.length} archivo(s) procesado(s) en ${this.resultadosPorCarpeta.length} carpeta(s)`;
-      console.log('Resultado conjunto de PDFs:', this.resultados);
     } catch (error: any) {
       this.error = error?.message || 'No fue posible analizar el PDF.';
-      console.error('Error analizando PDF:', error);
     } finally {
       if (this.trabajadorOcr) {
         await this.trabajadorOcr.terminate();
@@ -139,7 +154,6 @@ export class PdfAnalyzerComponent {
         kilobytes: Number((archivo.size / 1024).toFixed(2)),
         megabytes: Number((archivo.size / 1024 / 1024).toFixed(3)),
         ultimaModificacion: new Date(archivo.lastModified).toISOString(),
-        sha256: await this.calcularSha256(bytes),
       },
       documento: {
         versionPdf: pdf.match(/%PDF-([\d.]+)/)?.[1] || null,
@@ -634,7 +648,6 @@ export class PdfAnalyzerComponent {
         } catch (error: any) {
           metodo = 'OCR no disponible';
           texto = textoDigital;
-          console.warn(`No se pudo aplicar OCR en ${nombreArchivo}, página ${numero}:`, error);
         }
       }
 
@@ -669,11 +682,6 @@ export class PdfAnalyzerComponent {
         workerPath: 'assets/tesseract/worker.min.js',
         corePath: 'assets/tesseract/core',
         langPath: 'assets/tesseract/lang',
-        logger: (mensaje: any) => {
-          if (typeof mensaje.progress === 'number') {
-            this.progresoPorcentaje = Math.round(mensaje.progress * 100);
-          }
-        },
       });
     }
     const reconocimiento = await this.trabajadorOcr.recognize(canvas);
@@ -761,9 +769,4 @@ export class PdfAnalyzerComponent {
       .replace(/\\([0-7]{1,3})/g, (_x, octal) => String.fromCharCode(parseInt(octal, 8)));
   }
 
-  private async calcularSha256(bytes: Uint8Array): Promise<string | null> {
-    if (!globalThis.crypto?.subtle) return null;
-    const hash = await globalThis.crypto.subtle.digest('SHA-256', bytes);
-    return Array.from(new Uint8Array(hash)).map((valor) => valor.toString(16).padStart(2, '0')).join('');
-  }
 }
