@@ -254,7 +254,7 @@ export class PdfAnalyzerComponent {
         'Electrónico',
         'Pública',
         'Español',
-        this.autorDetectado(pdf),
+        'Mayerly Garavito Olivares',
         codigoCalidad,
         null,
         fecha ? fecha.slice(0, 4) : null,
@@ -345,7 +345,7 @@ export class PdfAnalyzerComponent {
         const codigoCalidad = nombre.match(/\b(F[A-Z]{1,3}[._-]?\d+(?:\.\d+)?)\b/i)?.[1]?.replace('_', '.') || null;
         return [nombre, this.nombreDocumentoDesdeArchivo(nombre), this.clasificarTipologia(nombre), fecha, fecha,
           this.ordenArchivo(nombre) || indice + 1, paginaInicio, paginaFin, 'Electrónico', 'Pública',
-          'Español', this.autorDetectado(pdf), codigoCalidad, null, fecha ? fecha.slice(0, 4) : null, null, null];
+          'Español', 'Mayerly Garavito Olivares', codigoCalidad, null, fecha ? fecha.slice(0, 4) : null, null, null];
       });
       const expediente = this.construirMetadatosExpediente(documentos, paginaAcumulada - 1);
       filasExpedientes.push(expediente);
@@ -429,27 +429,16 @@ export class PdfAnalyzerComponent {
   }
 
   private construirMetadatosExpediente(documentos: PdfAnalysis[], totalPaginas: number): any[] {
-    const todosLosTextos = documentos.map((pdf) => String(pdf.contenido['textoCompleto'] || '')).join('\n');
-    const documentoFocal = (codigo: string): PdfAnalysis | undefined => documentos.find(
-      (pdf) => new RegExp(`FCO[._\\s-]*${codigo}(?=$|[^0-9])`, 'i').test(
-        `${pdf.archivo['nombre']} ${pdf.contenido['textoCompleto'] || ''}`
-      )
-    );
-    const texto55 = String(documentoFocal('55')?.contenido['textoCompleto'] || '');
-    const texto66 = String(documentoFocal('66')?.contenido['textoCompleto'] || '');
-    const texto67 = String(documentoFocal('67')?.contenido['textoCompleto'] || '');
-    const texto70 = String(documentoFocal('70')?.contenido['textoCompleto'] || '');
-    const textoFth146 = String(documentos.find((pdf) => /FTH[._\s-]*146(?=$|[^0-9])/i.test(
-      String(pdf.archivo['nombre'] || '')
-    ))?.contenido['textoCompleto'] || '');
     const textoPrestacionServicios = documentos
       .filter((pdf) => this.esOrdenPrestacionServicios(String(pdf.archivo['nombre'] || '')))
       .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
       .filter(Boolean)
       .join('\n');
-    const textosPrioritarios = [
-      texto55, texto66, texto67, texto70, textoFth146, textoPrestacionServicios,
-    ].filter(Boolean).join('\n');
+    const textoActaFinalizacion = documentos
+      .filter((pdf) => this.esActaFinalizacion(String(pdf.archivo['nombre'] || '')))
+      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
+      .filter(Boolean)
+      .join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
@@ -467,19 +456,16 @@ export class PdfAnalyzerComponent {
     const rutas = documentos.map((pdf) => String(pdf.archivo['rutaRelativa'] || ''));
     const expedienteRuta = rutas.flatMap((ruta) => ruta.split(/[\\/]/))
       .find((valor) => /^\d{6,}_\d{2,6}$/i.test(valor));
-    const contrato = textosPrioritarios.match(/\b(20\d{8})\b/)?.[1] ||
-      todosLosTextos.match(/\b(20\d{8})\b/)?.[1] ||
+    const contrato = buscar(
+      textoPrestacionServicios,
+      /(?:REGISTRO\s+CONTRACTUAL[\s\S]{0,220}?)?\bNo\.?\s*:?\s*(20\d{8})\b/i
+    ) || textoPrestacionServicios.match(/\b(20\d{8})\b/)?.[1] ||
       expedienteRuta?.match(/\d{6,}/)?.[0] || '';
-    const codigoUnidadFth = buscar(textoFth146, /C[oó]digo\s+de\s+la\s+unidad\s*:?\s*(\d{3,6})/i);
-    const centroCosto = buscar(texto55, /Centro\s+de\s+Costo\s+(\d{3,6})/i);
-    const unidad = codigoUnidadFth || centroCosto || expedienteRuta?.match(/_(\d{3,5})\b/)?.[1] || '';
-    const nombreUnidadFth = buscar(
-      textoFth146,
-      /Nombre\s+de\s+la\s+unidad\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{3,100}?)(?=\s+B\.|\s+IDENTIFICACI)/i
-    );
-    const nombreUnidad = nombreUnidadFth || buscar(texto55, /Proyecto\s+(.+?)\s+Centro\s+de\s+Costo/i);
-    const cedulaFuentesPrincipales = soloDigitos(
-      buscar(`${texto55}\n${texto66}\n${texto67}`, /(?:Identificaci[oó]n|C\.C\.\s*o\s*Nit\.)\s*([\d.]+)/i)
+    const unidad = expedienteRuta?.match(/_(\d{3,5})\b/)?.[1] ||
+      buscar(textoPrestacionServicios, /UAA\s*-\s*PROYECTO[\s\S]{0,100}?(\d{3,6})/i) || '';
+    const nombreUnidad = buscar(
+      textoPrestacionServicios,
+      /UAA\s*:\s*(.+?)(?=\s+TEL\s*:|\s+FAX\s*:|\s+\|)/i
     );
     const cedulaPrestacion = soloDigitos(buscar(
       textoPrestacionServicios,
@@ -487,31 +473,27 @@ export class PdfAnalyzerComponent {
     ));
     const cedulaValida = (valor: string): string =>
       /^\d{6,12}$/.test(valor) ? valor : '';
-    const cedula = cedulaValida(cedulaPrestacion) || cedulaValida(cedulaFuentesPrincipales);
-    const contratista = buscar(texto55, /Nombre\s+o\s+Raz[oó]n\s+Social\s+(.+?)\s+Identificaci[oó]n/i) ||
-      buscar(`${texto66}\n${texto67}`, /Nombre\s+Completo\s+(Willman.+?)\s+(?:Cargo|C\.C\.)/i) ||
-      buscar(texto70, /([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ ]{8,80})\s+Proveedor/i) ||
-      buscar(textoPrestacionServicios, /SE[ÑN]ORES\s*:?\s*(.+?)(?=\s+NIT\.?\s*O\s*C\.?\s*C\.?)/i);
-    const valorEjecutado = moneda(`${texto66}\n${texto67}`, 'VALOR\\s+TOTAL\\s+EJECUTADO');
-    const valorInicial = moneda(`${texto55}\n${texto66}\n${texto67}`, '(?:Valor\\s+del\\s+Contrato|VALOR\\s+INICIAL)');
-    const valorOrdenPrestacion = moneda(
+    const cedula = cedulaValida(cedulaPrestacion);
+    const contratista = buscar(
       textoPrestacionServicios,
-      '(?:TOTAL\\s+ORDEN|VALOR\\s+TOTAL|SUBTOTAL)\\s*:'
+      /SE[ÑN]ORES\s*:?\s*(.+?)(?=\s+NIT\.?\s*O\s*C\.?\s*C\.?)/i
     );
-    const valorContrato = valorOrdenPrestacion ?? valorInicial ?? valorEjecutado;
-    const objeto = buscar(texto55, /Objeto\s+del\s+Contrato\s+([\s\S]{20,700}?)\s+Valor\s+del\s+Contrato/i) ||
-      buscar(`${texto66}\n${texto67}`, /OBJETO\s+([\s\S]{20,700}?)\s+FECHA\s+DE/i);
-    const fechaInicio = fechaNumerica(texto66, 'FECHA\\s+DE\\s+INICIO\\s+DEL\\s+CONTRATO') ||
-      buscar(texto67, /FECHA\s+DE\s+INICIO[\s\S]{0,50}?(\d{1,2}\s+Febrero\s+\d{4})/i);
-    const fechaFinal = fechaNumerica(texto66, 'FECHA\\s+TERMINACI[ÓO]N\\s+DEL\\s+CONTRATO') ||
-      buscar(texto67, /FECHA\s+DE\s+TERMINACI[ÓO]N[\s\S]{0,50}?(\d{1,2}\s+Julio\s+\d{4})/i);
-    const fechaCierre = fechaNumerica(texto66, 'FECHA\\s+DEL\\s+ACTA') ||
-      this.fechaTextoACompacta(buscar(texto67, /FECHA\s+DEL\s+ACTA:\s*Bucaramanga\s+([^\n]+)/i));
-    const responsableEntrega = buscar(`${texto66}\n${texto67}`, /(Efra[ií]n\s+Alberto\s+Sanmiguel\s+Acevedo)/i);
+    // No usar "VALOR TOTAL" de forma genérica: en algunos expedientes puede
+    // corresponder a un CDT/CDP u otro concepto distinto al contrato.
+    const valorOrdenPrestacion =
+      moneda(textoPrestacionServicios, 'TOTAL\\s+ORDEN\\s*:') ??
+      moneda(textoPrestacionServicios, 'SUBTOTAL\\s*:') ??
+      moneda(textoPrestacionServicios, 'VALOR\\s+TOTAL\\s+DEL\\s+CONTRATO\\s*:');
+    const valorContrato = valorOrdenPrestacion;
+    const objeto = buscar(textoPrestacionServicios, /DETALLE\s+DEL\s+CONTRATO\s+([\s\S]{20,700}?)\s+VALOR\s+EN\s+LETRAS/i);
+    const fechaInicio = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DE\\s+INICIO\\s+DEL\\s+CONTRATO');
+    const fechaFinal = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+(?:DE\\s+)?TERMINACI[ÓO]N\\s+DEL\\s+CONTRATO');
+    const fechaCierre = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DEL\\s+ACTA');
+    const responsableEntrega = buscar(textoActaFinalizacion, /(Efra[ií]n\s+Alberto\s+Sanmiguel\s+Acevedo)/i);
     const cargoEntrega = responsableEntrega ? 'Jefe División Financiera' : '';
     const fechas = documentos.map((pdf) => this.fechaDesdeNombre(pdf.archivo['nombre'])).filter(Boolean) as string[];
     fechas.sort();
-    const nombreExpediente = expedienteRuta || [contrato, unidad].filter(Boolean).join('_') || 'expediente_contratos';
+    const nombreExpediente = contrato || expedienteRuta || 'expediente_contratos';
     return [
       unidad, nombreUnidad, 'C09', 'Contratos', 'C09.06', 'Contrato de Prestación de Servicios',
       nombreExpediente, cedula ? `CC ${cedula}` : '', contratista ? `Nombre ${contratista}` : '',
@@ -522,7 +504,7 @@ export class PdfAnalyzerComponent {
       'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
       'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
       'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
-      `Datos contractuales priorizados desde FCO.55, FCO.66, FCO.67, FCO.70, FTH.146 y la orden de prestación de servicios. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
+      `Datos contractuales extraídos de la orden de prestación de servicios y del acta de finalización. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
     ];
   }
 
@@ -624,8 +606,7 @@ export class PdfAnalyzerComponent {
   }
 
   private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
-    return /FCO[._\s-]*(?:55|66|67|70)(?=$|[^0-9])|FTH[._\s-]*146(?=$|[^0-9])/i.test(nombreArchivo) ||
-      this.esOrdenPrestacionServicios(nombreArchivo);
+    return this.esOrdenPrestacionServicios(nombreArchivo) || this.esActaFinalizacion(nombreArchivo);
   }
 
   private describirErrorPdf(error: any): string {
@@ -643,12 +624,21 @@ export class PdfAnalyzerComponent {
   }
 
   private esOrdenPrestacionServicios(nombreArchivo: string): boolean {
-    const nombreNormalizado = nombreArchivo
+    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
+    return /(?:^|_)(?:orden|contrato)(?:_de)?_prestacion(?:_de)?_servicios(?:_|$)/.test(nombreNormalizado);
+  }
+
+  private esActaFinalizacion(nombreArchivo: string): boolean {
+    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
+    return /(?:^|_)acta_(?:de_)?finalizacion(?:_|$)/.test(nombreNormalizado);
+  }
+
+  private normalizarNombreArchivo(nombreArchivo: string): string {
+    return nombreArchivo
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLocaleLowerCase('es-CO')
       .replace(/[^a-z0-9]+/g, '_');
-    return /(?:^|_)(?:orden|contrato)(?:_de)?_prestacion(?:_de)?_servicios(?:_|$)/.test(nombreNormalizado);
   }
 
   private async obtenerResumenPaginas(bytes: Uint8Array): Promise<{ paginas: any[]; totalPaginas: number }> {
