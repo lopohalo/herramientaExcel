@@ -439,6 +439,11 @@ export class PdfAnalyzerComponent {
       .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
       .filter(Boolean)
       .join('\n');
+    const textoCuentaCobro = documentos
+      .filter((pdf) => this.esCuentaCobro(String(pdf.archivo['nombre'] || '')))
+      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
+      .filter(Boolean)
+      .join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
@@ -475,8 +480,8 @@ export class PdfAnalyzerComponent {
       /^\d{6,12}$/.test(valor) ? valor : '';
     const cedula = cedulaValida(cedulaPrestacion);
     const contratista = buscar(
-      textoPrestacionServicios,
-      /SE[ÑN]ORES\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=[\s|¦-]*NIT\.?\s*O\s*C\.?\s*C\.?)/i
+      textoCuentaCobro,
+      /DEBE\s+A\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=\s+C\.?\s*C\.?\s*:?\s*[\d.])/i
     );
     // No usar "VALOR TOTAL" de forma genérica: en algunos expedientes puede
     // corresponder a un CDT/CDP u otro concepto distinto al contrato.
@@ -606,7 +611,9 @@ export class PdfAnalyzerComponent {
   }
 
   private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
-    return this.esOrdenPrestacionServicios(nombreArchivo) || this.esActaFinalizacion(nombreArchivo);
+    return this.esOrdenPrestacionServicios(nombreArchivo) ||
+      this.esActaFinalizacion(nombreArchivo) ||
+      this.esCuentaCobro(nombreArchivo);
   }
 
   private describirErrorPdf(error: any): string {
@@ -631,6 +638,11 @@ export class PdfAnalyzerComponent {
   private esActaFinalizacion(nombreArchivo: string): boolean {
     const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
     return /(?:^|_)acta_(?:de_)?finalizacion(?:_|$)/.test(nombreNormalizado);
+  }
+
+  private esCuentaCobro(nombreArchivo: string): boolean {
+    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
+    return /(?:^|_)cuenta_(?:de_)?cobro(?:_?1)?_pdf_?$/.test(nombreNormalizado);
   }
 
   private normalizarNombreArchivo(nombreArchivo: string): string {
@@ -682,6 +694,14 @@ export class PdfAnalyzerComponent {
         } catch (error: any) {
           metodo = 'OCR no disponible';
           texto = textoDigital;
+          if (!this.erroresProcesamiento.some((incidencia) => incidencia.archivo === nombreArchivo)) {
+            this.erroresProcesamiento.push({
+              archivo: nombreArchivo,
+              mensaje: String(error?.message || '').includes('tiempo máximo')
+                ? 'El OCR tardó más de 30 segundos; el lote continuó sin detenerse.'
+                : 'No fue posible aplicar OCR; el lote continuó con el texto disponible.',
+            });
+          }
         }
       }
 
@@ -718,7 +738,29 @@ export class PdfAnalyzerComponent {
         langPath: 'assets/tesseract/lang',
       });
     }
-    const reconocimiento = await this.trabajadorOcr.recognize(canvas);
+    let temporizador: any;
+    const tiempoMaximo = new Promise<never>((_resolve, reject) => {
+      temporizador = setTimeout(
+        () => reject(new Error('OCR excedió el tiempo máximo permitido.')),
+        30000
+      );
+    });
+    let reconocimiento: any;
+    try {
+      reconocimiento = await Promise.race([
+        this.trabajadorOcr.recognize(canvas),
+        tiempoMaximo,
+      ]);
+    } catch (error: any) {
+      if (String(error?.message || '').includes('tiempo máximo') && this.trabajadorOcr) {
+        const trabajadorBloqueado = this.trabajadorOcr;
+        this.trabajadorOcr = null;
+        trabajadorBloqueado.terminate().catch(() => undefined);
+      }
+      throw error;
+    } finally {
+      clearTimeout(temporizador);
+    }
     canvas.width = 0;
     canvas.height = 0;
     return {
