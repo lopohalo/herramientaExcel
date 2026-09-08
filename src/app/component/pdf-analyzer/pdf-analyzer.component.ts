@@ -439,11 +439,6 @@ export class PdfAnalyzerComponent {
       .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
       .filter(Boolean)
       .join('\n');
-    const textoCuentaCobro = documentos
-      .filter((pdf) => this.esCuentaCobro(String(pdf.archivo['nombre'] || '')))
-      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
-      .filter(Boolean)
-      .join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
@@ -480,8 +475,11 @@ export class PdfAnalyzerComponent {
       /^\d{6,12}$/.test(valor) ? valor : '';
     const cedula = cedulaValida(cedulaPrestacion);
     const contratista = buscar(
-      textoCuentaCobro,
-      /DEBE\s+A\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=\s+C\.?\s*C\.?\s*:?\s*[\d.])/i
+      textoActaFinalizacion,
+      /Supervisor\s*\/?\s*Interventor\s+([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)\s+Contratista/i
+    ) || buscar(
+      textoActaFinalizacion,
+      /Nombre\s+Completo\s+([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=\s+Cargo|\s+C\.?\s*C\.?)/i
     );
     // No usar "VALOR TOTAL" de forma genérica: en algunos expedientes puede
     // corresponder a un CDT/CDP u otro concepto distinto al contrato.
@@ -612,8 +610,7 @@ export class PdfAnalyzerComponent {
 
   private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
     return this.esOrdenPrestacionServicios(nombreArchivo) ||
-      this.esActaFinalizacion(nombreArchivo) ||
-      this.esCuentaCobro(nombreArchivo);
+      this.esActaFinalizacion(nombreArchivo);
   }
 
   private describirErrorPdf(error: any): string {
@@ -638,11 +635,6 @@ export class PdfAnalyzerComponent {
   private esActaFinalizacion(nombreArchivo: string): boolean {
     const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
     return /(?:^|_)acta_(?:de_)?finalizacion(?:_|$)/.test(nombreNormalizado);
-  }
-
-  private esCuentaCobro(nombreArchivo: string): boolean {
-    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
-    return /(?:^|_)cuenta_(?:de_)?cobro(?:_?1)?_pdf_?$/.test(nombreNormalizado);
   }
 
   private normalizarNombreArchivo(nombreArchivo: string): string {
