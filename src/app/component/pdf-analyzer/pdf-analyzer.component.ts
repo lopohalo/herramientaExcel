@@ -476,7 +476,7 @@ export class PdfAnalyzerComponent {
     const cedula = cedulaValida(cedulaPrestacion);
     const contratista = buscar(
       textoPrestacionServicios,
-      /SE[ÑN]ORES\s*:?\s*(.+?)(?=\s+NIT\.?\s*O\s*C\.?\s*C\.?)/i
+      /SE[ÑN]ORES\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=[\s|¦-]*NIT\.?\s*O\s*C\.?\s*C\.?)/i
     );
     // No usar "VALOR TOTAL" de forma genérica: en algunos expedientes puede
     // corresponder a un CDT/CDP u otro concepto distinto al contrato.
