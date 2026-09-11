@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
-import { createWorker } from 'tesseract.js';
 import * as XLSXStyle from 'xlsx-js-style';
 
 GlobalWorkerOptions.workerSrc = 'assets/pdfjs/pdf.worker.min.js';
@@ -34,7 +33,7 @@ export class PdfAnalyzerComponent {
     prioritarios: number;
     paginas: number;
   }> = [];
-  private trabajadorOcr: any = null;
+  private cuentasCobroPrioritarias = new Set<string>();
 
   async seleccionarArchivo(event: Event, variasCarpetas = false): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -58,6 +57,9 @@ export class PdfAnalyzerComponent {
         return;
       }
     }
+    const estructura = this.separarArchivosDirectosYCarpetas(archivos, variasCarpetas);
+    archivos = estructura.archivosDirectos;
+    this.prepararCuentasCobroPrioritarias(archivos);
     this.error = '';
     this.modoVariasCarpetas = variasCarpetas;
     if (!agregarALote) {
@@ -65,6 +67,12 @@ export class PdfAnalyzerComponent {
       this.resultadosPorCarpeta = [];
       this.erroresProcesamiento = [];
     }
+    const carpetasExistentes = new Set(this.resultados
+      .filter((item) => item.archivo['esCarpeta'])
+      .map((item) => String(item.archivo['rutaRelativa'] || '')));
+    estructura.carpetas
+      .filter((carpeta) => !carpetasExistentes.has(carpeta.rutaRelativa))
+      .forEach((carpeta) => this.resultados.push(this.crearRegistroCarpeta(carpeta.nombre, carpeta.rutaRelativa)));
     const ignorados = seleccionados.length - archivos.length;
     if (ignorados > 0) this.progreso = `${ignorados} archivo(s) no PDF serán ignorados.`;
 
@@ -81,10 +89,13 @@ export class PdfAnalyzerComponent {
           if (!cabecera.startsWith('%PDF-')) {
             throw new Error('No contiene una cabecera PDF válida.');
           }
-          const contenidoBinario = this.esDocumentoContractualPrioritario(archivo.name)
-            ? new TextDecoder('latin1').decode(bytes)
-            : cabecera;
-          const resultado = await this.analizarPdf(archivo, bytes, contenidoBinario);
+          const rutaRelativa = (archivo as any).webkitRelativePath || archivo.name;
+          const extraccionProfunda = this.esDocumentoContractualPrioritario(archivo.name, rutaRelativa);
+          const resultado = await this.conTiempoMaximo(
+            this.analizarPdf(archivo, bytes, cabecera, extraccionProfunda),
+            60000,
+            archivo.name
+          );
           this.resultados.push(resultado);
         } catch (errorArchivo: any) {
           this.erroresProcesamiento.push({
@@ -97,9 +108,7 @@ export class PdfAnalyzerComponent {
         ([nombre, documentos]) => ({
           nombre,
           documentos,
-          prioritarios: documentos.filter((pdf) =>
-            this.esDocumentoContractualPrioritario(String(pdf.archivo['nombre'] || ''))
-          ).length,
+          prioritarios: documentos.filter((pdf) => pdf.contenido['extraccionProfunda']).length,
           paginas: documentos.reduce((total, pdf) => total + Number(pdf.paginas['total'] || 0), 0),
         })
       );
@@ -108,19 +117,31 @@ export class PdfAnalyzerComponent {
     } catch (error: any) {
       this.error = error?.message || 'No fue posible analizar el PDF.';
     } finally {
-      if (this.trabajadorOcr) {
-        await this.trabajadorOcr.terminate();
-        this.trabajadorOcr = null;
-      }
       this.analizando = false;
       input.value = '';
+    }
+  }
+
+  private async conTiempoMaximo<T>(operacion: Promise<T>, milisegundos: number, archivo: string): Promise<T> {
+    let temporizador: any;
+    const limite = new Promise<never>((_resolve, reject) => {
+      temporizador = setTimeout(
+        () => reject(new Error(`${archivo}: superó el tiempo máximo de procesamiento.`)),
+        milisegundos
+      );
+    });
+    try {
+      return await Promise.race([operacion, limite]);
+    } finally {
+      clearTimeout(temporizador);
     }
   }
 
   private async analizarPdf(
     archivo: File,
     bytes: Uint8Array,
-    pdf: string
+    pdf: string,
+    extraccionProfunda: boolean
   ): Promise<PdfAnalysis> {
     const coincidencias = (expresion: RegExp): RegExpMatchArray[] =>
       Array.from(pdf.matchAll(expresion));
@@ -137,9 +158,12 @@ export class PdfAnalyzerComponent {
     const operadoresTexto = /(?:^|\s)BT(?:\s|$)[\s\S]*?(?:^|\s)ET(?:\s|$)/m.test(pdf);
     const tieneTextoDetectable = textos.length > 0 || fuentes > 0 || operadoresTexto;
 
-    const extraccionProfunda = this.esDocumentoContractualPrioritario(archivo.name);
+    // El FCO.55 siempre conserva el texto de su página 3. Es una sola página
+    // y evita depender de la profundidad o forma de la ruta seleccionada.
+    // Sus datos solo se usan después si el expediente no tiene Cuenta_Cobro.
+    const paginasEspecificas = this.esInformeOportunidad(archivo.name) ? [3] : undefined;
     const extraccion = extraccionProfunda
-      ? await this.extraerContenidoCompleto(bytes, archivo.name)
+      ? await this.extraerContenidoCompleto(bytes, archivo.name, paginasEspecificas)
       : await this.obtenerResumenPaginas(bytes);
     const textoCompleto = extraccion.paginas.map((pagina: any) => pagina.texto).join('\n\n');
     const camposDetectados = this.detectarCampos(textoCompleto);
@@ -183,14 +207,14 @@ export class PdfAnalyzerComponent {
         operadoresTextoDetectados: operadoresTexto,
         fragmentosTextoSimple: textos.slice(0, 200),
         cantidadFragmentos: textos.length,
-        pareceEscaneado: extraccion.paginas.some((pagina: any) => pagina.metodo === 'OCR'),
-        recomiendaOcr: extraccion.paginas.some((pagina: any) => pagina.metodo === 'OCR'),
+        pareceEscaneado: extraccion.paginas.some((pagina: any) => pagina.metodo === 'sin texto digital'),
+        recomiendaOcr: extraccion.paginas.some((pagina: any) => pagina.metodo === 'sin texto digital'),
         textoCompleto,
         paginas: extraccion.paginas,
         camposDetectados,
         extraccionProfunda,
         observacion: extraccionProfunda
-          ? 'Documento contractual prioritario procesado con extracción de texto y OCR cuando fue necesario.'
+          ? 'Documento contractual prioritario procesado únicamente mediante texto digital.'
           : 'Procesamiento optimizado: se conservaron los metadatos y el número de páginas sin extraer el contenido interno.',
       },
       seguridad: {
@@ -217,7 +241,9 @@ export class PdfAnalyzerComponent {
       ? this.agruparPorExpediente(this.resultados)
       : new Map<string, PdfAnalysis[]>([['seleccion_actual', this.resultados]]);
     if (this.modoVariasCarpetas && grupos.size > 1) {
-      this.generarInventarioConsolidado(grupos);
+      grupos.forEach((documentos, nombreCarpeta) => {
+        this.generarInventarioExpediente(documentos, nombreCarpeta);
+      });
       return;
     }
     const [nombreCarpeta, documentos] = Array.from(grupos.entries())[0];
@@ -226,7 +252,7 @@ export class PdfAnalyzerComponent {
 
   private generarInventarioExpediente(documentosGrupo: PdfAnalysis[], nombreCarpeta: string): void {
     const documentos = [...documentosGrupo].sort(
-      (a, b) => this.ordenArchivo(a.archivo['nombre']) - this.ordenArchivo(b.archivo['nombre'])
+      (a, b) => this.compararOrdenDocumental(a, b)
     );
     let paginaAcumulada = 1;
     let fechaAnterior: string | null = null;
@@ -234,18 +260,19 @@ export class PdfAnalyzerComponent {
       const nombre = String(pdf.archivo['nombre'] || '');
       const totalPaginas = Number(pdf.paginas['total']) ||
         Number(pdf.contenido['paginas']?.length) || 0;
-      const paginaInicio = paginaAcumulada;
-      const paginaFin = totalPaginas ? paginaInicio + totalPaginas - 1 : paginaInicio;
-      paginaAcumulada = paginaFin + 1;
+      const esCarpeta = Boolean(pdf.archivo['esCarpeta']);
+      const paginaInicio = esCarpeta ? null : paginaAcumulada;
+      const paginaFin = esCarpeta ? null : (totalPaginas ? paginaAcumulada + totalPaginas - 1 : paginaAcumulada);
+      if (!esCarpeta) paginaAcumulada = Number(paginaFin) + 1;
       const fechaDirecta = this.fechaDesdeNombre(nombre);
       const fecha = fechaDirecta || fechaAnterior;
       if (fechaDirecta) fechaAnterior = fechaDirecta;
-      const codigoCalidad = nombre.match(/\b(F[A-Z]{1,3}[._-]?\d+(?:\.\d+)?)\b/i)?.[1]
-        ?.replace('_', '.') || null;
+      const nombreDocumental = esCarpeta ? 'Carpeta' : this.nombreDocumentalCatalogo(nombre);
+      const codigoCalidad = this.extraerCodigoCalidad(nombre);
       return [
         nombre,
-        this.nombreDocumentoDesdeArchivo(nombre),
-        this.clasificarTipologia(nombre),
+        nombreDocumental,
+        esCarpeta ? 'Carpeta' : this.clasificarTipologia(nombre, nombreDocumental),
         fecha,
         fecha,
         this.ordenArchivo(nombre) || indice + 1,
@@ -329,21 +356,23 @@ export class PdfAnalyzerComponent {
 
     Array.from(grupos.entries()).forEach(([nombreCarpeta, documentosGrupo]) => {
       const documentos = [...documentosGrupo].sort(
-        (a, b) => this.ordenArchivo(a.archivo['nombre']) - this.ordenArchivo(b.archivo['nombre'])
+        (a, b) => this.compararOrdenDocumental(a, b)
       );
       let paginaAcumulada = 1;
       let fechaAnterior: string | null = null;
       const detalle = documentos.map((pdf, indice) => {
         const nombre = String(pdf.archivo['nombre'] || '');
         const totalPaginas = Number(pdf.paginas['total']) || Number(pdf.contenido['paginas']?.length) || 0;
-        const paginaInicio = paginaAcumulada;
-        const paginaFin = totalPaginas ? paginaInicio + totalPaginas - 1 : paginaInicio;
-        paginaAcumulada = paginaFin + 1;
+        const esCarpeta = Boolean(pdf.archivo['esCarpeta']);
+        const paginaInicio = esCarpeta ? null : paginaAcumulada;
+        const paginaFin = esCarpeta ? null : (totalPaginas ? paginaAcumulada + totalPaginas - 1 : paginaAcumulada);
+        if (!esCarpeta) paginaAcumulada = Number(paginaFin) + 1;
         const fechaDirecta = this.fechaDesdeNombre(nombre);
         const fecha = fechaDirecta || fechaAnterior;
         if (fechaDirecta) fechaAnterior = fechaDirecta;
-        const codigoCalidad = nombre.match(/\b(F[A-Z]{1,3}[._-]?\d+(?:\.\d+)?)\b/i)?.[1]?.replace('_', '.') || null;
-        return [nombre, this.nombreDocumentoDesdeArchivo(nombre), this.clasificarTipologia(nombre), fecha, fecha,
+        const nombreDocumental = esCarpeta ? 'Carpeta' : this.nombreDocumentalCatalogo(nombre);
+        const codigoCalidad = this.extraerCodigoCalidad(nombre);
+        return [nombre, nombreDocumental, esCarpeta ? 'Carpeta' : this.clasificarTipologia(nombre, nombreDocumental), fecha, fecha,
           this.ordenArchivo(nombre) || indice + 1, paginaInicio, paginaFin, 'Electrónico', 'Pública',
           'Español', 'Mayerly Garavito Olivares', codigoCalidad, null, fecha ? fecha.slice(0, 4) : null, null, null];
       });
@@ -418,10 +447,10 @@ export class PdfAnalyzerComponent {
       // webkitRelativePath tiene la forma carpetaMadre/contrato/archivo.pdf.
       // En modo lote se debe separar por el hijo directo de la carpeta madre,
       // incluso cuando la propia carpeta madre parece tener código de contrato.
-      const carpetaContrato = this.modoVariasCarpetas
+      const carpetasContrato = segmentos.filter((segmento) => /^\d{6,}_\d{2,6}$/i.test(segmento));
+      const carpetaContrato = carpetasContrato.at(-1) || (this.modoVariasCarpetas
         ? (segmentos.length >= 3 ? segmentos[1] : segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual')
-        : (segmentos.find((segmento) => /^\d{6,}_\d{2,6}$/i.test(segmento)) ||
-          (segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual'));
+        : (segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual'));
       if (!grupos.has(carpetaContrato)) grupos.set(carpetaContrato, []);
       grupos.get(carpetaContrato)!.push(pdf);
     });
@@ -439,13 +468,58 @@ export class PdfAnalyzerComponent {
       .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
       .filter(Boolean)
       .join('\n');
+    const textoCuentaCobro = documentos
+      .filter((pdf) => this.esCuentaCobro(String(pdf.archivo['nombre'] || '')))
+      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
+      .filter(Boolean)
+      .join('\n');
+    // Conservar siempre el texto del FCO.55 como respaldo. La existencia de
+    // un archivo llamado Cuenta_Cobro no garantiza que tenga texto legible.
+    const textoInformeOportunidad = documentos
+      .filter((pdf) => this.esInformeOportunidad(String(pdf.archivo['nombre'] || '')))
+      .map((pdf) => String(pdf.contenido['textoCompleto'] || ''))
+      .filter(Boolean)
+      .join('\n');
     const buscar = (texto: string, expresion: RegExp): string =>
       (texto.match(expresion)?.[1] || '').replace(/\s+/g, ' ').trim();
     const soloDigitos = (valor: string): string => valor.replace(/\D/g, '');
     const fechaNumerica = (texto: string, etiqueta: string): string => {
-      const patron = new RegExp(`${etiqueta}[\\s\\S]{0,90}?D[ií]a(?:/Mes/Año)?\\s*(\\d{1,2})\\s*(?:Mes\\s*)?(\\d{1,2})\\s*(?:Año\\s*)?(\\d{4})`, 'i');
-      const partes = texto.match(patron);
-      return partes ? `${partes[3]}${partes[2].padStart(2, '0')}${partes[1].padStart(2, '0')}` : '';
+      const bloque = texto.match(new RegExp(`${etiqueta}[\\s\\S]{0,240}`, 'i'))?.[0] || '';
+      const meses: Record<string, string> = {
+        enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
+        julio: '07', agosto: '08', septiembre: '09', setiembre: '09', octubre: '10',
+        noviembre: '11', diciembre: '12',
+      };
+      const compactar = (dia: string, mesValor: string, anio: string): string => {
+        const mesLimpio = mesValor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const mes = /^\d{1,2}$/.test(mesLimpio)
+          ? mesLimpio.padStart(2, '0')
+          : meses[mesLimpio];
+        const diaNumero = Number(dia);
+        const mesNumero = Number(mes);
+        return mes && diaNumero >= 1 && diaNumero <= 31 && mesNumero >= 1 && mesNumero <= 12
+          ? `${anio}${mes}${dia.padStart(2, '0')}`
+          : '';
+      };
+      const valorMes = '(\\d{1,2}|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)';
+      const partesEtiquetadas = bloque.match(new RegExp(
+        `D[ií]a\\s*:?\\s*(\\d{1,2})\\s*(?:Mes\\s*:?)?\\s*${valorMes}\\s*(?:A[nñ]o\\s*:?)?\\s*(\\d{4})`,
+        'i'
+      ));
+      if (partesEtiquetadas) {
+        return compactar(partesEtiquetadas[1], partesEtiquetadas[2], partesEtiquetadas[3]);
+      }
+      const encabezadosPrimero = bloque.match(new RegExp(
+        `D[ií]a\\s*(?:[/|]\\s*)?Mes\\s*(?:[/|]\\s*)?A[nñ]o\\s*(\\d{1,2})\\s*${valorMes}\\s*(\\d{4})`,
+        'i'
+      ));
+      if (encabezadosPrimero) {
+        return compactar(encabezadosPrimero[1], encabezadosPrimero[2], encabezadosPrimero[3]);
+      }
+      const partesFecha = bloque.match(/\b(\d{1,2})\s*[\/-]\s*(\d{1,2})\s*[\/-]\s*(\d{4})\b/);
+      return partesFecha
+        ? compactar(partesFecha[1], partesFecha[2], partesFecha[3])
+        : '';
     };
     const moneda = (texto: string, etiqueta: string): number | null => {
       const valor = buscar(texto, new RegExp(`${etiqueta}\\s*\\$?\\s*([\\d.,]+)`, 'i'));
@@ -467,20 +541,44 @@ export class PdfAnalyzerComponent {
       textoPrestacionServicios,
       /UAA\s*:\s*(.+?)(?=\s+TEL\s*:|\s+FAX\s*:|\s+\|)/i
     );
-    const cedulaPrestacion = soloDigitos(buscar(
-      textoPrestacionServicios,
-      /NIT\.?\s*O\s*C\.?\s*C\.?\s*:?\s*([\d.,]+)/i
+    // pdf.js puede entregar estas etiquetas separadas por carácter:
+    // "D E B E A" y "C . C .", aunque visualmente se vean normales.
+    const bloqueCuentaCobro = textoCuentaCobro.match(
+      /D\s*E\s*B\s*E\s*A\s*:?\s*([\s\S]{1,250}?)(?=C\s*\.\s*C\s*\.)/i
+    )?.[1] || '';
+    const cedulaCuentaCobro = soloDigitos(buscar(
+      textoCuentaCobro,
+      /D\s*E\s*B\s*E\s*A\s*:?[\s\S]{0,300}?C\s*\.\s*C\s*\.\s*:?\s*((?:\d[\s.]*){6,12})/i
+    ));
+    const cedulaInformeOportunidad = soloDigitos(buscar(
+      textoInformeOportunidad,
+      /Identificaci[oó]n\s*:?[\s|]*(?:(?:N\s*\.?\s*I\s*\.?\s*T\s*\.?|C\s*\.?\s*C\s*\.?|C[eé]dula(?:\s+de\s+Ciudadan[ií]a)?)\s*:?)?[\s|]*((?:\d[\s.\-]*){6,12})/i
     ));
     const cedulaValida = (valor: string): string =>
       /^\d{6,12}$/.test(valor) ? valor : '';
-    const cedula = cedulaValida(cedulaPrestacion);
-    const contratista = buscar(
-      textoActaFinalizacion,
-      /Supervisor\s*\/?\s*Interventor\s+([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)\s+Contratista/i
-    ) || buscar(
-      textoActaFinalizacion,
-      /Nombre\s+Completo\s+([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=\s+Cargo|\s+C\.?\s*C\.?)/i
+    // El FCO.55 es la fuente principal para la identificación y el nombre.
+    // La cuenta de cobro queda disponible como respaldo si faltan esos campos.
+    const cedula = cedulaValida(cedulaInformeOportunidad) || cedulaValida(cedulaCuentaCobro);
+    const contratistaAnterior = buscar(
+      textoCuentaCobro,
+      /DEBE\s+A\s*:?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ ]{4,120}?)(?=\s+C\.?\s*C\.?\s*:?[\s\d])/i
     );
+    const contratistaInforme = buscar(
+      textoInformeOportunidad,
+      /Nombre\s+o\s+Raz[oó]n\s+Social\s+([\s\S]{2,180}?)(?=\s+Identificaci[oó]n)/i
+    )
+      .replace(/[^A-Za-z\u00c0-\u024f0-9&.'()\-\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\b([A-ZÁÉÍÓÚÑÜ])\s+(?=[A-ZÁÉÍÓÚÑÜ]{2,}\b)/g, '$1')
+      .trim();
+    const contratistaCuentaCobro = bloqueCuentaCobro
+      .replace(/[^A-Za-z\u00c0-\u024f\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim() || contratistaAnterior;
+    const contratista = contratistaInforme || contratistaCuentaCobro;
+    const tipoDocumento = cedulaValida(cedulaInformeOportunidad)
+      ? (/Identificaci[oó]n\s*:?[\s|]*N\s*\.?\s*I\s*\.?\s*T/i.test(textoInformeOportunidad) ? 'NIT' : 'CC')
+      : 'CC';
     // No usar "VALOR TOTAL" de forma genérica: en algunos expedientes puede
     // corresponder a un CDT/CDP u otro concepto distinto al contrato.
     const valorOrdenPrestacion =
@@ -492,22 +590,22 @@ export class PdfAnalyzerComponent {
     const fechaInicio = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DE\\s+INICIO\\s+DEL\\s+CONTRATO');
     const fechaFinal = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+(?:DE\\s+)?TERMINACI[ÓO]N\\s+DEL\\s+CONTRATO');
     const fechaCierre = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DEL\\s+ACTA');
-    const responsableEntrega = buscar(textoActaFinalizacion, /(Efra[ií]n\s+Alberto\s+Sanmiguel\s+Acevedo)/i);
-    const cargoEntrega = responsableEntrega ? 'Jefe División Financiera' : '';
+    const responsableEntrega = 'Efraín Alberto Sanmiguel Acevedo';
+    const cargoEntrega = 'Jefe División Financiera';
     const fechas = documentos.map((pdf) => this.fechaDesdeNombre(pdf.archivo['nombre'])).filter(Boolean) as string[];
     fechas.sort();
     const nombreExpediente = contrato || expedienteRuta || 'expediente_contratos';
     return [
       unidad, nombreUnidad, 'C09', 'Contratos', 'C09.06', 'Contrato de Prestación de Servicios',
-      nombreExpediente, cedula ? `CC ${cedula}` : '', contratista ? `Nombre ${contratista}` : '',
+      nombreExpediente, cedula ? `${tipoDocumento} ${cedula}` : '', contratista ? `Nombre ${contratista}` : '',
       valorContrato !== null ? `Valor contrato $ ${Number(valorContrato).toLocaleString('es-CO')}` : '',
       fechaCierre || fechaFinal || fechas.at(-1) || '', '', totalPaginas, 'Inventario Archivo de Gestión',
-      this.fechaTextoACompacta(fechaInicio) || fechaInicio || fechas[0] || '',
-      this.fechaTextoACompacta(fechaFinal) || fechaFinal || fechas.at(-1) || '',
+      this.fechaTextoACompacta(fechaInicio) || fechaInicio || '',
+      this.fechaTextoACompacta(fechaFinal) || fechaFinal || '',
       'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
       'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
       'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
-      `Datos contractuales extraídos de la orden de prestación de servicios y del acta de finalización. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
+      `Datos contractuales extraídos de la orden de prestación de servicios, el acta de finalización y una cuenta de cobro. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
     ];
   }
 
@@ -580,6 +678,15 @@ export class PdfAnalyzerComponent {
     return Number(nombre.match(/^(\d{1,6})/)?.[1]) || 0;
   }
 
+  private compararOrdenDocumental(a: PdfAnalysis, b: PdfAnalysis): number {
+    const ordenA = this.ordenArchivo(String(a.archivo['nombre'] || ''));
+    const ordenB = this.ordenArchivo(String(b.archivo['nombre'] || ''));
+    if (ordenA !== ordenB) return ordenA - ordenB;
+    const rutaA = String(a.archivo['rutaRelativa'] || a.archivo['nombre'] || '');
+    const rutaB = String(b.archivo['rutaRelativa'] || b.archivo['nombre'] || '');
+    return rutaA.localeCompare(rutaB, 'es-CO', { numeric: true, sensitivity: 'base' });
+  }
+
   private fechaDesdeNombre(nombre: string): string | null {
     const fecha = nombre.match(/(?:^|_)((?:19|20)\d{6})(?:_|\.)/)?.[1];
     return fecha || null;
@@ -588,10 +695,116 @@ export class PdfAnalyzerComponent {
   private nombreDocumentoDesdeArchivo(nombre: string): string {
     return nombre.replace(/\.pdf$/i, '').replace(/^\d+_/, '')
       .replace(/^(?:19|20)\d{6}_/, '').replace(/F[A-Z]{1,3}[._-]?\d+(?:\.\d+)?_/i, '')
-      .replace(/_+/g, ' ').trim();
+      .replace(/(?:^|_)Anexo\s*\d+(?:_|\s)*/i, '')
+      .replace(/_+/g, ' ')
+      .replace(/\s*\d+\s*$/g, '')
+      .trim();
   }
 
-  private clasificarTipologia(nombre: string): string {
+  private nombreDocumentalCatalogo(nombre: string): string {
+    const valor = this.normalizarNombreArchivo(nombre);
+    const catalogo: Array<[RegExp, string]> = [
+      [/informe_oportunidad|fco_55/, 'Informe de Oportunidad y Conveniencia'],
+      [/solicitud_propuesta/, 'Formato Solicitud Propuesta'],
+      [/solicitud_cotizacion|fco_57/, 'Formato Solicitud de Cotización'],
+      [/evaluacion_cotizacion|fco_59/, 'Evaluación de Cotización'],
+      [/orden_(?:de_)?prestacion_(?:de_)?servicios.*ajustada/, 'Orden de Prestación de Servicios Ajustada'],
+      [/orden_(?:de_)?prestacion_(?:de_)?servicios/, 'Orden de Prestación de Servicios'],
+      [/(?:correo_)?autorizacion_(?:de_)?contratos?|fth_146/, 'Solicitud de Autorización de Contratos con Personas Naturales'],
+      [/propuesta_trabajo/, 'Propuesta Trabajo'],
+      [/(?:^|_)cotizacion(?:_|$)/, 'Cotización'],
+      [/inexistencia_(?:de_)?personal/, 'Certificado Inexistencia Personal'],
+      [/(solicitud_)?(?:certificado_)?disponibilidad_presupuestal|(?:^|_)cdp(?:_|$)/, 'Solicitud Certificado de Disponibilidad Presupuestal'],
+      [/proceso_contratacion_publica/, 'Proceso Contratacion Publica'],
+      [/cedula_ciudadania/, 'Cédula de Ciudadanía'],
+      [/hoja_(?:de_)?vida_anexos/, 'Hoja Vida Anexos'],
+      [/libreta_militar/, 'Libreta Militar'],
+      [/afiliacion_eps/, 'Certificado Afiliacion EPS'],
+      [/fondo_pensional/, 'Certificado Fondo Pensional'],
+      [/certificacion_bancaria|certificado_bancario/, 'Certificación Bancaria'],
+      [/examen_ocupacional/, 'Certificado Examen Ocupacional'],
+      [/correo_aceptacion_cotizacion/, 'Correo Aceptacion Cotizacion'],
+      [/afiliacion_arl/, 'Certificación de Afiliación ARL'],
+      [/factura(?:_de)?_venta\d*|(?:^|_)factura\d*(?:_|$)/, 'Factura de venta'],
+      [/camara_(?:de_)?comercio/, 'Cámara de Comercio'],
+      [/aportes_parafiscales/, 'Certificado de Aportes Parafiscales'],
+      [/anexo.*retencion.*fuente|retencion.*fuente.*anexo/, 'Formato para aplicación de Retencion en la fuente en Renta'],
+      [/retencion_(?:en_la_)?fuente/, 'Formato para aplicación de Retencion en la fuente en Renta'],
+      [/procuraduria/, 'Certificado de Procuraduria'],
+      [/contraloria/, 'Certificado de Contraloria'],
+      [/policia_nacional/, 'Certificado de Policía Nacional'],
+      [/medidas_correctivas/, 'Certificado de Medidas Correctivas'],
+      [/deudores_alimentarios|redam/, 'Certificado Deudores Alimentarios Morosos'],
+      [/(?:^|_)rut\d*(?:_|$)|registro_unico_tributario/, 'Formulario del Registro Único Tributario'],
+      [/estandares_minimos.*sg/, 'Estándares Mínimos SG'],
+      [/analisis.*valoracion.*(?:mitigacion|riesgo)|fco_58/, 'Formato para Análisis, Valoración y Mitigación del Riesgo'],
+      [/orden_(?:de_)?compra/, 'Orden de Compra'],
+      [/orden_(?:de_)?consultoria/, 'Orden de Consultoria'],
+      [/designacion_(?:de_)?supervisor/, 'Carta de Designación de Supervisor'],
+      [/poliza(?:.*garantia)?/, 'Póliza de Garantía'],
+      [/acta_(?:de_)?inicio/, 'Acta de Inicio'],
+      [/informe_(?:de_)?supervision.*unico_pago|unico_pago.*informe_(?:de_)?supervision/, 'Informe de Supervisión Único Pago'],
+      [/cuenta_(?:de_)?cobro/, 'Cuenta de cobro'],
+      [/informe_(?:de_)?actividades/, 'Informe de Actividades'],
+      [/seguridad_social/, 'Certificado de Seguridad Social'],
+      [/carta_(?:de_)?autorizacion_(?:de_)?pago/, 'Carta Autorización de Pago'],
+      [/orden_(?:de_)?pago_(?:automatica)?/, 'Orden de Pago Automática'],
+      [/comprobante_(?:de_)?salida_(?:de_)?almacen/, 'Comprobante de Salida de Almacen'],
+      [/acta_(?:de_)?finalizacion|recibo_(?:a_)?satisfaccion/, 'Acta de Finalización o Recibo a Satisfacción'],
+      [/acta_(?:de_)?liquidacion/, 'Acta de Liquidación'],
+      [/evaluacion_(?:de_)?proveedor(?:es)?/, 'Formato para Evaluación de Proveedor'],
+      [/inhabilidades/, 'Inhabilidades'],
+      [/lista_(?:de_)?chequeo.*verificacion|verificacion.*lista_(?:de_)?chequeo/, 'Lista de Chequeo de Verificación'],
+      [/correo_(?:de_)?autorizacion_(?:del_)?supervisor/, 'Correo Autorización Supervisor'],
+      [/acta_(?:de_)?pago_parcial(?:.*informe_(?:de_)?supervision)?|informe_(?:de_)?supervision.*acta_(?:de_)?pago_parcial/, 'Acta Pago Parcial e Informe de Supervisión'],
+      [/certificado.*existencia.*representante_legal|existencia.*representante_legal/, 'Certificado Existencia Representante Legal'],
+    ];
+    return catalogo.find(([patron]) => patron.test(valor))?.[1] ||
+      this.nombreDocumentoDesdeArchivo(nombre);
+  }
+
+  private extraerCodigoCalidad(nombre: string): string | null {
+    const coincidencia = nombre.match(/(?:^|[^A-Z0-9])(F[A-Z]{2,3})[._\-\s]*(\d+(?:[._\-]\d+)*)(?=[^0-9]|$)/i);
+    if (!coincidencia) return null;
+    return `${coincidencia[1].toUpperCase()}.${coincidencia[2].replace(/[._\-]+/g, '.')}`;
+  }
+
+  private clasificarTipologia(nombre: string, nombreDocumental = ''): string {
+    const documento = this.normalizarNombreArchivo(nombreDocumental);
+    const anexos = [
+      'formato_solicitud_propuesta', 'propuesta_trabajo', 'certificado_inexistencia_personal',
+      'formato_solicitud_de_cotizacion', 'evaluacion_de_cotizacion',
+      'solicitud_certificado_de_disponibilidad_presupuestal', 'hoja_vida_anexos',
+      'cedula_de_ciudadania', 'libreta_militar', 'certificado_afiliacion_eps',
+      'certificado_fondo_pensional', 'certificado_examen_ocupacional',
+      'certificacion_bancaria', 'orden_de_prestacion_de_servicios_ajustada',
+      'solicitud_de_autorizacion_de_contratos_con_personas_naturales',
+      'formato_para_aplicacion_de_retencion_en_la_fuente', 'certificado_de_procuraduria',
+      'certificado_de_contraloria', 'certificado_de_policia_nacional',
+      'certificado_de_medidas_correctivas', 'inhabilidades',
+      'certificado_de_aportes_parafiscales',
+      'certificado_deudores_alimentarios_morosos', 'formulario_del_registro_unico_tributario',
+      'formato_para_analisis_valoracion_y_mitigacion_del_riesgo', 'cuenta_de_cobro',
+      'formato_para_aplicacion_de_retencion_en_la_fuente_en_renta',
+      'certificado_de_seguridad_social', 'correo_autorizacion_supervisor',
+    ];
+    if (anexos.includes(documento)) return 'Anexo';
+    if (documento === 'informe_de_oportunidad_y_conveniencia') return 'Informe';
+    if (documento === 'orden_de_consultoria') return 'Contrato';
+    if (documento === 'orden_de_prestacion_de_servicios') return 'Contrato';
+    if (documento === 'carta_de_designacion_de_supervisor') return 'Comunicación';
+    if (documento === 'poliza_de_garantia') return 'Póliza';
+    if (documento === 'orden_de_pago_automatica') return 'Soporte';
+    if ([
+      'acta_pago_parcial_e_informe_de_supervision',
+      'acta_de_finalizacion_o_recibo_a_satisfaccion',
+      'acta_de_liquidacion',
+      'formato_para_evaluacion_de_proveedor',
+    ].includes(documento)) return 'Acta';
+    if (documento === 'informe_de_actividades') {
+      const consecutivo = Number(nombre.match(/(?:actividades)[^\d]*(\d+)(?=\D*\.pdf$)/i)?.[1] || 0);
+      return consecutivo > 0 && consecutivo <= 2 ? 'Anexo' : 'Informe';
+    }
     const valor = nombre.toLowerCase();
     if (valor.includes('acta')) return 'Acta';
     if (valor.includes('contrato')) return 'Contrato';
@@ -608,9 +821,11 @@ export class PdfAnalyzerComponent {
     return pdf.metadatos['autor'] || null;
   }
 
-  private esDocumentoContractualPrioritario(nombreArchivo: string): boolean {
+  private esDocumentoContractualPrioritario(nombreArchivo: string, rutaRelativa = nombreArchivo): boolean {
     return this.esOrdenPrestacionServicios(nombreArchivo) ||
-      this.esActaFinalizacion(nombreArchivo);
+      this.esActaFinalizacion(nombreArchivo) ||
+      this.cuentasCobroPrioritarias.has(rutaRelativa) ||
+      this.esInformeOportunidad(nombreArchivo);
   }
 
   private describirErrorPdf(error: any): string {
@@ -637,6 +852,95 @@ export class PdfAnalyzerComponent {
     return /(?:^|_)acta_(?:de_)?finalizacion(?:_|$)/.test(nombreNormalizado);
   }
 
+  private esCuentaCobro(nombreArchivo: string): boolean {
+    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
+    return /(?:^|_)cuenta_(?:de_)?cobro\d*(?:_|$)/.test(nombreNormalizado);
+  }
+
+  private esInformeOportunidad(nombreArchivo: string): boolean {
+    const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
+    return nombreNormalizado.includes('informe_oportunidad') ||
+      nombreNormalizado.includes('fco_55');
+  }
+
+  private prepararCuentasCobroPrioritarias(archivos: File[]): void {
+    this.cuentasCobroPrioritarias.clear();
+    const seleccionPorContrato = new Map<string, string>();
+    [...archivos]
+      .filter((archivo) => this.esCuentaCobro(archivo.name))
+      .sort((a, b) => b.name.localeCompare(a.name, 'es-CO', { numeric: true }))
+      .forEach((archivo) => {
+        const ruta = (archivo as any).webkitRelativePath || archivo.name;
+        const contrato = this.claveContratoArchivo(ruta);
+        if (!seleccionPorContrato.has(contrato)) seleccionPorContrato.set(contrato, ruta);
+      });
+    seleccionPorContrato.forEach((ruta) => this.cuentasCobroPrioritarias.add(ruta));
+
+  }
+
+  private claveContratoArchivo(ruta: string): string {
+    const segmentos = String(ruta).split(/[\\/]/).filter(Boolean);
+    const carpetasContrato = segmentos.filter((segmento) => /^\d{6,}_\d{2,6}$/i.test(segmento));
+    if (carpetasContrato.length) return carpetasContrato.at(-1)!;
+    return segmentos.length >= 3
+      ? segmentos[1]
+      : segmentos.length >= 2 ? segmentos[0] : 'seleccion_manual';
+  }
+
+  private separarArchivosDirectosYCarpetas(
+    archivos: File[],
+    variasCarpetas: boolean
+  ): { archivosDirectos: File[]; carpetas: Array<{ nombre: string; rutaRelativa: string }> } {
+    const archivosDirectos: File[] = [];
+    const carpetas = new Map<string, { nombre: string; rutaRelativa: string }>();
+    archivos.forEach((archivo) => {
+      const ruta = String((archivo as any).webkitRelativePath || archivo.name);
+      const segmentos = ruta.split(/[\\/]/).filter(Boolean);
+      const indicesContrato = segmentos
+        .map((segmento, indice) => /^\d{6,}_\d{2,6}$/i.test(segmento) ? indice : -1)
+        .filter((indice) => indice >= 0);
+      const indiceContrato = indicesContrato.at(-1) ?? (variasCarpetas && segmentos.length >= 3 ? 1 : 0);
+      const indiceArchivo = segmentos.length - 1;
+      if (indiceArchivo > indiceContrato + 1) {
+        const nombreCarpeta = segmentos[indiceContrato + 1];
+        const rutaCarpeta = segmentos.slice(0, indiceContrato + 2).join('/');
+        if (!carpetas.has(rutaCarpeta)) {
+          carpetas.set(rutaCarpeta, { nombre: nombreCarpeta, rutaRelativa: rutaCarpeta });
+        }
+        return;
+      }
+      archivosDirectos.push(archivo);
+    });
+    return { archivosDirectos, carpetas: Array.from(carpetas.values()) };
+  }
+
+  private crearRegistroCarpeta(nombre: string, rutaRelativa: string): PdfAnalysis {
+    return {
+      archivo: {
+        nombre,
+        rutaRelativa,
+        extension: null,
+        tipoMime: 'carpeta',
+        bytes: 0,
+        kilobytes: 0,
+        megabytes: 0,
+        ultimaModificacion: null,
+        esCarpeta: true,
+      },
+      documento: { tipo: 'Carpeta' },
+      paginas: { total: 0 },
+      recursos: {},
+      contenido: {
+        textoCompleto: '',
+        paginas: [],
+        extraccionProfunda: false,
+        observacion: 'Carpeta interna registrada sin recorrer sus documentos.',
+      },
+      seguridad: {},
+      metadatos: {},
+    };
+  }
+
   private normalizarNombreArchivo(nombreArchivo: string): string {
     return nombreArchivo
       .normalize('NFD')
@@ -654,47 +958,55 @@ export class PdfAnalyzerComponent {
 
   private async extraerContenidoCompleto(
     bytes: Uint8Array,
-    nombreArchivo: string
+    nombreArchivo: string,
+    paginasEspecificas?: number[]
   ): Promise<{ paginas: any[]; totalPaginas: number }> {
     const documento: any = await getDocument({ data: bytes.slice() }).promise;
     const paginas: any[] = [];
 
-    for (let numero = 1; numero <= documento.numPages; numero++) {
+    const numerosPagina = paginasEspecificas?.filter((numero) =>
+      numero >= 1 && numero <= documento.numPages
+    ) || Array.from({ length: documento.numPages }, (_valor, indice) => indice + 1);
+    for (const numero of numerosPagina) {
       this.progreso = `${nombreArchivo}: leyendo página ${numero} de ${documento.numPages}`;
       const pagina: any = await documento.getPage(numero);
       const contenido: any = await pagina.getTextContent();
-      const textoDigital = contenido.items
+      const textoSecuencial = contenido.items
         .map((item: any) => `${item.str || ''}${item.hasEOL ? '\n' : ' '}`)
         .join('')
         .replace(/[ \t]+/g, ' ')
         .replace(/ *\n */g, '\n')
         .trim();
+      const filasVisuales: Array<{ y: number; items: any[] }> = [];
+      contenido.items
+        .filter((item: any) => String(item.str || '').trim())
+        .forEach((item: any) => {
+          const y = Number(item.transform?.[5] || 0);
+          let fila = filasVisuales.find((actual) => Math.abs(actual.y - y) <= 2);
+          if (!fila) {
+            fila = { y, items: [] };
+            filasVisuales.push(fila);
+          }
+          fila.items.push(item);
+        });
+      const textoVisual = filasVisuales
+        .sort((a, b) => b.y - a.y)
+        .map((fila) => fila.items
+          .sort((a: any, b: any) => Number(a.transform?.[4] || 0) - Number(b.transform?.[4] || 0))
+          .map((item: any) => String(item.str || '').trim())
+          .filter(Boolean)
+          .join(' '))
+        .filter(Boolean)
+        .join('\n');
+      const textoDigital = `${textoSecuencial}\n${textoVisual}`.trim();
 
       let texto = textoDigital;
       let metodo = 'texto PDF';
       let confianza: number | null = textoDigital.length ? 100 : null;
 
       if (textoDigital.replace(/\s/g, '').length < 20) {
-        try {
-          this.progreso = `${nombreArchivo}: aplicando OCR a página ${numero} de ${documento.numPages}`;
-          const resultadoOcr = await this.aplicarOcr(pagina);
-          if (resultadoOcr.texto.trim()) {
-            texto = resultadoOcr.texto.trim();
-            metodo = 'OCR';
-            confianza = resultadoOcr.confianza;
-          }
-        } catch (error: any) {
-          metodo = 'OCR no disponible';
-          texto = textoDigital;
-          if (!this.erroresProcesamiento.some((incidencia) => incidencia.archivo === nombreArchivo)) {
-            this.erroresProcesamiento.push({
-              archivo: nombreArchivo,
-              mensaje: String(error?.message || '').includes('tiempo máximo')
-                ? 'El OCR tardó más de 30 segundos; el lote continuó sin detenerse.'
-                : 'No fue posible aplicar OCR; el lote continuó con el texto disponible.',
-            });
-          }
-        }
+        metodo = 'sin texto digital';
+        confianza = null;
       }
 
       const vista = pagina.getViewport({ scale: 1 });
@@ -712,53 +1024,6 @@ export class PdfAnalyzerComponent {
     const totalPaginas = documento.numPages;
     await documento.destroy();
     return { paginas, totalPaginas };
-  }
-
-  private async aplicarOcr(pagina: any): Promise<{ texto: string; confianza: number }> {
-    const viewport = pagina.getViewport({ scale: 2 });
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
-    const contexto = canvas.getContext('2d', { willReadFrequently: true });
-    if (!contexto) throw new Error('El navegador no permitió crear el lienzo para OCR.');
-    await pagina.render({ canvasContext: contexto, viewport }).promise;
-
-    if (!this.trabajadorOcr) {
-      this.trabajadorOcr = await createWorker('spa', 1, {
-        workerPath: 'assets/tesseract/worker.min.js',
-        corePath: 'assets/tesseract/core',
-        langPath: 'assets/tesseract/lang',
-      });
-    }
-    let temporizador: any;
-    const tiempoMaximo = new Promise<never>((_resolve, reject) => {
-      temporizador = setTimeout(
-        () => reject(new Error('OCR excedió el tiempo máximo permitido.')),
-        30000
-      );
-    });
-    let reconocimiento: any;
-    try {
-      reconocimiento = await Promise.race([
-        this.trabajadorOcr.recognize(canvas),
-        tiempoMaximo,
-      ]);
-    } catch (error: any) {
-      if (String(error?.message || '').includes('tiempo máximo') && this.trabajadorOcr) {
-        const trabajadorBloqueado = this.trabajadorOcr;
-        this.trabajadorOcr = null;
-        trabajadorBloqueado.terminate().catch(() => undefined);
-      }
-      throw error;
-    } finally {
-      clearTimeout(temporizador);
-    }
-    canvas.width = 0;
-    canvas.height = 0;
-    return {
-      texto: reconocimiento.data.text || '',
-      confianza: Number((reconocimiento.data.confidence || 0).toFixed(2)),
-    };
   }
 
   private detectarCampos(texto: string): Record<string, any> {
