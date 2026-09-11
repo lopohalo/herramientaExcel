@@ -866,8 +866,12 @@ export class PdfAnalyzerComponent {
 
   private esActaFinalizacion(nombreArchivo: string): boolean {
     const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
-    return /(?:^|_)acta_(?:de_)?(?:finalizacion|terminacion)(?:_|$)/.test(nombreNormalizado) ||
-      /(?:^|_)recibo_(?:a_)?satisfaccion(?:_|$)/.test(nombreNormalizado);
+
+    // Algunos expedientes agregan un consecutivo directamente al final del nombre:
+    // Acta_Finalizacion.pdf, Acta_Finalizacion1.pdf, Acta_Finalizacion5.pdf, etc.
+    // El "\d*" permite esos sufijos sin dejar de exigir que sea realmente un acta.
+    return /(?:^|_)acta_(?:de_)?(?:finalizacion|terminacion)\d*(?:_|$)/.test(nombreNormalizado) ||
+      /(?:^|_)recibo_(?:a_)?satisfaccion\d*(?:_|$)/.test(nombreNormalizado);
   }
 
   private esCuentaCobro(nombreArchivo: string): boolean {
