@@ -535,8 +535,8 @@ export class PdfAnalyzerComponent {
       /(?:REGISTRO\s+CONTRACTUAL[\s\S]{0,220}?)?\bNo\.?\s*:?\s*(20\d{8})\b/i
     ) || textoPrestacionServicios.match(/\b(20\d{8})\b/)?.[1] ||
       expedienteRuta?.match(/\d{6,}/)?.[0] || '';
-    const unidad = expedienteRuta?.match(/_(\d{3,5})\b/)?.[1] ||
-      buscar(textoPrestacionServicios, /UAA\s*-\s*PROYECTO[\s\S]{0,100}?(\d{3,6})/i) || '';
+    // El Código unidad del inventario debe ser siempre 3140.
+    const unidad = '3140';
     const nombreUnidad = buscar(
       textoPrestacionServicios,
       /UAA\s*:\s*(.+?)(?=\s+TEL\s*:|\s+FAX\s*:|\s+\|)/i
@@ -587,9 +587,25 @@ export class PdfAnalyzerComponent {
       moneda(textoPrestacionServicios, 'VALOR\\s+TOTAL\\s+DEL\\s+CONTRATO\\s*:');
     const valorContrato = valorOrdenPrestacion;
     const objeto = buscar(textoPrestacionServicios, /DETALLE\s+DEL\s+CONTRATO\s+([\s\S]{20,700}?)\s+VALOR\s+EN\s+LETRAS/i);
-    const fechaInicio = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DE\\s+INICIO\\s+DEL\\s+CONTRATO');
-    const fechaFinal = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+(?:DE\\s+)?TERMINACI[ÓO]N\\s+DEL\\s+CONTRATO');
-    const fechaCierre = fechaNumerica(textoActaFinalizacion, 'FECHA\\s+DEL\\s+ACTA');
+
+    // pdf.js puede separar por carácter las etiquetas del acta (F E C H A...).
+    // Primero compactamos solo para búsqueda, sin modificar el texto almacenado.
+    const textoActaBusqueda = textoActaFinalizacion
+      .replace(/\b([A-Za-zÁÉÍÓÚÑáéíóúñ])(?:\s+([A-Za-zÁÉÍÓÚÑáéíóúñ])){2,}\b/g, (bloque) => bloque.replace(/\s+/g, ''))
+      .replace(/[ \t]+/g, ' ');
+
+    const fechaInicio = fechaNumerica(
+      textoActaBusqueda,
+      'FECHA\\s+DE\\s+INICIO\\s+(?:DEL|DE\\s+EL)\\s+CONTRATO'
+    );
+    const fechaFinal = fechaNumerica(
+      textoActaBusqueda,
+      'FECHA\\s+(?:DE\\s+)?(?:TERMINACI[ÓO]N|FINALIZACI[ÓO]N)\\s+(?:DEL|DE\\s+EL)\\s+CONTRATO'
+    );
+    const fechaCierre = fechaNumerica(
+      textoActaBusqueda,
+      'FECHA\\s+(?:DEL|DE\\s+EL)\\s+ACTA'
+    );
     const responsableEntrega = 'Efraín Alberto Sanmiguel Acevedo';
     const cargoEntrega = 'Jefe División Financiera';
     const fechas = documentos.map((pdf) => this.fechaDesdeNombre(pdf.archivo['nombre'])).filter(Boolean) as string[];
@@ -803,8 +819,9 @@ export class PdfAnalyzerComponent {
     ].includes(documento)) return 'Acta';
     if (documento === 'informe_de_actividades') {
       const consecutivo = Number(nombre.match(/(?:actividades)[^\d]*(\d+)(?=\D*\.pdf$)/i)?.[1] || 0);
-      return consecutivo > 0 && consecutivo <= 2 ? 'Anexo' : 'Informe';
+      return consecutivo > 0 && consecutivo <= 2 ? 'Anexo' : 'Anexo';
     }
+    if(documento === 'carta_autorizacion_de_pago') return 'Anexo';
     const valor = nombre.toLowerCase();
     if (valor.includes('acta')) return 'Acta';
     if (valor.includes('contrato')) return 'Contrato';
@@ -849,7 +866,8 @@ export class PdfAnalyzerComponent {
 
   private esActaFinalizacion(nombreArchivo: string): boolean {
     const nombreNormalizado = this.normalizarNombreArchivo(nombreArchivo);
-    return /(?:^|_)acta_(?:de_)?finalizacion(?:_|$)/.test(nombreNormalizado);
+    return /(?:^|_)acta_(?:de_)?(?:finalizacion|terminacion)(?:_|$)/.test(nombreNormalizado) ||
+      /(?:^|_)recibo_(?:a_)?satisfaccion(?:_|$)/.test(nombreNormalizado);
   }
 
   private esCuentaCobro(nombreArchivo: string): boolean {
