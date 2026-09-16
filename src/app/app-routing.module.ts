@@ -14,7 +14,7 @@ import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.comp
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: PdfAnalyzerComponent},
+    {path: "", component: PruebaComponent},
     {path: "pdf", component: PdfAnalyzerComponent},
     {path: "contabilidad", component: PruebaComponent},
     {path: "tabla", component: BasegeneralComponent},

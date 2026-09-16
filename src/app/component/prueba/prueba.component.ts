@@ -29483,6 +29483,246 @@ export class PruebaComponent implements OnInit {
     return Number.isFinite(numero) ? numero : 0;
   }
 
+  async cargarBalanceComparativo(): Promise<void> {
+    const hoy = new Date();
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const opcionesMes = (seleccionado: number) => meses.map((mes, indice) =>
+      `<option value="${indice + 1}" ${indice + 1 === seleccionado ? 'selected' : ''}>${mes}</option>`
+    ).join('');
+    const seleccion = await Swal.fire({
+      title: 'Balance comparativo',
+      width: 760,
+      html: `
+        <div style="padding:14px 16px;margin-bottom:18px;border-radius:12px;background:#edf7f2;color:#315b49;text-align:left">
+          <strong style="display:block;margin-bottom:7px">¿Cómo generar el reporte?</strong>
+          <ol style="margin:0;padding-left:20px;line-height:1.55">
+            <li>Selecciona el mes y año del balance actualmente cargado en el sistema.</li>
+            <li>Selecciona el mes y el año histórico que deseas tomar del archivo.</li>
+            <li>Adjunta el Excel comparativo que contiene las columnas 2024 y 2025.</li>
+            <li>Presiona <b>Guardar y seguir</b> para descargar el resultado.</li>
+          </ol>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left">
+          <label>Mes periodo actual<select id="mes-actual" class="swal2-input" style="margin:6px 0;width:100%">${opcionesMes(hoy.getMonth() + 1)}</select></label>
+          <label>Año periodo actual<input id="anio-actual" class="swal2-input" type="number" min="2000" max="2100" value="${hoy.getFullYear()}" style="margin:6px 0;width:100%"></label>
+          <label>Mes histórico<select id="mes-base" class="swal2-input" style="margin:6px 0;width:100%">${opcionesMes(6)}</select></label>
+          <label>Año histórico<select id="anio-base" class="swal2-input" style="margin:6px 0;width:100%"><option value="2025">2025</option><option value="2024">2024</option></select></label>
+        </div>
+        <label style="display:block;margin-top:18px;text-align:left;font-weight:600;color:#425b50">Archivo de balance comparativo</label>
+        <label for="archivo-balance-comparativo" style="display:flex;align-items:center;gap:10px;margin-top:7px;padding:15px;border:1px dashed #6fa78d;border-radius:10px;background:#f8fbf9;cursor:pointer;text-align:left">
+          <span style="font-size:23px">📄</span><span id="nombre-archivo-comparativo">Seleccionar archivo .xls o .xlsx</span>
+        </label>
+        <input id="archivo-balance-comparativo" type="file" accept=".xls,.xlsx" style="display:none">`,
+      showCancelButton: true,
+      confirmButtonText: 'Guardar y seguir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#176b4d',
+      focusConfirm: false,
+      didOpen: () => {
+        const selector = document.getElementById('archivo-balance-comparativo') as HTMLInputElement;
+        selector?.addEventListener('change', () => {
+          const nombre = document.getElementById('nombre-archivo-comparativo');
+          if (nombre) nombre.textContent = selector.files?.[0]?.name || 'Seleccionar archivo .xls o .xlsx';
+        });
+      },
+      preConfirm: () => {
+        const mesActual = Number((document.getElementById('mes-actual') as HTMLSelectElement)?.value);
+        const anioActual = Number((document.getElementById('anio-actual') as HTMLInputElement)?.value);
+        const mesBase = Number((document.getElementById('mes-base') as HTMLSelectElement)?.value);
+        const anioBase = Number((document.getElementById('anio-base') as HTMLSelectElement)?.value);
+        const archivo = (document.getElementById('archivo-balance-comparativo') as HTMLInputElement)?.files?.[0];
+        if (!mesActual || !mesBase || anioActual < 2000) {
+          Swal.showValidationMessage('Selecciona meses y años válidos.');
+          return false;
+        }
+        if (!archivo) {
+          Swal.showValidationMessage('Debes seleccionar el archivo Excel comparativo.');
+          return false;
+        }
+        if (!/\.(xlsx?|XLSX?)$/.test(archivo.name)) {
+          Swal.showValidationMessage('El archivo debe tener formato .xls o .xlsx.');
+          return false;
+        }
+        return { mesActual, anioActual, mesBase, anioBase, archivo };
+      },
+    });
+    if (!seleccion.isConfirmed || !seleccion.value) return;
+    const valor = seleccion.value as any;
+    const archivo = valor.archivo as File;
+    try {
+      const libroBase = XLSX.read(await archivo.arrayBuffer(), { type: 'array', cellDates: false });
+      const estructura = this.detectarEstructuraBalanceComparativo(libroBase);
+      if (!estructura) throw new Error('No se encontraron las columnas de años del balance (por ejemplo, 2025 y 2024).');
+      if (!estructura.anios.some((item: any) => item.anio === valor.anioBase)) {
+        throw new Error(`El archivo no contiene una columna para el año ${valor.anioBase}. Años encontrados: ${estructura.anios.map((x: any) => x.anio).join(', ')}.`);
+      }
+      const datosBase = this.leerBalanceComparativo(libroBase, estructura, valor.anioBase);
+      if (!datosBase.length) throw new Error(`No se encontraron valores para el año ${valor.anioBase}.`);
+
+      // Se reutiliza exactamente el cálculo existente; no se modifica ninguna
+      // de sus sumatorias ni reglas contables.
+      this.generarReporteGeneral();
+      const datosActuales = this.clonarDatos(this.datosTabla);
+      this.exportarBalanceComparativo(
+        datosActuales,
+        datosBase,
+        `${meses[valor.mesActual - 1]} ${valor.anioActual}`,
+        `${meses[valor.mesBase - 1]} ${valor.anioBase}`
+      );
+    } catch (error: any) {
+      Swal.fire('No fue posible generar el comparativo', error?.message || 'Revisa el archivo seleccionado.', 'error');
+    }
+  }
+
+  private detectarEstructuraBalanceComparativo(libro: XLSX.WorkBook): any | null {
+    const normalizar = (valor: any): string => String(valor ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    for (const nombreHoja of libro.SheetNames) {
+      const filas: any[][] = XLSX.utils.sheet_to_json(libro.Sheets[nombreHoja], {
+        header: 1, raw: true, defval: '',
+      });
+      for (let indiceFila = 0; indiceFila < Math.min(filas.length, 35); indiceFila++) {
+        const anios = filas[indiceFila].map((valor, columna) => ({ anio: Number(valor), columna }))
+          .filter((item) => Number.isInteger(item.anio) && item.anio >= 2000 && item.anio <= 2100);
+        if (anios.length < 2) continue;
+        const textosSuperiores = filas.slice(0, indiceFila + 1).flat().map(normalizar).join(' ');
+        const nombresMes = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const indiceMes = nombresMes.findIndex((mes) => textosSuperiores.includes(mes));
+        const primeraColumnaAnio = Math.min(...anios.map((x) => x.columna));
+        let columnaNombre = Math.max(0, primeraColumnaAnio - 1);
+        let mejorPuntaje = -1;
+        for (let columna = 0; columna < primeraColumnaAnio; columna++) {
+          const puntaje = filas.slice(indiceFila + 1, Math.min(filas.length, indiceFila + 65))
+            .filter((fila) => typeof fila[columna] === 'string' && /[a-záéíóúñ]/i.test(fila[columna]) && String(fila[columna]).trim().length > 3).length;
+          if (puntaje > mejorPuntaje) {
+            mejorPuntaje = puntaje;
+            columnaNombre = columna;
+          }
+        }
+        return { nombreHoja, filaEncabezado: indiceFila, anios, columnaNombre, mes: indiceMes >= 0 ? indiceMes + 1 : null };
+      }
+    }
+    return null;
+  }
+
+  private leerBalanceComparativo(libro: XLSX.WorkBook, estructura: any, anio: number): any[] {
+    const filas: any[][] = XLSX.utils.sheet_to_json(libro.Sheets[estructura.nombreHoja], {
+      header: 1, raw: true, defval: '',
+    });
+    const columnaValor = estructura.anios.find((item: any) => item.anio === anio)?.columna;
+    if (columnaValor == null) return [];
+    const candidatas = filas.slice(estructura.filaEncabezado + 1).map((fila, indice) => {
+      const nombre = String(fila[estructura.columnaNombre] ?? '').replace(/\s+/g, ' ').trim();
+      const valorCrudo = fila[columnaValor];
+      const tieneValor = typeof valorCrudo === 'number' || /\d/.test(String(valorCrudo ?? ''));
+      const codigo = String(fila[1] ?? fila[0] ?? '').replace(/\s+/g, ' ').trim();
+      return { codigo, nombre, nuevoSaldo: tieneValor ? this.valorComparativo(valorCrudo) : null, orden: indice, tieneValor };
+    });
+    const normalizarNombre = (valor: any): string => String(valor ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const indiceCierre = candidatas.findIndex((fila) => normalizarNombre(fila.nombre).includes('totalcuentasdeorden'));
+    const ultimoConValor = candidatas.reduce((ultimo, fila, indice) => fila.tieneValor ? indice : ultimo, -1);
+    const ultimoIndice = indiceCierre >= 0 ? indiceCierre : ultimoConValor;
+    return candidatas.slice(0, ultimoIndice + 1).filter((fila) => fila.nombre);
+  }
+
+  private valorComparativo(valor: any): number {
+    if (typeof valor === 'number') return Number.isFinite(valor) ? valor : 0;
+    let texto = String(valor ?? '').replace(/\s/g, '').replace(/[$()]/g, '');
+    const negativo = String(valor ?? '').includes('(') && String(valor ?? '').includes(')');
+    if (texto.includes(',') && texto.includes('.')) {
+      texto = texto.lastIndexOf(',') > texto.lastIndexOf('.')
+        ? texto.replace(/\./g, '').replace(',', '.')
+        : texto.replace(/,/g, '');
+    } else if ((texto.match(/\./g) || []).length > 1) {
+      texto = texto.replace(/\./g, '');
+    } else if (texto.includes(',') && !texto.includes('.')) {
+      const decimales = texto.split(',').at(-1)?.length;
+      texto = decimales === 2 ? texto.replace(/\./g, '').replace(',', '.') : texto.replace(/,/g, '');
+    }
+    const numero = Number(texto);
+    return Number.isFinite(numero) ? (negativo ? -Math.abs(numero) : numero) : 0;
+  }
+
+  private exportarBalanceComparativo(actuales: any[], base: any[], periodoActual: string, periodoBase: string): void {
+    const claveNombre = (valor: any): string => String(valor ?? '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      .replace(/\btotal\b/g, '').replace(/[^a-z0-9]/g, '');
+    const actualesPorNombre = new Map<string, any>();
+    actuales.forEach((fila: any) => {
+      const clave = claveNombre(fila.nombre || fila.cuenta || fila.descripcion);
+      if (clave && !actualesPorNombre.has(clave)) actualesPorNombre.set(clave, fila);
+    });
+    const actualesPorCodigo = new Map(actuales.map((fila: any) => [String(fila.codigo ?? '').trim(), fila]));
+    const filas: any[][] = base.map((anterior: any) => {
+      const actual = actualesPorNombre.get(claveNombre(anterior.nombre)) || actualesPorCodigo.get(String(anterior.codigo ?? '').trim()) || {};
+      const esEncabezado = anterior.nuevoSaldo == null;
+      const valorActual = esEncabezado ? '' : this.valorComparativo(actual.nuevoSaldo ?? actual.saldoActual ?? 0);
+      const valorBase = esEncabezado ? '' : this.valorComparativo(anterior.nuevoSaldo);
+      const variacion = esEncabezado ? '' : (valorActual as number) - (valorBase as number);
+      return [anterior.nombre || actual.nombre || '', anterior.codigo || actual.codigo || '', valorActual, valorBase, variacion];
+    });
+    const partesActual = periodoActual.trim().split(/\s+/);
+    const partesBase = periodoBase.trim().split(/\s+/);
+    const mesesNumero: Record<string, number> = { enero: 1, febrero: 2, marzo: 3, abril: 4, mayo: 5, junio: 6, julio: 7, agosto: 8, septiembre: 9, octubre: 10, noviembre: 11, diciembre: 12 };
+    const mesActual = mesesNumero[String(partesActual[0] || '').toLowerCase()] || 12;
+    const anioActual = Number(partesActual[1]) || new Date().getFullYear();
+    const ultimoDia = new Date(anioActual, mesActual, 0).getDate();
+    const tituloPeriodo = partesActual[0]?.toLowerCase() === partesBase[0]?.toLowerCase()
+      ? `AL ${ultimoDia} DE ${partesActual[0].toUpperCase()} DE ${partesActual[1]} Y ${partesBase[1]}`
+      : `A ${periodoActual.toUpperCase()} Y ${periodoBase.toUpperCase()}`;
+    const contenido: any[][] = [
+      ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
+      ['ESTADO DE SITUACIÓN FINANCIERA'],
+      [tituloPeriodo],
+      ['Cifras en pesos colombianos sin decimales'],
+      [],
+      ['', 'NOTAS', partesActual[1] || periodoActual, partesBase[1] || periodoBase, 'VARIACIÓN'],
+      ...filas,
+    ];
+    const hoja: any = XLSXStyle.utils.aoa_to_sheet(contenido);
+    hoja['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } },
+      { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } },
+    ];
+    hoja['!cols'] = [{ wch: 62 }, { wch: 14 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+    hoja['!rows'] = [{ hpt: 31 }, { hpt: 25 }, { hpt: 24 }, { hpt: 21 }, { hpt: 24 }, { hpt: 25 }];
+    hoja['!freeze'] = { xSplit: 0, ySplit: 6, topLeftCell: 'A7' };
+    ['A1', 'A2', 'A3', 'A4'].forEach((ref, indice) => hoja[ref].s = {
+      font: { bold: true, color: { rgb: '000000' }, sz: indice === 0 ? 17 : indice === 3 ? 11 : 14 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+    });
+    for (let fila = 5; fila <= 5; fila++) {
+      for (let columna = 0; columna < 5; columna++) {
+        const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: columna })];
+        if (celda) celda.s = { font: { bold: true, sz: 12 }, alignment: { horizontal: columna < 2 ? 'center' : 'right', vertical: 'center' } };
+      }
+    }
+    for (let fila = 6; fila < contenido.length; fila++) {
+      const nombreFila = String(contenido[fila]?.[0] || '');
+      const esTotal = /^total\b/i.test(nombreFila.trim());
+      const esEncabezado = contenido[fila]?.slice(2).every((valor: any) => valor === '' || valor == null);
+      for (let columna = 0; columna < 5; columna++) {
+        const celda = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: columna })];
+        if (!celda) continue;
+        celda.s = {
+          font: { bold: esTotal || esEncabezado, sz: 11 },
+          alignment: { horizontal: columna >= 2 ? 'right' : 'left', vertical: 'center' },
+          border: esTotal ? { bottom: { style: 'thin', color: { rgb: '000000' } } } : undefined,
+        };
+        if (columna >= 2) celda.z = '#,##0;[Red]-#,##0;-';
+      }
+    }
+    const libro = XLSXStyle.utils.book_new();
+    XLSXStyle.utils.book_append_sheet(libro, hoja, 'Balance comparativo');
+    const sello = `${periodoActual.replace(/\s+/g, '_')}_vs_${periodoBase.replace(/\s+/g, '_')}`;
+    const nombreArchivo = `UIS_Balance_Comprobacion_Comparativo_${sello}.xlsx`;
+    XLSXStyle.writeFile(libro, nombreArchivo, { bookType: 'xlsx', cellStyles: true, compression: true });
+    Swal.fire('Comparativo generado', `${nombreArchivo} se descargó correctamente.`, 'success');
+  }
+
   claseVisualCuenta(fila: any): string {
     const tieneCorriente = this.valorNumerico(fila?.tipoDeCuenta) !== 0;
     const tieneNoCorriente = this.valorNumerico(fila?.compartidoTipo) !== 0;
