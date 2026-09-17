@@ -36,7 +36,23 @@
     </div>
 
     <section class="card data-card" *ngIf="mostrarTabla">
-      <div class="data-header"><div><span class="section-kicker">Mesa de trabajo</span><h3>Cuentas procesadas</h3><p>{{ datosTabla.length }} registros disponibles para revisión</p></div><div class="data-actions"><button class="secondary-action" type="button" *ngIf="['', 'original', 'chip', 'balance', 'situacion'].includes(reporteActivo) && seleccionadosNewTable.length > 0" (click)="openDialogAjusteReporte()"><mat-icon>tune</mat-icon>Ajustar corriente / no corriente</button><button class="export-action" type="button" (click)="exportexcel()"><mat-icon>download</mat-icon>Exportar Excel</button></div></div>
+      <div class="data-header"><div><span class="section-kicker">Mesa de trabajo</span><h3>Cuentas procesadas</h3><p>{{ datosTabla.length }} registros disponibles para revisión</p></div><div class="data-actions"><button class="secondary-action column-visibility-trigger" type="button" [class.is-active]="mostrarSelectorColumnas" (click)="mostrarSelectorColumnas = !mostrarSelectorColumnas"><mat-icon>view_column</mat-icon>Columnas<mat-icon>{{ mostrarSelectorColumnas ? 'expand_less' : 'expand_more' }}</mat-icon></button><button class="secondary-action" type="button" *ngIf="['', 'original', 'chip', 'balance', 'situacion'].includes(reporteActivo) && seleccionadosNewTable.length > 0" (click)="openDialogAjusteReporte()"><mat-icon>tune</mat-icon>Ajustar corriente / no corriente</button><button class="export-action" type="button" (click)="exportexcel()"><mat-icon>download</mat-icon>Exportar Excel</button></div></div>
+      <div class="column-visibility-panel" *ngIf="mostrarSelectorColumnas">
+        <div class="column-menu-content">
+          <div class="column-menu-heading"><div><strong>Columnas visibles</strong><small>El código permanece siempre visible</small></div><button type="button" aria-label="Cerrar selector de columnas" (click)="mostrarSelectorColumnas = false"><mat-icon>close</mat-icon></button></div>
+          <div class="column-menu-presets">
+            <button type="button" (click)="mostrarColumnasClasificacion()">Código y clasificación</button>
+            <button type="button" (click)="mostrarTodasLasColumnas()">Mostrar todas</button>
+          </div>
+          <div class="column-options-grid">
+            <label class="column-option" *ngFor="let opcion of opcionesColumnasTabla" [class.is-selected]="columnaVisible(opcion.id)" [class.is-disabled]="opcion.id === 'codigo' || !columnaDisponible(opcion.id)">
+              <input type="checkbox" [checked]="columnaVisible(opcion.id)" [disabled]="opcion.id === 'codigo' || !columnaDisponible(opcion.id)" (change)="establecerVisibilidadColumna(opcion.id, $any($event.target).checked)" />
+              <mat-icon>{{ columnaVisible(opcion.id) ? 'check' : 'add' }}</mat-icon>
+              <span>{{ opcion.etiqueta }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
       <div class="toolbar-row">
         <mat-form-field appearance="outline" class="search-field"><mat-label>Buscar por código o cuenta</mat-label><mat-icon matPrefix>search</mat-icon><input matInput (keyup)="applyFilter($event)" placeholder="Ej. 1.1.05 o Caja" /></mat-form-field>
         <div class="legend"><button type="button" (click)="miFuncion('todos')"><mat-icon>view_list</mat-icon>Todos</button><button type="button" (click)="miFuncion('c')"><i class="current"></i>Corriente</button><button type="button" (click)="miFuncion('n')"><i class="non-current"></i>No corriente</button><button type="button" (click)="miFuncion('com')"><i class="shared"></i>Ambas</button><button type="button" (click)="miFuncion('d')"><i class="default"></i>Sin clasificar</button></div>

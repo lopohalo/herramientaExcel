@@ -38,6 +38,20 @@ export class PruebaComponent implements OnInit {
   displayedColumns: string[] = this.columnasTablaBase.filter(
     (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
   );
+  columnasReporteDisponibles: string[] = [...this.displayedColumns];
+  readonly opcionesColumnasTabla = [
+    { id: 'codigo', etiqueta: 'Código' },
+    { id: 'nombre', etiqueta: 'Cuenta' },
+    { id: 'saldoAnterior', etiqueta: 'Saldo anterior' },
+    { id: 'debito', etiqueta: 'Débito' },
+    { id: 'credito', etiqueta: 'Crédito' },
+    { id: 'nuevoSaldo', etiqueta: 'Nuevo saldo' },
+    { id: 'tipoSaldoAnterior', etiqueta: 'Tipo anterior' },
+    { id: 'tipoSaldoNuevo', etiqueta: 'Tipo actual' },
+    { id: 'tipoDeCuenta', etiqueta: 'Corriente' },
+    { id: 'compartidoTipo', etiqueta: 'No corriente' },
+  ];
+  mostrarSelectorColumnas = false;
   reporteActivo: 'balance' | 'chip' | 'resultados' | 'situacion' | 'original' | '' = '';
   tablaInicialGuardada: any[] = [];
   reporteChipGuardado: any[] = [];
@@ -26183,6 +26197,11 @@ export class PruebaComponent implements OnInit {
   }
   fileUpload(event: any) {
     this.reporteActivo = '';
+    this.mostrarSelectorColumnas = false;
+    this.columnasReporteDisponibles = this.columnasTablaBase.filter(
+      (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
+    );
+    this.displayedColumns = [...this.columnasReporteDisponibles];
     this.tablaInicialGuardada = [];
     this.reporteChipGuardado = [];
     this.datosReporteActual = [];
@@ -26195,6 +26214,9 @@ export class PruebaComponent implements OnInit {
     this.reporteEnRecalculo = '';
     if (!this.displayedColumns.includes('tipo')) {
       this.displayedColumns = ['tipo', ...this.displayedColumns];
+    }
+    if (!this.columnasReporteDisponibles.includes('tipo')) {
+      this.columnasReporteDisponibles = ['tipo', ...this.columnasReporteDisponibles];
     }
     this.currentPage = 1;
     this.pageSize = 100;
@@ -29565,16 +29587,18 @@ export class PruebaComponent implements OnInit {
       }
       const datosResultados = this.leerBalanceComparativo(libroBase, estructuraResultados, valor.anioBase, 'resultados');
 
-      // Se reutiliza exactamente el cálculo existente; no se modifica ninguna
-      // de sus sumatorias ni reglas contables.
-      this.generarReporteGeneral();
-      const datosActuales = this.clonarDatos(this.datosTabla);
+      // El comparativo conserva la estructura oficial de los estados
+      // financieros y solamente asigna los valores de cada periodo.
+      this.asegurarTablaInicial();
+      const datosActuales = this.construirEstadoSituacionFinanciera();
+      const resultadosActuales = this.construirEstadoResultadosFinancieros();
       this.exportarBalanceComparativo(
         datosActuales,
         datosBase,
         `${meses[valor.mesActual - 1]} ${valor.anioActual}`,
         `${meses[valor.mesBase - 1]} ${valor.anioBase}`,
-        datosResultados
+        datosResultados,
+        resultadosActuales
       );
     } catch (error: any) {
       Swal.fire('No fue posible generar el comparativo', error?.message || 'Revisa el archivo seleccionado.', 'error');
@@ -29658,23 +29682,28 @@ export class PruebaComponent implements OnInit {
     return Number.isFinite(numero) ? (negativo ? -Math.abs(numero) : numero) : 0;
   }
 
-  private exportarBalanceComparativo(actuales: any[], base: any[], periodoActual: string, periodoBase: string, baseResultados: any[] = []): void {
+  private exportarBalanceComparativo(actuales: any[], base: any[], periodoActual: string, periodoBase: string, baseResultados: any[] = [], actualesResultados: any[] = []): void {
     const claveNombre = (valor: any): string => String(valor ?? '')
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
       .replace(/\btotal\b/g, '').replace(/[^a-z0-9]/g, '');
-    const actualesPorNombre = new Map<string, any>();
-    actuales.forEach((fila: any) => {
+    const basePorNombre = new Map<string, any[]>();
+    base.forEach((fila: any) => {
+      if (fila.nuevoSaldo == null) return;
       const clave = claveNombre(fila.nombre || fila.cuenta || fila.descripcion);
-      if (clave && !actualesPorNombre.has(clave)) actualesPorNombre.set(clave, fila);
+      if (!clave) return;
+      const coincidencias = basePorNombre.get(clave) || [];
+      coincidencias.push(fila);
+      basePorNombre.set(clave, coincidencias);
     });
-    const actualesPorCodigo = new Map(actuales.map((fila: any) => [String(fila.codigo ?? '').trim(), fila]));
-    const filas: any[][] = base.map((anterior: any) => {
-      const actual = actualesPorNombre.get(claveNombre(anterior.nombre)) || actualesPorCodigo.get(String(anterior.codigo ?? '').trim()) || {};
-      const esEncabezado = anterior.nuevoSaldo == null;
-      const valorActual = esEncabezado ? '' : this.valorComparativo(actual.nuevoSaldo ?? actual.saldoActual ?? 0);
-      const valorBase = esEncabezado ? '' : this.valorComparativo(anterior.nuevoSaldo);
-      const variacion = esEncabezado ? '' : (valorActual as number) - (valorBase as number);
-      return [anterior.nombre || actual.nombre || '', anterior.codigo || actual.codigo || '', valorActual, valorBase, variacion];
+    const ocurrencias = new Map<string, number>();
+    const filas: any[][] = actuales.map((actual: any) => {
+      const clave = claveNombre(actual.nombre || actual.cuenta || actual.descripcion);
+      const indice = ocurrencias.get(clave) || 0;
+      const anterior = (basePorNombre.get(clave) || [])[indice] || {};
+      ocurrencias.set(clave, indice + 1);
+      const valorActual = this.valorComparativo(actual.nuevoSaldo ?? actual.saldoActual ?? 0);
+      const valorBase = this.valorComparativo(anterior.nuevoSaldo ?? 0);
+      return [actual.nombre || anterior.nombre || '', anterior.codigo || actual.codigo || '', valorActual, valorBase, valorActual - valorBase];
     });
     const partesActual = periodoActual.trim().split(/\s+/);
     const partesBase = periodoBase.trim().split(/\s+/);
@@ -29732,7 +29761,7 @@ export class PruebaComponent implements OnInit {
     const libro = XLSXStyle.utils.book_new();
     XLSXStyle.utils.book_append_sheet(libro, hoja, 'Estado situación');
     if (baseResultados.length) {
-      const hojaResultados = this.crearHojaResultadosComparativa(actuales, baseResultados, periodoActual, periodoBase);
+      const hojaResultados = this.crearHojaResultadosComparativa(actualesResultados, baseResultados, periodoActual, periodoBase);
       XLSXStyle.utils.book_append_sheet(libro, hojaResultados, 'Estado resultados');
     }
     const sello = `${periodoActual.replace(/\s+/g, '_')}_vs_${periodoBase.replace(/\s+/g, '_')}`;
@@ -29744,17 +29773,24 @@ export class PruebaComponent implements OnInit {
   private crearHojaResultadosComparativa(actuales: any[], base: any[], periodoActual: string, periodoBase: string): any {
     const clave = (valor: any): string => String(valor ?? '').normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\btotal\b/g, '').replace(/[^a-z0-9]/g, '');
-    const porNombre = new Map<string, any>();
-    actuales.forEach((fila: any) => {
-      const llave = clave(fila.nombre || fila.cuenta || fila.descripcion);
-      if (llave && !porNombre.has(llave)) porNombre.set(llave, fila);
+    const basePorNombre = new Map<string, any[]>();
+    base.forEach((fila: any) => {
+      if (fila.nuevoSaldo == null) return;
+      const llave = clave(fila.nombre);
+      if (!llave) return;
+      const coincidencias = basePorNombre.get(llave) || [];
+      coincidencias.push(fila);
+      basePorNombre.set(llave, coincidencias);
     });
-    const filas = base.map((historico: any) => {
-      const actual = porNombre.get(clave(historico.nombre)) || {};
-      const encabezado = historico.nuevoSaldo == null;
-      const valorActual = encabezado ? '' : this.valorComparativo(actual.nuevoSaldo ?? actual.saldoActual ?? 0);
-      const valorBase = encabezado ? '' : this.valorComparativo(historico.nuevoSaldo);
-      return [historico.nombre, historico.codigo || '', valorActual, valorBase, encabezado ? '' : (valorActual as number) - (valorBase as number)];
+    const ocurrencias = new Map<string, number>();
+    const filas = actuales.map((actual: any) => {
+      const llave = clave(actual.nombre || actual.cuenta || actual.descripcion);
+      const indice = ocurrencias.get(llave) || 0;
+      const historico = (basePorNombre.get(llave) || [])[indice] || {};
+      ocurrencias.set(llave, indice + 1);
+      const valorActual = this.valorComparativo(actual.valor ?? actual.nuevoSaldo ?? actual.saldoActual ?? 0);
+      const valorBase = this.valorComparativo(historico.nuevoSaldo ?? 0);
+      return [actual.nombre || historico.nombre || '', historico.codigo || actual.codigo || '', valorActual, valorBase, valorActual - valorBase];
     });
     const partesActual = periodoActual.trim().split(/\s+/);
     const partesBase = periodoBase.trim().split(/\s+/);
@@ -30189,6 +30225,7 @@ export class PruebaComponent implements OnInit {
 
   prepararVistaReporte(tipo: 'balance' | 'chip' | 'resultados' | 'situacion' | 'original'): void {
     this.reporteActivo = tipo;
+    this.mostrarSelectorColumnas = false;
     this.currentPage = 1;
     this.pageSize = 100;
     this.selectAll = false;
@@ -30204,9 +30241,42 @@ export class PruebaComponent implements OnInit {
       )
       : [...this.columnasTablaBase];
     const columnasSinSeleccion = columnasReporte.filter((columna: string) => columna !== 'tipo');
-    this.displayedColumns = ['original', 'chip', 'balance', 'situacion'].includes(tipo)
+    this.columnasReporteDisponibles = ['original', 'chip', 'balance', 'situacion'].includes(tipo)
       ? ['tipo', ...columnasSinSeleccion]
       : columnasSinSeleccion;
+    this.displayedColumns = [...this.columnasReporteDisponibles];
+  }
+
+  columnaDisponible(id: string): boolean {
+    return this.columnasReporteDisponibles.includes(id);
+  }
+
+  columnaVisible(id: string): boolean {
+    return this.displayedColumns.includes(id);
+  }
+
+  establecerVisibilidadColumna(id: string, visible: boolean): void {
+    if (id === 'codigo' || !this.columnaDisponible(id)) return;
+    const columnasVisibles = new Set(this.displayedColumns);
+    if (visible) {
+      columnasVisibles.add(id);
+    } else {
+      columnasVisibles.delete(id);
+    }
+    this.displayedColumns = this.columnasReporteDisponibles.filter(
+      (columna: string) => columnasVisibles.has(columna)
+    );
+  }
+
+  mostrarTodasLasColumnas(): void {
+    this.displayedColumns = [...this.columnasReporteDisponibles];
+  }
+
+  mostrarColumnasClasificacion(): void {
+    const columnasPreferidas = ['tipo', 'codigo', 'tipoDeCuenta', 'compartidoTipo'];
+    this.displayedColumns = this.columnasReporteDisponibles.filter(
+      (columna: string) => columnasPreferidas.includes(columna)
+    );
   }
   secuenciaDecodigosNuevos() {}
   applyFilter(event: any) {
