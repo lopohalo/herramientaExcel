@@ -5,6 +5,10 @@
 
   "main": "./worker.js",
 
+  "build": {
+    "command": "npm run build"
+  },
+
   "assets": {
     "directory": "./dist/herramienta-excel",
     "binding": "ASSETS",
