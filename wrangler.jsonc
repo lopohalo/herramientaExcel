@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "herramientaexcel",
+  "compatibility_date": "2026-09-21",
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist/herramienta-excel",
+    "not_found_handling": "single-page-application"
+  }
+}
