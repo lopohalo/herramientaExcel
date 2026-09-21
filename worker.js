@@ -4,76 +4,68 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // ============================
-    // PROXY DNP
-    // ============================
     if (url.pathname.startsWith('/dnp-api/')) {
       try {
-        // Quita /dnp-api, igual que pathRewrite del proxy Angular
         const dnpPath = url.pathname.replace(/^\/dnp-api/, '');
 
         const targetUrl = new URL(
           `${DNP_ORIGIN}${dnpPath}${url.search}`
         );
 
+        console.log('DNP REQUEST:', request.method, targetUrl.toString());
+
         const headers = new Headers(request.headers);
 
-        // Equivalente a tu proxy.conf.json
         headers.set('Origin', DNP_ORIGIN);
         headers.set('Referer', `${DNP_ORIGIN}/`);
-
-        // No debemos reenviar el host de Cloudflare.
         headers.delete('host');
 
-        const init = {
+        const options = {
           method: request.method,
           headers,
           redirect: 'follow'
         };
 
-        // POST de ConsultarGrupoSisben tiene body null.
-        // ObtenerDatosRUI lleva FormData.
         if (
           request.method !== 'GET' &&
           request.method !== 'HEAD'
         ) {
-          init.body = request.body;
+          options.body = request.body;
         }
 
-        const response = await fetch(targetUrl, init);
+        console.log('Enviando petición al DNP...');
 
-        // Construimos una nueva respuesta para poder
-        // controlar los headers enviados al navegador.
-        const responseHeaders = new Headers(response.headers);
+        const response = await fetch(targetUrl, options);
 
-        responseHeaders.set(
-          'Access-Control-Allow-Origin',
-          url.origin
+        console.log(
+          'DNP RESPONSE:',
+          response.status,
+          response.statusText
         );
 
         return new Response(response.body, {
           status: response.status,
           statusText: response.statusText,
-          headers: responseHeaders
+          headers: response.headers
         });
 
       } catch (error) {
+        console.error('ERROR DNP:', error);
+
         return Response.json(
           {
             ok: false,
             error: 'Error consultando DNP',
-            detalle: String(error)
+            detalle:
+              error instanceof Error
+                ? error.message
+                : String(error)
           },
-          {
-            status: 502
-          }
+          { status: 502 }
         );
       }
     }
 
-    // ============================
-    // ANGULAR
-    // ============================
     return env.ASSETS.fetch(request);
   }
 };

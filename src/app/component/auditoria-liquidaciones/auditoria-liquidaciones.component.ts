@@ -156,8 +156,8 @@ export class AuditoriaLiquidacionesComponent {
       const [grupo, rui]: any[] = cache
         ? [cache.grupo, cache.rui]
         : await Promise.all([
-            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ConsultarGrupoSisben`, null, { params }).pipe(timeout(10000))),
-            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ObtenerDatosRUI`, formulario).pipe(timeout(10000))),
+            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ConsultarGrupoSisben`, null, { params }).pipe(timeout(30000))),
+            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ObtenerDatosRUI`, formulario).pipe(timeout(30000))),
           ]);
       if (!cache) this.cacheSisben.set(`${tipo}:${caso.documento}`, { grupo, rui });
       caso.sisbenConsultado = grupo?.grupo || 'NO REGISTRA';
