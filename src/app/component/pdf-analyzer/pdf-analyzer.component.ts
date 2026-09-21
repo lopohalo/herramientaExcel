@@ -316,8 +316,8 @@ export class PdfAnalyzerComponent {
     const hojaExpediente = XLSXStyle.utils.aoa_to_sheet([encabezadosExpediente, expediente]);
     const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], encabezadosDocumentos, ...filasDocumentales]);
     const hojaListas = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], ...listas]);
-    hojaDocumentos['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
-    hojaListas['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
+    hojaDocumentos['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: encabezadosDocumentos.length - 1 } }];
+    hojaListas['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
     this.estilizarHoja(hojaExpediente, encabezadosExpediente.length, 2, 24);
     this.estilizarHoja(hojaDocumentos, encabezadosDocumentos.length, filasDocumentales.length + 2, 25, 1, tituloContratista);
     this.estilizarHoja(hojaListas, 7, listas.length + 1, 24, 1, tituloContratista);
@@ -384,7 +384,7 @@ export class PdfAnalyzerComponent {
       const filaTituloDocumento = filasDocumentos.length;
       titulosDocumentales.push(filaTituloDocumento);
       filasDocumentos.push([titulo]);
-      mergesDocumentos.push({ s: { r: filaTituloDocumento, c: 0 }, e: { r: filaTituloDocumento, c: 5 } });
+      mergesDocumentos.push({ s: { r: filaTituloDocumento, c: 0 }, e: { r: filaTituloDocumento, c: encabezadosDocumentos.length - 1 } });
       encabezadosDocumentales.push(filasDocumentos.length);
       filasDocumentos.push(encabezadosDocumentos, ...detalle, []);
 
@@ -392,7 +392,7 @@ export class PdfAnalyzerComponent {
       const filaTituloLista = filasListas.length;
       titulosListas.push(filaTituloLista);
       filasListas.push([titulo]);
-      mergesListas.push({ s: { r: filaTituloLista, c: 0 }, e: { r: filaTituloLista, c: 5 } });
+      mergesListas.push({ s: { r: filaTituloLista, c: 0 }, e: { r: filaTituloLista, c: 6 } });
       encabezadosListas.push(filasListas.length);
       filasListas.push(['Frecuencia consulta', 'Soporte', 'Tipo expediente', 'Acceso', 'Tipología', 'Origen', 'Idioma'], ...lista, []);
     });
@@ -726,8 +726,10 @@ export class PdfAnalyzerComponent {
       [/evaluacion_cotizacion|fco_59/, 'Evaluación de Cotización'],
       [/orden_(?:de_)?prestacion_(?:de_)?servicios.*ajustada/, 'Orden de Prestación de Servicios Ajustada'],
       [/orden_(?:de_)?prestacion_(?:de_)?servicios/, 'Orden de Prestación de Servicios'],
+      [/correo_(?:de_)?autorizacion_(?:de_)?pago/, 'Correo Autorización Pago'],
       [/(?:correo_)?autorizacion_(?:de_)?contratos?|fth_146/, 'Solicitud de Autorización de Contratos con Personas Naturales'],
       [/propuesta_trabajo/, 'Propuesta Trabajo'],
+      [/correo_aceptacion_cotizacion/, 'Cotización'],
       [/(?:^|_)cotizacion(?:_|$)/, 'Cotización'],
       [/inexistencia_(?:de_)?personal/, 'Certificado Inexistencia Personal'],
       [/(solicitud_)?(?:certificado_)?disponibilidad_presupuestal|(?:^|_)cdp(?:_|$)/, 'Solicitud Certificado de Disponibilidad Presupuestal'],
@@ -739,11 +741,10 @@ export class PdfAnalyzerComponent {
       [/fondo_pensional/, 'Certificado Fondo Pensional'],
       [/certificacion_bancaria|certificado_bancario/, 'Certificación Bancaria'],
       [/examen_ocupacional/, 'Certificado Examen Ocupacional'],
-      [/correo_aceptacion_cotizacion/, 'Correo Aceptacion Cotizacion'],
-      [/afiliacion_arl/, 'Certificación de Afiliación ARL'],
+      [/afiliacion_arl/, 'Certificado de Afiliación ARL'],
       [/factura(?:_de)?_venta\d*|(?:^|_)factura\d*(?:_|$)/, 'Factura de venta'],
       [/camara_(?:de_)?comercio/, 'Cámara de Comercio'],
-      [/aportes_parafiscales/, 'Certificado de Aportes Parafiscales'],
+      [/(?:aportes_)?parafiscales/, 'Certificado Parafiscales'],
       [/anexo.*retencion.*fuente|retencion.*fuente.*anexo/, 'Formato para aplicación de Retencion en la fuente en Renta'],
       [/retencion_(?:en_la_)?fuente/, 'Formato para aplicación de Retencion en la fuente en Renta'],
       [/procuraduria/, 'Certificado de Procuraduria'],
@@ -756,7 +757,9 @@ export class PdfAnalyzerComponent {
       [/analisis.*valoracion.*(?:mitigacion|riesgo)|fco_58/, 'Formato para Análisis, Valoración y Mitigación del Riesgo'],
       [/orden_(?:de_)?compra/, 'Orden de Compra'],
       [/orden_(?:de_)?consultoria/, 'Orden de Consultoria'],
+      [/orden_(?:de_)?trabajo/, 'Orden de Trabajo'],
       [/designacion_(?:de_)?supervisor/, 'Carta de Designación de Supervisor'],
+      [/poliza.*actualizada/, 'Póliza de Garantía Actualizada'],
       [/poliza(?:.*garantia)?/, 'Póliza de Garantía'],
       [/acta_(?:de_)?inicio/, 'Acta de Inicio'],
       [/informe_(?:de_)?supervision.*unico_pago|unico_pago.*informe_(?:de_)?supervision/, 'Informe de Supervisión Único Pago'],
@@ -798,7 +801,8 @@ export class PdfAnalyzerComponent {
       'formato_para_aplicacion_de_retencion_en_la_fuente', 'certificado_de_procuraduria',
       'certificado_de_contraloria', 'certificado_de_policia_nacional',
       'certificado_de_medidas_correctivas', 'inhabilidades',
-      'certificado_de_aportes_parafiscales',
+      'certificado_de_aportes_parafiscales', 'certificado_parafiscales',
+      'cotizacion', 'correo_autorizacion_pago',
       'certificado_deudores_alimentarios_morosos', 'formulario_del_registro_unico_tributario',
       'formato_para_analisis_valoracion_y_mitigacion_del_riesgo', 'cuenta_de_cobro',
       'formato_para_aplicacion_de_retencion_en_la_fuente_en_renta',
@@ -807,9 +811,11 @@ export class PdfAnalyzerComponent {
     if (anexos.includes(documento)) return 'Anexo';
     if (documento === 'informe_de_oportunidad_y_conveniencia') return 'Informe';
     if (documento === 'orden_de_consultoria') return 'Contrato';
+    if (documento === 'orden_de_trabajo') return 'Contrato';
     if (documento === 'orden_de_prestacion_de_servicios') return 'Contrato';
     if (documento === 'carta_de_designacion_de_supervisor') return 'Comunicación';
     if (documento === 'poliza_de_garantia') return 'Póliza';
+    if (documento === 'poliza_de_garantia_actualizada') return 'Póliza';
     if (documento === 'orden_de_pago_automatica') return 'Soporte';
     if ([
       'acta_pago_parcial_e_informe_de_supervision',
