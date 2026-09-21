@@ -1,18 +1,15 @@
-const {
-  app,
-  BrowserWindow,
-  ipcMain
-} = require('electron');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+const fs = require("fs");
 
-const path = require('path');
-
-const DNP_ORIGIN =
-  'https://ventanillasocial.dnp.gov.co';
+const DNP_ORIGIN = "https://ventanillasocial.dnp.gov.co";
 
 let mainWindow;
 
 /**
- * Crea la ventana principal.
+ * ============================================================
+ * CREAR VENTANA
+ * ============================================================
  */
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -20,37 +17,158 @@ function createWindow() {
     height: 900,
     minWidth: 1000,
     minHeight: 700,
+    show: false,
 
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      sandbox: false
     }
   });
 
-  if (process.env.ELECTRON_DEV === 'true') {
-    console.log('Electron ejecutándose en DESARROLLO');
+  /**
+   * ==========================================================
+   * DESARROLLO
+   * ==========================================================
+   */
+  if (process.env.ELECTRON_DEV === "true") {
+    console.log("=================================");
+    console.log("Electron ejecutándose en DESARROLLO");
+    console.log("=================================");
 
-    mainWindow.loadURL(
-      'http://localhost:4200'
-    );
-  } else {
-    console.log('Electron ejecutándose en PRODUCCIÓN');
+    mainWindow.loadURL("http://localhost:4200")
+      .then(() => {
+        console.log("Angular DEV cargado correctamente");
+      })
+      .catch((error) => {
+        console.error("Error cargando Angular DEV:", error);
+      });
 
-    mainWindow.loadFile(
-      path.join(
-        __dirname,
-        '../dist/herramienta-excel/index.html'
-      )
+    mainWindow.webContents.openDevTools();
+
+    mainWindow.once("ready-to-show", () => {
+      mainWindow.show();
+    });
+
+    return;
+  }
+
+  /**
+   * ==========================================================
+   * PRODUCCIÓN
+   * ==========================================================
+   */
+
+  console.log("=================================");
+  console.log("Electron ejecutándose en PRODUCCIÓN");
+  console.log("app.isPackaged:", app.isPackaged);
+  console.log("__dirname:", __dirname);
+  console.log("process.resourcesPath:", process.resourcesPath);
+  console.log("=================================");
+
+  let indexPath;
+
+  /**
+   * Cuando ejecutamos:
+   *
+   * npx electron .
+   *
+   * Angular está en:
+   *
+   * proyecto/dist/herramienta-excel/index.html
+   */
+  if (!app.isPackaged) {
+    indexPath = path.join(
+      __dirname,
+      "..",
+      "dist",
+      "herramienta-excel",
+      "index.html"
     );
   }
 
-  // TEMPORAL para encontrar errores
-  mainWindow.webContents.openDevTools();
+  /**
+   * Cuando ejecutamos el .exe instalado,
+   * electron-builder mete la aplicación dentro de app.asar.
+   *
+   * __dirname ya apunta a:
+   *
+   * resources/app.asar/electron
+   *
+   * por lo tanto:
+   *
+   * ../dist/herramienta-excel/index.html
+   *
+   * sigue siendo la ruta correcta.
+   */
+  else {
+    indexPath = path.join(
+      __dirname,
+      "..",
+      "dist",
+      "herramienta-excel",
+      "index.html"
+    );
+  }
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  console.log("Buscando Angular en:");
+  console.log(indexPath);
+  console.log("¿Existe?:", fs.existsSync(indexPath));
+  console.log("=================================");
+
+  /**
+   * Capturar errores de carga.
+   */
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (
+      event,
+      errorCode,
+      errorDescription,
+      validatedURL
+    ) => {
+      console.error("=================================");
+      console.error("ERROR CARGANDO ANGULAR");
+      console.error("Código:", errorCode);
+      console.error("Descripción:", errorDescription);
+      console.error("URL:", validatedURL);
+      console.error("=================================");
+    }
+  );
+
+  mainWindow.webContents.on(
+    "did-finish-load",
+    () => {
+      console.log("Angular terminó de cargar");
+    }
+  );
+
+  mainWindow.loadFile(indexPath)
+    .then(() => {
+      console.log("loadFile OK");
+    })
+    .catch((error) => {
+      console.error("ERROR EN loadFile:", error);
+    });
+
+  /**
+   * Mostrar la ventana únicamente cuando
+   * Electron tenga algo listo para mostrar.
+   */
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
   });
+
+  /**
+   * IMPORTANTE:
+   *
+   * Dejamos DevTools solamente mientras
+   * comprobamos el instalador.
+   *
+   * Después puedes quitar esta línea.
+   */
+  mainWindow.webContents.openDevTools();
 }
 
 /**
@@ -59,65 +177,59 @@ function createWindow() {
  * ============================================================
  */
 ipcMain.handle(
-  'dnp:consultar-grupo-sisben',
-
+  "dnp:consultar-grupo-sisben",
   async (event, datos) => {
     try {
-      const {
-        pNumDoc,
-        pTipDoc
-      } = datos || {};
+      const { pNumDoc, pTipDoc } = datos || {};
 
       if (!pNumDoc || !pTipDoc) {
         throw new Error(
-          'Faltan pNumDoc o pTipDoc'
+          "Faltan pNumDoc o pTipDoc"
         );
       }
 
       const target = new URL(
-        '/Home/ConsultarGrupoSisben',
+        "/Home/ConsultarGrupoSisben",
         DNP_ORIGIN
       );
 
       target.searchParams.set(
-        'pNumDoc',
+        "pNumDoc",
         String(pNumDoc)
       );
 
       target.searchParams.set(
-        'pTipDoc',
+        "pTipDoc",
         String(pTipDoc)
       );
 
       console.log(
-        'Consultando grupo SISBÉN desde Electron...'
+        "Consultando grupo SISBÉN desde Electron..."
       );
 
       const response = await fetch(
         target.toString(),
         {
-          method: 'POST',
+          method: "POST",
 
           headers: {
             Origin: DNP_ORIGIN,
 
-            Referer:
-              `${DNP_ORIGIN}/`,
+            Referer: `${DNP_ORIGIN}/`,
 
             Accept:
-              'application/json, text/plain, */*',
+              "application/json, text/plain, */*",
 
-            'User-Agent':
-              'Mozilla/5.0'
+            "User-Agent":
+              "Mozilla/5.0"
           }
         }
       );
 
-      const body =
-        await response.text();
+      const body = await response.text();
 
       console.log(
-        'SISBÉN:',
+        "SISBÉN status:",
         response.status
       );
 
@@ -127,12 +239,6 @@ ipcMain.handle(
         );
       }
 
-      /**
-       * Intentamos devolver JSON.
-       *
-       * Si DNP devuelve texto, devolvemos
-       * directamente el texto.
-       */
       try {
         return JSON.parse(body);
       } catch {
@@ -140,14 +246,15 @@ ipcMain.handle(
       }
 
     } catch (error) {
+
       console.error(
-        'Error consultando SISBÉN:',
+        "Error consultando SISBÉN:",
         error
       );
 
       throw new Error(
         error?.message ||
-        'No fue posible consultar SISBÉN'
+        "No fue posible consultar SISBÉN"
       );
     }
   }
@@ -159,48 +266,38 @@ ipcMain.handle(
  * ============================================================
  */
 ipcMain.handle(
-  'dnp:obtener-datos-rui',
-
+  "dnp:obtener-datos-rui",
   async (event, datos) => {
     try {
-      const {
-        pNumDoc,
-        pTipDoc
-      } = datos || {};
+      const { pNumDoc, pTipDoc } =
+        datos || {};
 
       if (!pNumDoc || !pTipDoc) {
         throw new Error(
-          'Faltan pNumDoc o pTipDoc'
+          "Faltan pNumDoc o pTipDoc"
         );
       }
 
       console.log(
-        'Consultando RUI desde Electron...'
+        "Consultando RUI desde Electron..."
       );
 
-      /**
-       * Creamos FormData desde Node/Electron.
-       *
-       * Esto replica lo que actualmente
-       * hace Angular.
-       */
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
-        'pNumDoc',
+        "pNumDoc",
         String(pNumDoc)
       );
 
       formData.append(
-        'pTipDoc',
+        "pTipDoc",
         String(pTipDoc)
       );
 
       const response = await fetch(
         `${DNP_ORIGIN}/Home/ObtenerDatosRUI`,
         {
-          method: 'POST',
+          method: "POST",
 
           headers: {
             Origin: DNP_ORIGIN,
@@ -209,10 +306,10 @@ ipcMain.handle(
               `${DNP_ORIGIN}/`,
 
             Accept:
-              'application/json, text/plain, */*',
+              "application/json, text/plain, */*",
 
-            'User-Agent':
-              'Mozilla/5.0'
+            "User-Agent":
+              "Mozilla/5.0"
           },
 
           body: formData
@@ -223,7 +320,7 @@ ipcMain.handle(
         await response.text();
 
       console.log(
-        'RUI:',
+        "RUI status:",
         response.status
       );
 
@@ -240,14 +337,15 @@ ipcMain.handle(
       }
 
     } catch (error) {
+
       console.error(
-        'Error consultando RUI:',
+        "Error consultando RUI:",
         error
       );
 
       throw new Error(
         error?.message ||
-        'No fue posible consultar RUI'
+        "No fue posible consultar RUI"
       );
     }
   }
@@ -260,22 +358,33 @@ ipcMain.handle(
  */
 
 app.whenReady().then(() => {
+
   createWindow();
 
-  app.on('activate', () => {
-    if (
-      BrowserWindow.getAllWindows().length === 0
-    ) {
-      createWindow();
+  app.on(
+    "activate",
+    () => {
+
+      if (
+        BrowserWindow.getAllWindows().length === 0
+      ) {
+        createWindow();
+      }
+
     }
-  });
+  );
+
 });
 
 app.on(
-  'window-all-closed',
+  "window-all-closed",
   () => {
-    if (process.platform !== 'darwin') {
+
+    if (
+      process.platform !== "darwin"
+    ) {
       app.quit();
     }
+
   }
 );
