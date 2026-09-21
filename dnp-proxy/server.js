@@ -6,19 +6,31 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DNP_ORIGIN = 'https://ventanillasocial.dnp.gov.co';
 
-// Por ahora permitimos Cloudflare + localhost.
-// Luego podemos restringirlo todavía más.
-app.use(cors({
-  origin: true,
-  methods: ['POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-}));
+/**
+ * CORS
+ *
+ * Por ahora permitimos cualquier origen para realizar las pruebas.
+ * Cuando todo funcione, lo restringimos únicamente a tu dominio
+ * de Cloudflare.
+ */
+app.use(
+  cors({
+    origin: true,
+    methods: ['POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type']
+  })
+);
 
 /**
+ * ============================================================
  * CONSULTAR GRUPO SISBÉN
+ * ============================================================
  *
  * Angular envía:
- * POST /Home/ConsultarGrupoSisben?pNumDoc=...&pTipDoc=...
+ *
+ * POST /Home/ConsultarGrupoSisben
+ *      ?pNumDoc=...
+ *      &pTipDoc=...
  */
 app.post('/Home/ConsultarGrupoSisben', async (req, res) => {
   try {
@@ -38,79 +50,136 @@ app.post('/Home/ConsultarGrupoSisben', async (req, res) => {
     target.searchParams.set('pNumDoc', pNumDoc);
     target.searchParams.set('pTipDoc', pTipDoc);
 
+    // No imprimimos el documento en los logs.
+    console.log('======================================');
     console.log('Consultando grupo SISBÉN');
+    console.log('Enviando petición al DNP...');
+    console.log('======================================');
 
     const response = await fetch(target, {
       method: 'POST',
+
       headers: {
-        'Origin': DNP_ORIGIN,
-        'Referer': `${DNP_ORIGIN}/`,
-        'Accept': 'application/json, text/plain, */*',
-        'User-Agent': req.get('user-agent') || 'Mozilla/5.0'
+        Origin: DNP_ORIGIN,
+        Referer: `${DNP_ORIGIN}/`,
+        Accept: 'application/json, text/plain, */*',
+        'User-Agent':
+          req.get('user-agent') || 'Mozilla/5.0'
       }
     });
 
     console.log(
       'DNP ConsultarGrupoSisben:',
-      response.status
+      response.status,
+      response.statusText
     );
 
     const body = await response.text();
 
-    res.status(response.status);
-
-    const contentType = response.headers.get('content-type');
+    const contentType =
+      response.headers.get('content-type');
 
     if (contentType) {
       res.set('Content-Type', contentType);
     }
 
-    return res.send(body);
+    return res
+      .status(response.status)
+      .send(body);
 
   } catch (error) {
-    console.error(
-      'Error ConsultarGrupoSisben:',
-      error
-    );
+    console.error('======================================');
+    console.error('ERROR CONSULTAR GRUPO SISBÉN');
+    console.error('======================================');
+
+    console.error('Error completo:', error);
+    console.error('Mensaje:', error?.message);
+    console.error('Cause:', error?.cause);
+
+    if (error?.cause) {
+      console.error('Cause code:', error.cause.code);
+      console.error('Cause errno:', error.cause.errno);
+      console.error('Cause syscall:', error.cause.syscall);
+      console.error('Cause address:', error.cause.address);
+      console.error('Cause port:', error.cause.port);
+      console.error('Cause message:', error.cause.message);
+    }
 
     return res.status(502).json({
       error: 'No fue posible conectar con DNP',
+
       detalle:
-        error instanceof Error
-          ? error.message
-          : String(error)
+        error?.message ||
+        String(error),
+
+      causa: error?.cause
+        ? {
+            code:
+              error.cause.code ?? null,
+
+            errno:
+              error.cause.errno ?? null,
+
+            syscall:
+              error.cause.syscall ?? null,
+
+            address:
+              error.cause.address ?? null,
+
+            port:
+              error.cause.port ?? null,
+
+            message:
+              error.cause.message ?? null
+          }
+        : null
     });
   }
 });
 
 /**
+ * ============================================================
  * OBTENER DATOS RUI
+ * ============================================================
  *
- * Angular actualmente manda FormData con:
+ * Angular manda FormData:
+ *
  * pNumDoc
  * pTipDoc
  *
- * Para no reconstruir el multipart, enviamos
- * directamente el body recibido al DNP.
+ * Recibimos el multipart completo y lo reenviamos al DNP
+ * sin reconstruirlo.
  */
 app.post(
   '/Home/ObtenerDatosRUI',
+
   express.raw({
     type: () => true,
     limit: '2mb'
   }),
+
   async (req, res) => {
     try {
+      console.log('======================================');
       console.log('Consultando RUI');
+      console.log('Enviando petición al DNP...');
+      console.log('======================================');
 
       const headers = {
-        'Origin': DNP_ORIGIN,
-        'Referer': `${DNP_ORIGIN}/`,
-        'Accept': 'application/json, text/plain, */*',
-        'User-Agent': req.get('user-agent') || 'Mozilla/5.0'
+        Origin: DNP_ORIGIN,
+        Referer: `${DNP_ORIGIN}/`,
+        Accept: 'application/json, text/plain, */*',
+        'User-Agent':
+          req.get('user-agent') || 'Mozilla/5.0'
       };
 
-      const contentType = req.get('content-type');
+      /**
+       * Es MUY importante conservar Content-Type porque
+       * contiene el boundary del multipart/form-data
+       * enviado originalmente por Angular.
+       */
+      const contentType =
+        req.get('content-type');
 
       if (contentType) {
         headers['Content-Type'] = contentType;
@@ -127,12 +196,12 @@ app.post(
 
       console.log(
         'DNP ObtenerDatosRUI:',
-        response.status
+        response.status,
+        response.statusText
       );
 
-      const body = await response.text();
-
-      res.status(response.status);
+      const body =
+        await response.text();
 
       const responseContentType =
         response.headers.get('content-type');
@@ -144,33 +213,120 @@ app.post(
         );
       }
 
-      return res.send(body);
+      return res
+        .status(response.status)
+        .send(body);
 
     } catch (error) {
-      console.error(
-        'Error ObtenerDatosRUI:',
-        error
-      );
+      console.error('======================================');
+      console.error('ERROR OBTENER DATOS RUI');
+      console.error('======================================');
+
+      console.error('Error completo:', error);
+      console.error('Mensaje:', error?.message);
+      console.error('Cause:', error?.cause);
+
+      if (error?.cause) {
+        console.error(
+          'Cause code:',
+          error.cause.code
+        );
+
+        console.error(
+          'Cause errno:',
+          error.cause.errno
+        );
+
+        console.error(
+          'Cause syscall:',
+          error.cause.syscall
+        );
+
+        console.error(
+          'Cause address:',
+          error.cause.address
+        );
+
+        console.error(
+          'Cause port:',
+          error.cause.port
+        );
+
+        console.error(
+          'Cause message:',
+          error.cause.message
+        );
+      }
 
       return res.status(502).json({
         error: 'No fue posible conectar con DNP',
+
         detalle:
-          error instanceof Error
-            ? error.message
-            : String(error)
+          error?.message ||
+          String(error),
+
+        causa: error?.cause
+          ? {
+              code:
+                error.cause.code ?? null,
+
+              errno:
+                error.cause.errno ?? null,
+
+              syscall:
+                error.cause.syscall ?? null,
+
+              address:
+                error.cause.address ?? null,
+
+              port:
+                error.cause.port ?? null,
+
+              message:
+                error.cause.message ?? null
+            }
+          : null
       });
     }
   }
 );
 
-// Para comprobar rápidamente que Render está vivo.
+/**
+ * ============================================================
+ * HEALTH CHECK
+ * ============================================================
+ *
+ * GET https://dnp-proxy.onrender.com/health
+ */
 app.get('/health', (req, res) => {
-  res.json({
+  return res.json({
     ok: true,
     service: 'dnp-proxy'
   });
 });
 
+/**
+ * Ruta raíz opcional.
+ *
+ * Así ya no aparecerá "Cannot GET /"
+ * al abrir directamente el dominio de Render.
+ */
+app.get('/', (req, res) => {
+  return res.json({
+    ok: true,
+    service: 'dnp-proxy',
+    status: 'running'
+  });
+});
+
+/**
+ * ============================================================
+ * INICIAR SERVIDOR
+ * ============================================================
+ */
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`DNP Proxy ejecutándose en puerto ${PORT}`);
+  console.log('======================================');
+  console.log('DNP Proxy iniciado correctamente');
+  console.log(`Puerto: ${PORT}`);
+  console.log('======================================');
 });
