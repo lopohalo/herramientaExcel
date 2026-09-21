@@ -42,7 +42,8 @@ interface CasoAuditoria {
   styleUrls: ['./auditoria-liquidaciones.component.scss'],
 })
 export class AuditoriaLiquidacionesComponent {
-  private readonly dnpBaseUrl = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.hostname.endsWith('.pages.dev')
+  private readonly dnpBaseUrl = ['localhost', '127.0.0.1'].includes(window.location.hostname) ||
+    window.location.hostname.endsWith('.pages.dev') || window.location.hostname.endsWith('.workers.dev')
     ? '/dnp-api'
     : window.location.hostname.endsWith('.netlify.app')
       ? '/.netlify/functions/dnp-proxy'
