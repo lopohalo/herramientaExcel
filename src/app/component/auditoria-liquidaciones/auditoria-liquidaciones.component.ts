@@ -316,7 +316,7 @@ export class AuditoriaLiquidacionesComponent {
   }
 
   private codigoTipoDocumento(tipo: string): number | null {
-    const mapa: Record<string, number> = { cc: 1, ti: 2, ce: 3, rc: 4 };
+    const mapa: Record<string, number> = { cc: 3, ti: 2, ppt: 8, rc: 4 };
     return mapa[this.normalizar(tipo)] || null;
   }
 
