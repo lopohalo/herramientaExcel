@@ -44,7 +44,10 @@ interface CasoAuditoria {
 export class AuditoriaLiquidacionesComponent {
   private readonly dnpBaseUrl = ['localhost', '127.0.0.1'].includes(window.location.hostname)
     ? '/dnp-api'
-    : '/.netlify/functions/dnp-proxy';
+    : window.location.hostname.endsWith('.netlify.app')
+      ? '/.netlify/functions/dnp-proxy'
+      : 'https://peaceful-sfogliatella-30e3e6.netlify.app/.netlify/functions/dnp-proxy';
+  private readonly cacheSisben = new Map<string, { grupo: any; rui: any }>();
   readonly salarioMinimo2026 = 1750905;
   umbralPension = this.salarioMinimo2026 / 2;
   registros: CasoAuditoria[] = [];
@@ -116,13 +119,21 @@ export class AuditoriaLiquidacionesComponent {
   cambiarPagina(delta: number): void { this.pagina = Math.min(this.totalPaginas - 1, Math.max(0, this.pagina + delta)); }
 
   async consultarAlertasSisben(): Promise<void> {
-    const casos = this.registros.filter((x) => x.criticidad !== 'Sin alerta' && x.documento);
+    // La consulta masiva prioriza criticidad alta/crítica. Los casos medios se
+    // pueden consultar individualmente para no saturar los servicios de DNP.
+    const documentosVistos = new Set<string>();
+    const casos = this.registros.filter((x) => {
+      if (!['Crítica', 'Alta'].includes(x.criticidad) || !x.documento || documentosVistos.has(x.documento)) return false;
+      documentosVistos.add(x.documento);
+      return true;
+    });
     if (!casos.length || this.consultandoSisben) return;
     this.consultandoSisben = true;
     this.progresoSisben = 0;
-    for (let i = 0; i < casos.length; i += 3) {
-      await Promise.all(casos.slice(i, i + 3).map((caso) => this.consultarCasoSisben(caso, false)));
-      this.progresoSisben = Math.round(Math.min(casos.length, i + 3) * 100 / casos.length);
+    for (let i = 0; i < casos.length; i += 2) {
+      await Promise.all(casos.slice(i, i + 2).map((caso) => this.consultarCasoSisben(caso, false)));
+      this.progresoSisben = Math.round(Math.min(casos.length, i + 2) * 100 / casos.length);
+      if (i + 2 < casos.length) await new Promise((resolve) => setTimeout(resolve, 180));
     }
     this.consultandoSisben = false;
   }
@@ -136,12 +147,18 @@ export class AuditoriaLiquidacionesComponent {
       return;
     }
     try {
+      const cache = this.cacheSisben.get(`${tipo}:${caso.documento}`);
       const params = new HttpParams().set('pNumDoc', caso.documento).set('pTipDoc', String(tipo));
-      const grupo: any = await firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ConsultarGrupoSisben`, null, { params }).pipe(timeout(15000)));
       const formulario = new FormData();
       formulario.append('pNumDoc', caso.documento);
       formulario.append('pTipDoc', String(tipo));
-      const rui: any = await firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ObtenerDatosRUI`, formulario).pipe(timeout(15000)));
+      const [grupo, rui]: any[] = cache
+        ? [cache.grupo, cache.rui]
+        : await Promise.all([
+            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ConsultarGrupoSisben`, null, { params }).pipe(timeout(10000))),
+            firstValueFrom(this.http.post(`${this.dnpBaseUrl}/Home/ObtenerDatosRUI`, formulario).pipe(timeout(10000))),
+          ]);
+      if (!cache) this.cacheSisben.set(`${tipo}:${caso.documento}`, { grupo, rui });
       caso.sisbenConsultado = grupo?.grupo || 'NO REGISTRA';
       caso.descripcionSisben = grupo?.descripcion || '';
       caso.grupoIngresos = rui?.grupoIngresos || '';
