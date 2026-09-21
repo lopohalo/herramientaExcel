@@ -27,8 +27,6 @@
     "@tesseract.js-data/spa": "^1.0.0",
     "bootstrap": "^5.2.3",
     "chart.js": "^2.9.4",
-    "highcharts": "^12.3.0",
-    "highcharts-angular": "^5.1.0",
     "ng2-charts": "^2.4.2",
     "numeral": "^2.0.6",
     "pdfjs-dist": "^3.11.174",
