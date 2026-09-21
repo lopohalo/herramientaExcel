@@ -7,6 +7,7 @@ import { PruebaComponent } from './component/prueba/prueba.component';
 import { CaculadoraComponent } from './component/calculadora/calculadora.component';
 import { BasegeneralComponent } from './component/pages/basegeneral/basegeneral.component';
 import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.component';
+import { AuditoriaLiquidacionesComponent } from './component/auditoria-liquidaciones/auditoria-liquidaciones.component';
 
 
 
@@ -14,7 +15,8 @@ import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.comp
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: PruebaComponent},
+    {path: "", component: AuditoriaLiquidacionesComponent},
+    {path: "auditoria-liquidaciones", component: AuditoriaLiquidacionesComponent},
     {path: "pdf", component: PdfAnalyzerComponent},
     {path: "contabilidad", component: PruebaComponent},
     {path: "tabla", component: BasegeneralComponent},

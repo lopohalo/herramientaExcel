@@ -64,6 +64,7 @@ import { ModalTablaComponents } from './component/modales/modal-tabla/modal-tabl
 import { ChartsModule } from 'ng2-charts';
 import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.component';
 import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.component';
+import { AuditoriaLiquidacionesComponent } from './component/auditoria-liquidaciones/auditoria-liquidaciones.component';
 
 registerLocaleData(localeEsCo);
 
@@ -85,6 +86,7 @@ registerLocaleData(localeEsCo);
     ModalTablaGraficaComponent,
     BasegeneralComponent,
     PdfAnalyzerComponent,
+    AuditoriaLiquidacionesComponent,
   ],
   imports: [
     BrowserModule,

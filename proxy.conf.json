@@ -1,0 +1,15 @@
+{
+  "/dnp-api": {
+    "target": "https://ventanillasocial.dnp.gov.co",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/dnp-api": ""
+    },
+    "headers": {
+      "Origin": "https://ventanillasocial.dnp.gov.co",
+      "Referer": "https://ventanillasocial.dnp.gov.co/"
+    }
+  }
+}

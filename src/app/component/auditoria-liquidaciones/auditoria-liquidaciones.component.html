@@ -1,0 +1,51 @@
+<main class="auditoria-page">
+  <header class="hero">
+    <div><span class="eyebrow">Control y seguimiento</span><h1>Auditoría de liquidaciones</h1><p>Identifica inconsistencias para revisión humana y contrasta los casos priorizados con SISBÉN.</p></div>
+    <div class="hero-badge"><mat-icon>verified_user</mat-icon><span>Indicadores de revisión<br><small>No constituyen una decisión automática</small></span></div>
+  </header>
+
+  <section class="upload-card" *ngIf="!registros.length">
+    <mat-icon>upload_file</mat-icon><h2>Cargar reporte de liquidados</h2><p>Selecciona el Excel institucional con los registros que deseas analizar.</p>
+    <label class="upload-button">Seleccionar Excel<input type="file" accept=".xls,.xlsx" (change)="cargarExcel($event)"></label>
+    <small>Se esperan las columnas Estrato, Tipo Institución, Valor pensión, Valor pagado y Número de documento.</small>
+  </section>
+
+  <ng-container *ngIf="registros.length">
+    <section class="toolbar">
+      <div><strong>{{ nombreArchivo }}</strong><small>{{ registros.length }} registros analizados</small></div>
+      <label class="threshold">SMLMV 2026<input type="number" [(ngModel)]="umbralPension" (change)="recalcular()"><small>Umbral usado: pensión mayor a este valor</small></label>
+      <label class="replace-file"><mat-icon>upload</mat-icon>Cambiar archivo<input type="file" accept=".xls,.xlsx" (change)="cargarExcel($event)"></label>
+      <button class="sisben" (click)="consultarAlertasSisben()" [disabled]="consultandoSisben"><mat-icon>manage_search</mat-icon>{{ consultandoSisben ? 'Consultando ' + progresoSisben + '%' : 'Consultar alertas en SISBÉN' }}</button>
+      <button class="export" (click)="exportarExcel()"><mat-icon>download</mat-icon>Descargar auditoría</button>
+    </section>
+
+    <section class="stats">
+      <button (click)="cambiarFiltro('Todos')" [class.active]="filtro === 'Todos'"><span>Total</span><strong>{{ registros.length }}</strong></button>
+      <button class="critical" (click)="cambiarFiltro('Crítica')" [class.active]="filtro === 'Crítica'"><span>Críticos</span><strong>{{ criticos }}</strong></button>
+      <button class="high" (click)="cambiarFiltro('Alta')" [class.active]="filtro === 'Alta'"><span>Altos</span><strong>{{ altos }}</strong></button>
+      <button class="medium" (click)="cambiarFiltro('Media')" [class.active]="filtro === 'Media'"><span>Medios</span><strong>{{ medios }}</strong></button>
+      <button class="safe" (click)="cambiarFiltro('Sin alerta')" [class.active]="filtro === 'Sin alerta'"><span>Sin alerta</span><strong>{{ registros.length - totalAlertas }}</strong></button>
+    </section>
+
+    <section class="results-card">
+      <div class="filters"><div class="search"><mat-icon>search</mat-icon><input [(ngModel)]="busqueda" (ngModelChange)="pagina = 0" placeholder="Buscar por estudiante, documento o colegio"></div><span>{{ casosFiltrados.length }} resultados</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Criticidad</th><th>Estudiante</th><th>Documento</th><th>Estrato</th><th>Institución y pensión</th><th>Valor pagado</th><th>SISBÉN</th><th>Observaciones</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let caso of casosPagina" [class]="colorCriticidad(caso)">
+              <td><span class="risk"><i></i>{{ caso.criticidad }} · {{ caso.puntaje }}</span></td>
+              <td><strong>{{ caso.nombre }}</strong><small>Código {{ caso.codigo }}</small></td>
+              <td>{{ caso.tipoDocumento }} {{ caso.documento }}</td><td>{{ caso.estrato || '—' }}</td>
+              <td><strong>{{ caso.tipoInstitucion }}</strong><small>{{ caso.colegio }}</small><small>{{ formatoMoneda(caso.pension) }}</small></td>
+              <td><strong>{{ formatoMoneda(caso.valorPagado) }}</strong></td>
+              <td><strong>{{ caso.sisbenConsultado || caso.sisbenExcel || 'NO REGISTRA' }}</strong><small>{{ caso.estadoConsulta }}</small><small *ngIf="caso.municipioSisben">{{ caso.municipioSisben }}</small></td>
+              <td><ul><li *ngFor="let observacion of caso.observaciones">{{ observacion }}</li></ul><button class="row-query" *ngIf="caso.criticidad !== 'Sin alerta'" (click)="consultarCasoSisben(caso)" [disabled]="caso.estadoConsulta === 'Consultando'">Consultar</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer><span>Página {{ pagina + 1 }} de {{ totalPaginas }}</span><div><button (click)="cambiarPagina(-1)" [disabled]="pagina === 0"><mat-icon>chevron_left</mat-icon></button><button (click)="cambiarPagina(1)" [disabled]="pagina + 1 >= totalPaginas"><mat-icon>chevron_right</mat-icon></button></div></footer>
+    </section>
+  </ng-container>
+</main>
