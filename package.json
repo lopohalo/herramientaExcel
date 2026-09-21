@@ -14,7 +14,7 @@
     "test": "ng test",
     "electron": "electron .",
     "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && cross-env ELECTRON_DEV=true electron .\"",
-    "electron:build": "ng build --configuration production && electron-builder"
+    "electron:build": "ng build --configuration production --base-href ./ && electron-builder"
   },
   "private": true,
   "dependencies": {

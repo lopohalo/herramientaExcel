@@ -18,39 +18,25 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
-
     minWidth: 1000,
     minHeight: 700,
 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-
-      // Seguridad
       contextIsolation: true,
       nodeIntegration: false
     }
   });
 
-  /**
-   * DESARROLLO
-   *
-   * electron:dev establece ELECTRON_DEV=true
-   */
   if (process.env.ELECTRON_DEV === 'true') {
+    console.log('Electron ejecutándose en DESARROLLO');
+
     mainWindow.loadURL(
       'http://localhost:4200'
     );
-
-    // Puedes quitar esto después si no quieres
-    // que DevTools se abra automáticamente.
-    mainWindow.webContents.openDevTools();
   } else {
-    /**
-     * PRODUCCIÓN
-     *
-     * Angular 15 genera:
-     * dist/herramienta-excel/index.html
-     */
+    console.log('Electron ejecutándose en PRODUCCIÓN');
+
     mainWindow.loadFile(
       path.join(
         __dirname,
@@ -58,6 +44,9 @@ function createWindow() {
       )
     );
   }
+
+  // TEMPORAL para encontrar errores
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     mainWindow = null;
