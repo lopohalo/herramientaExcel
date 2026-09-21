@@ -3,11 +3,7 @@
   "name": "herramientaexcel",
   "compatibility_date": "2026-09-21",
 
-  "main": "./worker.js",
-
-  "build": {
-    "command": "npm run build"
-  },
+  "main": "worker.js",
 
   "assets": {
     "directory": "./dist/herramienta-excel",
