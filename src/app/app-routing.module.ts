@@ -15,7 +15,7 @@ import { AuditoriaLiquidacionesComponent } from './component/auditoria-liquidaci
 const routes: Routes = [
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: AuditoriaLiquidacionesComponent},
+    {path: "", component: PdfAnalyzerComponent},
     {path: "auditoria-liquidaciones", component: AuditoriaLiquidacionesComponent},
     {path: "pdf", component: PdfAnalyzerComponent},
     {path: "contabilidad", component: PruebaComponent},
