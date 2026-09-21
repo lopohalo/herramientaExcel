@@ -310,17 +310,13 @@ export class PdfAnalyzerComponent {
       'Metadato 1', 'Metadato 2',
     ];
     const listas = this.construirListasArchivisticas();
-    const persona = String(expediente[8] || '').replace(/^Nombre\s+/i, '').trim() || 'Contratista no identificado';
-    const tituloContratista = `CONTRATISTA: ${persona}`;
     const libro = XLSXStyle.utils.book_new();
     const hojaExpediente = XLSXStyle.utils.aoa_to_sheet([encabezadosExpediente, expediente]);
-    const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], encabezadosDocumentos, ...filasDocumentales]);
-    const hojaListas = XLSXStyle.utils.aoa_to_sheet([[tituloContratista], ...listas]);
-    hojaDocumentos['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: encabezadosDocumentos.length - 1 } }];
-    hojaListas['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }];
+    const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet([encabezadosDocumentos, ...filasDocumentales]);
+    const hojaListas = XLSXStyle.utils.aoa_to_sheet(listas);
     this.estilizarHoja(hojaExpediente, encabezadosExpediente.length, 2, 24);
-    this.estilizarHoja(hojaDocumentos, encabezadosDocumentos.length, filasDocumentales.length + 2, 25, 1, tituloContratista);
-    this.estilizarHoja(hojaListas, 7, listas.length + 1, 24, 1, tituloContratista);
+    this.estilizarHoja(hojaDocumentos, encabezadosDocumentos.length, filasDocumentales.length + 1, 25);
+    this.estilizarHoja(hojaListas, 7, listas.length, 24);
     XLSXStyle.utils.book_append_sheet(libro, hojaExpediente, 'metadatos_expediente');
     XLSXStyle.utils.book_append_sheet(libro, hojaDocumentos, 'metadatos_tipos_documentales');
     XLSXStyle.utils.book_append_sheet(libro, hojaListas, 'Listas');
@@ -347,12 +343,8 @@ export class PdfAnalyzerComponent {
     const filasExpedientes: any[][] = [];
     const filasDocumentos: any[][] = [];
     const filasListas: any[][] = [];
-    const mergesDocumentos: any[] = [];
-    const mergesListas: any[] = [];
     const encabezadosDocumentales: number[] = [];
     const encabezadosListas: number[] = [];
-    const titulosDocumentales: number[] = [];
-    const titulosListas: number[] = [];
 
     Array.from(grupos.entries()).forEach(([nombreCarpeta, documentosGrupo]) => {
       const documentos = [...documentosGrupo].sort(
@@ -378,21 +370,10 @@ export class PdfAnalyzerComponent {
       });
       const expediente = this.construirMetadatosExpediente(documentos, paginaAcumulada - 1);
       filasExpedientes.push(expediente);
-      const persona = String(expediente[8] || '').replace(/^Nombre\s+/i, '').trim() || 'Contratista no identificado';
-      const titulo = `CONTRATISTA: ${persona} — EXPEDIENTE: ${nombreCarpeta}`;
-
-      const filaTituloDocumento = filasDocumentos.length;
-      titulosDocumentales.push(filaTituloDocumento);
-      filasDocumentos.push([titulo]);
-      mergesDocumentos.push({ s: { r: filaTituloDocumento, c: 0 }, e: { r: filaTituloDocumento, c: encabezadosDocumentos.length - 1 } });
       encabezadosDocumentales.push(filasDocumentos.length);
       filasDocumentos.push(encabezadosDocumentos, ...detalle, []);
 
       const lista = this.construirListasArchivisticas();
-      const filaTituloLista = filasListas.length;
-      titulosListas.push(filaTituloLista);
-      filasListas.push([titulo]);
-      mergesListas.push({ s: { r: filaTituloLista, c: 0 }, e: { r: filaTituloLista, c: 6 } });
       encabezadosListas.push(filasListas.length);
       filasListas.push(['Frecuencia consulta', 'Soporte', 'Tipo expediente', 'Acceso', 'Tipología', 'Origen', 'Idioma'], ...lista, []);
     });
@@ -401,13 +382,9 @@ export class PdfAnalyzerComponent {
     const hojaExpediente = XLSXStyle.utils.aoa_to_sheet([encabezadosExpediente, ...filasExpedientes]);
     const hojaDocumentos = XLSXStyle.utils.aoa_to_sheet(filasDocumentos);
     const hojaListas = XLSXStyle.utils.aoa_to_sheet(filasListas);
-    hojaDocumentos['!merges'] = mergesDocumentos;
-    hojaListas['!merges'] = mergesListas;
     this.estilizarHoja(hojaExpediente, encabezadosExpediente.length, filasExpedientes.length + 1, 24);
     hojaDocumentos['!cols'] = Array.from({ length: encabezadosDocumentos.length }, () => ({ wch: 25 }));
     hojaListas['!cols'] = Array.from({ length: 7 }, () => ({ wch: 24 }));
-    titulosDocumentales.forEach((fila) => this.estilizarFilaTitulo(hojaDocumentos, fila));
-    titulosListas.forEach((fila) => this.estilizarFilaTitulo(hojaListas, fila));
     encabezadosDocumentales.forEach((fila) => this.estilizarFilaEncabezado(hojaDocumentos, fila, encabezadosDocumentos.length));
     encabezadosListas.forEach((fila) => this.estilizarFilaEncabezado(hojaListas, fila, 7));
     XLSXStyle.utils.book_append_sheet(libro, hojaExpediente, 'metadatos_expediente');
