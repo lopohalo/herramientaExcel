@@ -23,7 +23,10 @@ jobs:
         with:
           node-version: 18.20.8
           cache: npm
-      - run: npm ci
+      # El proyecto Angular 15 conserva dependencias antiguas que npm estricto
+      # intenta resolver nuevamente. El lockfile se respeta, pero se toleran
+      # sus peer dependencies históricas durante la instalación del runner.
+      - run: npm install --legacy-peer-deps
       - run: npm run build -- --base-href /herramientaExcel/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
