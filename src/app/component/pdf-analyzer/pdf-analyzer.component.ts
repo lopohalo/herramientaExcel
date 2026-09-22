@@ -561,8 +561,6 @@ export class PdfAnalyzerComponent {
       moneda(textoPrestacionServicios, 'SUBTOTAL\\s*:') ??
       moneda(textoPrestacionServicios, 'VALOR\\s+TOTAL\\s+DEL\\s+CONTRATO\\s*:');
     const valorContrato = valorOrdenPrestacion;
-    const objeto = buscar(textoPrestacionServicios, /DETALLE\s+DEL\s+CONTRATO\s+([\s\S]{20,700}?)\s+VALOR\s+EN\s+LETRAS/i);
-
     // pdf.js puede separar por carácter las etiquetas del acta (F E C H A...).
     // Primero compactamos solo para búsqueda, sin modificar el texto almacenado.
     const textoActaBusqueda = textoActaFinalizacion
@@ -599,7 +597,7 @@ export class PdfAnalyzerComponent {
       'Media', 'Electrónico', responsableEntrega, cargoEntrega, '20260910',
       'Matilde Cortés Becerra', 'Auxiliar de archivo', '20260910',
       'Dirección de Certificación y Gestión Documental', 'Electrónico', 'Pública',
-      `Datos contractuales extraídos de la orden de prestación de servicios, el acta de finalización y una cuenta de cobro. Objeto detectado: ${objeto || 'pendiente de revisión'}`,
+      '',
     ];
   }
 
