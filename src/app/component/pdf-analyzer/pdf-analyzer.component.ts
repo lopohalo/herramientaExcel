@@ -718,7 +718,7 @@ export class PdfAnalyzerComponent {
       [/fondo_pensional/, 'Certificado Fondo Pensional'],
       [/certificacion_bancaria|certificado_bancario/, 'Certificación Bancaria'],
       [/examen_ocupacional/, 'Certificado Examen Ocupacional'],
-      [/afiliacion_arl/, 'Certificado de Afiliación ARL'],
+      [/afiliacion_arl|certificado_arl/, 'Certificado de Afiliación ARL'],
       [/factura(?:_de)?_venta\d*|(?:^|_)factura\d*(?:_|$)/, 'Factura de venta'],
       [/camara_(?:de_)?comercio/, 'Cámara de Comercio'],
       [/(?:aportes_)?parafiscales/, 'Certificado Parafiscales'],
@@ -739,7 +739,7 @@ export class PdfAnalyzerComponent {
       [/poliza.*actualizada/, 'Póliza de Garantía Actualizada'],
       [/poliza(?:.*garantia)?/, 'Póliza de Garantía'],
       [/acta_(?:de_)?inicio/, 'Acta de Inicio'],
-      [/informe_(?:de_)?supervision.*unico_pago|unico_pago.*informe_(?:de_)?supervision/, 'Informe de Supervisión Único Pago'],
+      [/fco_62|informe_(?:de_)?supervision.*unico_pago|unico_pago.*informe_(?:de_)?supervision/, 'Informe de Supervisión Único Pago'],
       [/cuenta_(?:de_)?cobro/, 'Cuenta de cobro'],
       [/informe_(?:de_)?actividades/, 'Informe de Actividades'],
       [/seguridad_social/, 'Certificado de Seguridad Social'],
@@ -760,7 +760,7 @@ export class PdfAnalyzerComponent {
   }
 
   private extraerCodigoCalidad(nombre: string): string | null {
-    const coincidencia = nombre.match(/(?:^|[^A-Z0-9])(F[A-Z]{2,3})[._\-\s]*(\d+(?:[._\-]\d+)*)(?=[^0-9]|$)/i);
+    const coincidencia = nombre.match(/(?:^|[^A-Z0-9])(FCO|FFI|FTH)[._\-\s]*(\d+(?:[._\-]\d+)*)(?=[^0-9]|$)/i);
     if (!coincidencia) return null;
     return `${coincidencia[1].toUpperCase()}.${coincidencia[2].replace(/[._\-]+/g, '.')}`;
   }
