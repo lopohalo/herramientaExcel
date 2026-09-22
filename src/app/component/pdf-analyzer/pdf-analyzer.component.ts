@@ -161,7 +161,9 @@ export class PdfAnalyzerComponent {
     // El FCO.55 siempre conserva el texto de su página 3. Es una sola página
     // y evita depender de la profundidad o forma de la ruta seleccionada.
     // Sus datos solo se usan después si el expediente no tiene Cuenta_Cobro.
-    const paginasEspecificas = this.esInformeOportunidad(archivo.name) ? [3] : undefined;
+    // El FCO.55 contiene el Centro de Costo en la primera página y los datos
+    // del contratista normalmente en la tercera; ambas son necesarias.
+    const paginasEspecificas = this.esInformeOportunidad(archivo.name) ? [1, 3] : undefined;
     const extraccion = extraccionProfunda
       ? await this.extraerContenidoCompleto(bytes, archivo.name, paginasEspecificas)
       : await this.obtenerResumenPaginas(bytes);
@@ -516,6 +518,16 @@ export class PdfAnalyzerComponent {
     const unidad = '3140';
     // El Nombre unidad del inventario es un valor institucional fijo.
     const nombreUnidad = 'Divisi\u00f3n Financiera';
+    // Este valor es independiente de Código unidad y solo se utiliza como
+    // sufijo de Nombre del expediente.
+    const centroCostoInforme = soloDigitos(buscar(
+      textoInformeOportunidad,
+      /Centro\s+de\s+Costo\s*:?\s*((?:\d[\s.\-]*){2,10})/i
+    ));
+    const centroCostoRuta = expedienteRuta?.match(/_(\d{2,10})$/)?.[1] || '';
+    const centroCosto = /^\d{2,10}$/.test(centroCostoInforme)
+      ? centroCostoInforme
+      : centroCostoRuta || unidad;
     // pdf.js puede entregar estas etiquetas separadas por carácter:
     // "D E B E A" y "C . C .", aunque visualmente se vean normales.
     const bloqueCuentaCobro = textoCuentaCobro.match(
@@ -584,9 +596,9 @@ export class PdfAnalyzerComponent {
     const fechas = documentos.map((pdf) => this.fechaDesdeNombre(pdf.archivo['nombre'])).filter(Boolean) as string[];
     fechas.sort();
     const nombreExpedienteBase = contrato || expedienteRuta || 'expediente_contratos';
-    const nombreExpediente = nombreExpedienteBase.endsWith(`_${unidad}`)
+    const nombreExpediente = nombreExpedienteBase.endsWith(`_${centroCosto}`)
       ? nombreExpedienteBase
-      : `${nombreExpedienteBase}_${unidad}`;
+      : `${nombreExpedienteBase}_${centroCosto}`;
     return [
       unidad, nombreUnidad, 'C09', 'Contratos', 'C09.06', 'Contrato de Prestación de Servicios',
       nombreExpediente, cedula ? `${tipoDocumento} ${cedula}` : '', contratista ? `Nombre ${contratista}` : '',
