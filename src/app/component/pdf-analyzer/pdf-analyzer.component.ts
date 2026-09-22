@@ -514,10 +514,8 @@ export class PdfAnalyzerComponent {
       expedienteRuta?.match(/\d{6,}/)?.[0] || '';
     // El Código unidad del inventario debe ser siempre 3140.
     const unidad = '3140';
-    const nombreUnidad = buscar(
-      textoPrestacionServicios,
-      /UAA\s*:\s*(.+?)(?=\s+TEL\s*:|\s+FAX\s*:|\s+\|)/i
-    );
+    // El Nombre unidad del inventario es un valor institucional fijo.
+    const nombreUnidad = 'Divisi\u00f3n Financiera';
     // pdf.js puede entregar estas etiquetas separadas por carácter:
     // "D E B E A" y "C . C .", aunque visualmente se vean normales.
     const bloqueCuentaCobro = textoCuentaCobro.match(
