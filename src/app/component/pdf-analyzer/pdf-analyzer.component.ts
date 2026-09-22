@@ -585,7 +585,10 @@ export class PdfAnalyzerComponent {
     const cargoEntrega = 'Jefe División Financiera';
     const fechas = documentos.map((pdf) => this.fechaDesdeNombre(pdf.archivo['nombre'])).filter(Boolean) as string[];
     fechas.sort();
-    const nombreExpediente = contrato || expedienteRuta || 'expediente_contratos';
+    const nombreExpedienteBase = contrato || expedienteRuta || 'expediente_contratos';
+    const nombreExpediente = nombreExpedienteBase.endsWith(`_${unidad}`)
+      ? nombreExpedienteBase
+      : `${nombreExpedienteBase}_${unidad}`;
     return [
       unidad, nombreUnidad, 'C09', 'Contratos', 'C09.06', 'Contrato de Prestación de Servicios',
       nombreExpediente, cedula ? `${tipoDocumento} ${cedula}` : '', contratista ? `Nombre ${contratista}` : '',
