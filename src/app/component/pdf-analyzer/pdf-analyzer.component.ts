@@ -741,7 +741,7 @@ export class PdfAnalyzerComponent {
       [/medidas_correctivas/, 'Certificado de Medidas Correctivas'],
       [/deudores_alimentarios|redam/, 'Certificado Deudores Alimentarios Morosos'],
       [/(?:^|_)rut\d*(?:_|$)|registro_unico_tributario/, 'Formulario del Registro Único Tributario'],
-      [/estandares_minimos.*sg/, 'Estándares Mínimos SG'],
+      [/evaluacion_estandares.*sg|estandares_minimos.*sg/, 'Estándares Mínimos SG'],
       [/analisis.*valoracion.*(?:mitigacion|riesgo)|fco_58/, 'Formato para Análisis, Valoración y Mitigación del Riesgo'],
       [/orden_(?:de_)?compra/, 'Orden de Compra'],
       [/orden_(?:de_)?consultoria/, 'Orden de Consultoria'],
@@ -791,6 +791,7 @@ export class PdfAnalyzerComponent {
       'certificado_de_medidas_correctivas', 'inhabilidades',
       'certificado_de_aportes_parafiscales', 'certificado_parafiscales',
       'cotizacion', 'correo_autorizacion_pago',
+      'estandares_minimos_sg',
       'certificado_deudores_alimentarios_morosos', 'formulario_del_registro_unico_tributario',
       'formato_para_analisis_valoracion_y_mitigacion_del_riesgo', 'cuenta_de_cobro',
       'formato_para_aplicacion_de_retencion_en_la_fuente_en_renta',
@@ -799,6 +800,7 @@ export class PdfAnalyzerComponent {
     if (anexos.includes(documento)) return 'Anexo';
     if (documento === 'informe_de_oportunidad_y_conveniencia') return 'Informe';
     if (documento === 'orden_de_consultoria') return 'Contrato';
+    if (documento === 'orden_de_compra') return 'Contrato';
     if (documento === 'orden_de_trabajo') return 'Contrato';
     if (documento === 'orden_de_prestacion_de_servicios') return 'Contrato';
     if (documento === 'carta_de_designacion_de_supervisor') return 'Comunicación';
