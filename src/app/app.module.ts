@@ -66,6 +66,8 @@ import { ModalTablaGraficaComponent } from './component/modal-grafica/modal.comp
 import { PdfAnalyzerComponent } from './component/pdf-analyzer/pdf-analyzer.component';
 import { AuditoriaLiquidacionesComponent } from './component/auditoria-liquidaciones/auditoria-liquidaciones.component';
 
+import { CopInputDirective } from './component/calculadora/cop-input.directive';
+
 registerLocaleData(localeEsCo);
 
 
@@ -81,6 +83,7 @@ registerLocaleData(localeEsCo);
     ModalTablaComponent,
     ModalTablaComponents,
     CaculadoraComponent,
+    CopInputDirective,
     FormTaskComponent,
     TableTareasComponent,
     ModalTablaGraficaComponent,

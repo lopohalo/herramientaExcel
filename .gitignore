@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Informes locales y respaldos privados de inversiones
+.local-data/

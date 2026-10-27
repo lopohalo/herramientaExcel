@@ -54,7 +54,7 @@
               "node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/chart.js/dist/Chart.min.js"
             ],
-             "allowedCommonJsDependencies": [
+            "allowedCommonJsDependencies": [
               "chart.js",
               "sweetalert2",
               "xlsx-js-style",
@@ -89,7 +89,41 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "assets": [
+                "src/favicon.ico",
+                "src/assets",
+                {
+                  "glob": "pdf.worker.min.js",
+                  "input": "node_modules/pdfjs-dist/build",
+                  "output": "assets/pdfjs"
+                },
+                {
+                  "glob": "worker.min.js",
+                  "input": "node_modules/tesseract.js/dist",
+                  "output": "assets/tesseract"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "node_modules/tesseract.js-core",
+                  "output": "assets/tesseract/core"
+                },
+                {
+                  "glob": "spa.traineddata.gz",
+                  "input": "node_modules/@tesseract.js-data/spa/4.0.0",
+                  "output": "assets/tesseract/lang"
+                },
+                {
+                  "glob": "uis-septiembre-2026-respaldo.json",
+                  "input": ".local-data/informes",
+                  "output": "assets/local-informes"
+                },
+                {
+                  "glob": "plantilla-universidad.xlsx",
+                  "input": ".local-data/informes",
+                  "output": "assets/local-informes"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

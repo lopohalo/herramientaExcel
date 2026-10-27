@@ -1,583 +1,221 @@
-<div style="display: flex; flex-direction: column; min-height: 100vh">
-  <mat-sidenav-container class="example-container">
-    <mat-sidenav #sidenav class="mat-elevation-z10" mode="side" opened style="padding: 15px !important;">
-      <h5 style="margin-top: 10px">Tipos de herramientas</h5>
-      <ul>
-        <li><a routerLink="/tabla">Tabla de registros</a></li>
-        <li><a routerLink="/">Calculadora</a></li>
-      </ul>
-    </mat-sidenav>
-    <mat-sidenav-content class="sidenav-content">
-      <mat-toolbar color="primary">
-        <button mat-button (click)="sidenav.toggle()">
-          <mat-icon>menu</mat-icon>
-        </button>
-        Herramienta calculos financieros
-      </mat-toolbar>
-      <div style="display: flex; justify-content: center; margin-bottom: 20px">
-        <button
-          style="
-            color: rgb(2, 92, 11);
-            border: 1px solid rgb(0, 0, 0);
-            background-color: #fafafa;
-          "
-          mat-stroked-button
-          (click)="agregarExperienciaPeriodo()"
-          [title]="'Agregar periodo'"
-        >
-          <strong>Agregar calculadora</strong>
-        </button>
-        <button
-          style="
-            color: rgb(136, 131, 47);
-            border: 1px solid rgb(0, 0, 0);
-            background-color: #fafafa;
-          "
-          mat-stroked-button
-          (click)="comparar()"
-          [title]="'Comparar'"
-        >
-          <strong>Comparar</strong>
-        </button>
+<div class="investment-app">
+  <header class="topbar"><a routerLink="/" class="brand">Herramientas financieras</a><span class="local-badge">● Almacenamiento local</span></header>
+  <main class="container-fluid workspace">
+    <div class="page-heading">
+      <div>
+        <button *ngIf="view !== 'list'" class="btn btn-link back-link" (click)="navigate('list')">← Volver a mis inversiones</button>
+        <p class="eyebrow">TU PORTAFOLIO, CON CLARIDAD</p>
+        <h1>{{ view === 'list' ? 'Mis inversiones' : view === 'form' ? (editingId ? 'Editar inversión' : 'Nueva inversión') : view === 'result' ? 'Resultado de la inversión' : view === 'export' ? 'Exportar informe de inversiones' : view === 'report' ? 'Informe de la universidad' : 'Comparar inversiones' }}</h1>
+        <p class="text-muted">{{ view === 'list' ? 'Consulta tu portafolio y selecciona las inversiones que quieres comparar.' : view === 'form' ? 'Registra el título y sus condiciones para calcular su rentabilidad.' : view === 'result' ? form.value.name : view === 'export' ? 'El formato de la universidad, con las inversiones actuales y explicaciones para leerlo.' : view === 'report' ? 'Conserva los datos de origen y verifica su consistencia antes de registrarlos.' : 'Revisa las alternativas seleccionadas lado a lado.' }}</p>
       </div>
-      <div
-        style="
-          display: flex;
-          justify-content: center;
-          margin-bottom: 20px;
-          width: 500px;
-          flex-direction: column;
-        "
-      ></div>
-      <div
-        class="form-add-document"
-        style="
-          display: grid;
-          gap: 20px;
-          justify-content: center;
-          align-items: center;
-          grid-template-columns: 1fr 1fr;
-          margin: 40px;
-          height: 720px;
-        "
-      >
-        <div
-          class="container"
-          *ngFor="let formulario of formularios; let i = index; let last = last"
-        >
-          <div class="card" [ngClass]="flipped[i] ? 'flipped' : ''">
-            <div
-              class="back"
-              style="
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                border: 1px solid black;
-                border-radius: 10px;
-                background-color: #ffffff;
-                padding: 20px;
-                width: 100%;
-              "
-            >
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                "
-              >
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 20px;
-                  "
-                >
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="seleccionados[i]"
-                    (ngModelChange)="seleccionarFormulario(i)"
-                  />
-                  <span
-                    style="
-                      font-family: Arial, sans-serif;
-                      font-size: 16px;
-                      margin-right: 10px;
-                    "
-                    >Seleccionar</span
-                  >
-                </div>
-                <strong style="font-family: Arial, sans-serif; font-size: 16px"
-                  >Calculo {{ i + 1 }}</strong
-                >
-                <button
-                  class="button-content"
-                  (click)="flipped[i] = !flipped[i]"
-                  style="font-family: Arial, sans-serif; font-size: 16px"
-                >
-                  <mat-icon class="icon-button">swap_horiz</mat-icon>
-                </button>
-              </div>
-              <h1
-                style="
-                  font-family: Arial, sans-serif;
-                  font-size: 18px;
-                  font-weight: bold;
-                "
-              >
-                <strong>Total ganado mas capital</strong>
-              </h1>
-              <h1
-                *ngIf="formulario.form.get('total')?.value"
-                style="font-family: Arial, sans-serif; font-size: 18px"
-              >
-                $ {{ formulario.form.get("total")?.value }}
-              </h1>
-              <h1
-                style="
-                  font-family: Arial, sans-serif;
-                  font-size: 18px;
-                  font-weight: bold;
-                "
-              >
-                <strong>Total intereses</strong>
-              </h1>
-              <h1
-                *ngIf="formulario.form.get('total')?.value && changeView[i]"
-                style="font-family: Arial, sans-serif; font-size: 18px"
-              >
-                $ {{ formulario.form.get("totalIntereses")?.value }}
-              </h1>
-              <h1
-                *ngIf="formulario.form.get('total')?.value && !changeView[i]"
-                style="font-family: Arial, sans-serif; font-size: 18px"
-              >
-                $ {{ totalesMesaMesRendimientos[i] }}
-              </h1>
-              <h1
-                style="
-                  font-family: Arial, sans-serif;
-                  font-size: 18px;
-                  font-weight: bold;
-                "
-              >
-                Tasa Interna de Retorno (TIR)
-              </h1>
-              <h2 style="font-family: Arial, sans-serif; font-size: 16px">
-                %{{ formulario.form.get("valorTir")?.value }}
-              </h2>
-              <h1
-                style="
-                  font-family: Arial, sans-serif;
-                  font-size: 18px;
-                  font-weight: bold;
-                "
-              >
-                grafico
-              </h1>
-              <canvas
-                *ngIf="
-                  chartData[i] &&
-                  chartLabels[i] &&
-                  chartData[i].length > 0 &&
-                  chartLabels[i].length > 0
-                "
-                baseChart
-                [chartType]="'line'"
-                [legend]="true"
-                [datasets]="chartData[i]"
-                [labels]="chartLabels[i]"
-                [options]="chartOptions"
-              >
-              </canvas>
-              <div style="text-align: center"></div>
-              <div
-                style="
-                  display: flex;
-                  flex-direction: space-between;
-                  align-items: center;
-                "
-              >
-                <h3>
-                  Rendimientos por
-                  {{
-                    formulario.form.get("periocidad")?.value === 1
-                      ? "meses"
-                      : formulario.form.get("periocidad")?.value === 2
-                      ? "trimestres"
-                      : formulario.form.get("periocidad")?.value === 3
-                      ? "semestres"
-                      : "anuales"
-                  }}
-                </h3>
-                <button
-                  (click)="exportExcel(i)"
-                  class="btn btn-outline-success"
-                  type="button"
-                >
-                  Exportar a Excel
-                </button>
-              </div>
-
-              <table
-                class="table"
-                style="
-                  height: 80%;
-                  max-height: 70%;
-                  overflow-y: auto;
-                  display: block;
-                "
-                *ngIf="beneficiosAsignados.length > 0"
-              >
-                <thead>
-                  <tr>
-                    <th>Mes</th>
-                    <th>Año</th>
-                    <th>Beneficio Mensual</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let beneficio of beneficiosAsignados[i]">
-                    <td>{{ beneficio.mes }}</td>
-                    <td>{{ beneficio.ano }}</td>
-                    <td>{{ beneficio.beneficioMensual }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <!-- <table
-              class="table"
-              style="height: 40%; overflow-y: auto; display: block"
-              *ngIf="beneficiosAsignadosAcum.length > 0 && !changeView[i]"
-            >
-              <thead>
-                <tr>
-                  <th>Mes</th>
-                  <th>Año</th>
-                  <th>Beneficio Mensual</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let beneficio of beneficiosAsignadosAcum">
-                  <td>{{ beneficio.mes }}</td>
-                  <td>{{ beneficio.ano }}</td>
-                  <td>{{ beneficio.beneficioMensual }}</td>
-                </tr>
-              </tbody>
-            </table> -->
-              <!-- <h1>Inversion Amortizada ( Kapital + Intereses)</h1>
-            <table
-              class="table"
-              style="height: 40%; overflow-y: auto; display: block"
-              *ngIf="tablaKapital.length > 0"
-            >
-              <thead>
-                <tr>
-                  <th>Dato</th>
-                  <th>Periodo</th>
-                  <th>Beneficio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let beneficio of tablaKapital">
-                  <td>{{ beneficio.dato }}</td>
-                  <td>{{ beneficio.id }}</td>
-                  <td>{{ beneficio.valor }}</td>
-                </tr>
-              </tbody>
-            </table> -->
-              <!-- <h1>Total tasa pactada</h1>
-              <table
-              class="table"
-              style="height: 40%; overflow-y: auto; display: block"
-              *ngIf="beneficiosTasaPactada.length > 0"
-            >
-              <thead>
-                <tr>
-                  <th>periodo</th>
-                  <th>valor</th>
-                  <th>interes</th>
-                  <th>Beneficio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let beneficio of beneficiosTasaPactada">
-                  <td>{{ beneficio.mes }}</td>
-                  <td>{{ beneficio.valor }}</td>
-                  <td>{{ beneficio.interes }}</td>
-                  <td>{{ beneficio.beneficioTotal }}</td>
-                </tr>
-              </tbody>
-            </table> -->
-            </div>
-            <div
-              class="front"
-              style="
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                border: 1px solid black;
-                border-radius: 10px;
-                background-color: #ffffff;
-                padding: 20px;
-                width: 100%;
-                height: 650px;
-              "
-            >
-              <div
-                *ngIf="!flipped[i]"
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                "
-              >
-                <strong>Calculadora {{ i + 1 }}</strong>
-                <button
-                  class="button-content"
-                  (click)="flipped[i] = !flipped[i]"
-                >
-                  <mat-icon class="icon-button">swap_horiz</mat-icon>
-                </button>
-              </div>
-              <form
-                *ngIf="!flipped[i]"
-                class="form-add-document"
-                style="
-                  display: grid;
-                  grid-template-columns: 1fr 1fr;
-                  gap: 10px;
-                  width: 100%;
-                "
-                [formGroup]="formulario.form"
-              >
-                <mat-form-field>
-                  <mat-label> tipo de título </mat-label>
-                  <mat-select
-                    formControlName="idTipoTitulo"
-                    placeholder="
-      seleccione un tipo de título
-    "
-                    required
-                  >
-                    <mat-option
-                      *ngFor="let claseEntidadItem of claseEntidadList"
-                      [value]="claseEntidadItem.id"
-                    >
-                      {{ claseEntidadItem.nombre }}
-                    </mat-option>
-                  </mat-select>
-                  <mat-icon matPrefix> format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Valor del titulo</mat-label>
-                  <input
-                    #valorTitulo
-                    placeholder="Digite el valor del titulo"
-                    formControlName="valorTitulo"
-                    matInput
-                    type="number"
-                    required
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Valor de la compra</mat-label>
-                  <input
-                    #valorTitulo
-                    placeholder="Digite el valor del titulo"
-                    formControlName="valorCompra"
-                    matInput
-                    type="number"
-                    required
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Tipo de tasa</mat-label>
-                  <mat-select
-                    formControlName="tipoTasa"
-                    placeholder="
-      seleccione un tipo de tasa
-    "
-                    required
-                  >
-                    <mat-option *ngFor="let x of tiposDeTasa" [value]="x.id">
-                      {{ x.nombre }}
-                    </mat-option>
-                  </mat-select>
-                  <mat-icon matPrefix> format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Tasa facial </mat-label>
-                  <input
-                    #tasaFacial
-                    placeholder="Digite una tasa"
-                    formControlName="tasaFacial"
-                    matInput
-                    type="number"
-                    required
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Valor tasa IPC </mat-label>
-                  <input
-                    #tasaFacial
-                    placeholder="Digite una tasa"
-                    formControlName="tasaDFT"
-                    matInput
-                    type="number"
-                    required
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Fecha de compra </mat-label>
-                  <input
-                    matInput
-                    maxlength="10"
-                    placeholder="
-             Seleccione la fecha de ingreso
-            "
-                    [matDatepicker]="pickerFechaIngresoEmpresa"
-                    formControlName="fechaCompra"
-                    required
-                    #fechaIngreso
-                  />
-                  <mat-datepicker-toggle
-                    matSuffix
-                    [for]="pickerFechaIngresoEmpresa"
-                  ></mat-datepicker-toggle>
-                  <mat-datepicker
-                    #pickerFechaIngresoEmpresa
-                    color="primary"
-                  ></mat-datepicker>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Fecha de Vencimiento </mat-label>
-                  <input
-                    matInput
-                    maxlength="10"
-                    placeholder="
-             Seleccione la fecha de vencimiento
-            "
-                    [matDatepicker]="pickerFechaVencimiento"
-                    formControlName="fechaVcto"
-                    required
-                    #fechaVencimiento
-                  />
-                  <mat-datepicker-toggle
-                    matSuffix
-                    [for]="pickerFechaVencimiento"
-                  ></mat-datepicker-toggle>
-                  <mat-datepicker
-                    #pickerFechaVencimiento
-                    color="primary"
-                  ></mat-datepicker>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-
-                <mat-form-field>
-                  <mat-label>Meses</mat-label>
-                  <input
-                    #tasaFacial
-                    placeholder="Digite los meses"
-                    formControlName="meses"
-                    matInput
-                    type="number"
-                    required
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label>Años</mat-label>
-                  <input
-                    #tasaFacial
-                    placeholder="Digite los años"
-                    formControlName="anios"
-                    matInput
-                    type="number"
-                  />
-                  <mat-icon matPrefix>format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label> Periocidad</mat-label>
-                  <mat-select
-                    formControlName="periocidad"
-                    placeholder="
-      seleccione un tipo de Periocidad
-    "
-                    required
-                  >
-                    <mat-option *ngFor="let x of frecuencias" [value]="x.id">
-                      {{ x.nombre }}
-                    </mat-option>
-                  </mat-select>
-                  <mat-icon matPrefix> format_list_bulleted </mat-icon>
-                  <mat-error> Valor requerido </mat-error>
-                </mat-form-field>
-              </form>
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-evenly;
-                  align-items: center;
-                "
-                *ngIf="!flipped[i]"
-              >
-                <button
-                  style="
-                    color: rgb(252, 252, 252);
-                    background-color: rgb(14, 77, 1);
-                  "
-                  mat-stroked-button
-                  (click)="calcular(i)"
-                  [title]="'Agregar periodo'"
-                >
-                  <div class="uis-ll">Calcular</div>
-                </button>
-                <button
-                  *ngIf="i !== 0"
-                  style="
-                    color: rgb(0, 0, 0);
-                    background-color: rgb(209, 21, 21);
-                  "
-                  mat-stroked-button
-                  (click)="deleteExperienciaPeriodo(i)"
-                  title="Eliminar"
-                >
-                  <mat-icon>delete</mat-icon>
-                  <div class="uis-ll">Eliminar calculadora</div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="toolbar" *ngIf="view === 'list'">
+        <button class="btn btn-outline-primary" [disabled]="comparison.length < 2" (click)="openComparison()">Comparar seleccionadas ({{ comparison.length }})</button>
+        <button class="btn btn-outline-primary" [disabled]="!investments.length" (click)="openExport()">Exportar informe Excel</button>
+        <label class="btn btn-outline-secondary mb-0" for="report-file">{{ importingReport ? 'Leyendo Excel…' : 'Importar informe Excel' }}</label><input id="report-file" class="visually-hidden" type="file" accept=".xlsx,.xls" [disabled]="importingReport" (change)="importReport($event)">
+        <button class="btn btn-primary" (click)="newInvestment()">+ Nueva inversión</button>
       </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-  <footer class="text-center bg-body-tertiary" style="height: 0 !important">
-    <!-- Copyright -->
-    <div
-      class="text-center p-3"
-      style="
-        background-color: #3f51b5;
-        display: flex;
-        align-items: end;
-        justify-content: center;
-      "
-    >
-      © 2025 Copyright: financiera
     </div>
-    <!-- Copyright -->
-  </footer>
+    <div class="alert alert-danger" role="alert" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-success" role="status" *ngIf="message">{{ message }}</div>
+    <div class="summary-grid" *ngIf="view === 'list'">
+      <article><span>Inversiones registradas</span><strong>{{ investments.length }}</strong><small>Históricas, vigentes y programadas</small></article>
+      <article><span>Desembolso total registrado</span><strong>{{ money(totalCapital) }}</strong><small>Compras + costos iniciales · COP</small></article>
+      <article><span>Resultado neto proyectado</span><strong [class.negative]="totalProfit < 0">{{ money(totalProfit) }}</strong><small>Todos los cobros menos el desembolso</small></article>
+    </div>
+    <div class="editor-layout" *ngIf="view === 'form' || view === 'result'">
+      <section class="panel" id="investment-form" *ngIf="view === 'form'">
+        <div class="section-heading"><div><p class="eyebrow">CONDICIONES DE LA INVERSIÓN</p><h2>{{ editingId ? 'Editar inversión' : 'Registrar inversión' }}</h2></div><span class="badge text-bg-light">COP</span></div>
+        <form [formGroup]="form" (ngSubmit)="submitForm()">
+          <nav class="form-stepper" aria-label="Pasos del registro"><button type="button" *ngFor="let label of stepLabels; let i = index" [class.active]="formStep === i" [class.completed]="formStep > i" [attr.aria-current]="formStep === i ? 'step' : null" (click)="changeStep(i)"><b>{{ formStep > i ? '✓' : i + 1 }}</b><span>{{ label }}</span></button></nav>
+          <p class="form-text">Paso {{ formStep + 1 }} de 3</p>
+          <div class="notice mb-3" *ngIf="editedSource as source">{{ source.fund }} · {{ source.reference }} · Emisión {{ date(source.issued) }}. Convención del informe: cupón anual dividido por el número de pagos; agenda desde emisión. Cambiar la tasa o fecha modifica el escenario; el informe original se conserva.</div>
+          <div *ngIf="formStep === 0">
+          <h3 class="step-title">1. ¿Qué inversión vas a registrar?</h3>
+          <div class="row g-3">
+            <div class="col-md-8"><label for="inv-name" class="form-label">Nombre o referencia *</label><input id="inv-name" class="form-control" formControlName="name" placeholder="Ej. CDT ahorro de vivienda" maxlength="100"></div>
+            <div class="col-md-4"><label for="inv-type" class="form-label">Tipo de título</label><select id="inv-type" class="form-select" formControlName="type"><option *ngFor="let type of types">{{ type }}</option></select></div>
+            <div class="col-12"><label for="inv-issuer" class="form-label">Emisor / entidad</label><input id="inv-issuer" class="form-control" formControlName="issuer" placeholder="Entidad que emite el título" maxlength="100"></div>
+            <div class="col-md-6"><label for="purchase" class="form-label">¿Cuánto pagas por el título? *</label><input id="purchase" class="form-control" formControlName="purchase" type="text" inputmode="decimal" appCopInput placeholder="$ 0,00"><small>Lo que pagas por adquirir el título.</small></div>
+            <div class="col-md-6"><label for="nominal" class="form-label">Capital que devuelve el título *</label><input id="nominal" class="form-control" formControlName="nominal" type="text" inputmode="decimal" appCopInput placeholder="$ 0,00"><small>Capital usado para calcular intereses; puede diferir de lo que pagas.</small><button type="button" class="btn btn-link p-0 small-action" (click)="copyPurchase()" [disabled]="!form.value.purchase">Usar el mismo valor de compra</button></div>
+            <div class="col-md-6"><label for="start" class="form-label">Fecha de compra *</label><input id="start" class="form-control" type="date" formControlName="start"></div>
+            <div class="col-md-6"><label for="end" class="form-label">Fecha de vencimiento *</label><input id="end" class="form-control" type="date" formControlName="end"><small>El plazo se calcula con estas fechas.</small></div>
+          </div>
+          </div>
+          <div *ngIf="formStep === 1">
+            <h3 class="step-title">2. ¿Cómo te pagará la inversión?</h3>
+            <div class="row g-3">            <div class="col-12"><label for="mode" class="form-label">Forma de ingresar los pagos</label><select id="mode" class="form-select" formControlName="mode"><option value="schedule">Tengo una tasa y quiero calcular los pagos</option><option value="custom">Ya conozco las fechas y valores de los pagos</option></select></div></div>
+          <div class="form-section" *ngIf="form.value.mode === 'schedule'">
+            <h3>Datos del certificado</h3><p class="form-text">Copia la tasa y la frecuencia pactadas con la entidad. La tasa anunciada y la TIR pueden diferir si pagas costos o compras a un precio distinto del capital.</p>
+            <div class="row g-3">
+              <div class="col-md-6"><label for="rateType" class="form-label">¿Cómo aparece la tasa en tu certificado?</label><select id="rateType" class="form-select" formControlName="rateType"><option value="effective">Efectiva anual (EA)</option><option value="nominal">Anual simple proporcional</option><option value="indexed">Índice + spread anual simple</option></select></div>
+              <div class="col-md-6"><label for="rate" class="form-label">{{ form.value.rateType === 'indexed' ? 'Spread (puntos porcentuales)' : 'Tasa anual (%)' }} *</label><input id="rate" class="form-control" type="number" min="0" step="any" formControlName="rate"></div>
+              <div class="col-12" *ngIf="form.value.rateType === 'indexed'"><label for="index" class="form-label">Índice anual supuesto (%)</label><input id="index" class="form-control" type="number" min="0" step="any" formControlName="index"><div class="notice mt-2">Proyección: índice + spread, constantes durante todo el plazo. No se consulta IPC ni DTF. Si el contrato usa otra fórmula o tasas variables, registra sus flujos propios.</div></div>
+              <div class="col-md-6"><label for="frequency" class="form-label">Pago de intereses</label><select id="frequency" class="form-select" formControlName="frequency"><option [ngValue]="0">Al vencimiento</option><option [ngValue]="1">Mensual</option><option [ngValue]="3">Trimestral</option><option [ngValue]="6">Semestral</option><option [ngValue]="12">Anual</option></select></div>
+            </div>
+            <p class="form-text">Se devuelve el nominal al vencimiento. No se reinvierten cupones. Los periodos incompletos se calculan por días reales; la agenda parte de la compra. Para títulos adquiridos con cupones ya definidos, usa flujos propios.</p>
+          </div>
+          <div class="form-section" *ngIf="form.value.mode === 'custom'">
+            <h3>Cobros netos de la inversión</h3><p class="form-text">Incluye todos los pagos después de retenciones y gastos, y la devolución de capital. No se añade ningún cobro automáticamente. El desembolso inicial se toma de la compra + costos.</p>
+            <div class="flow-editor" *ngFor="let flow of customFlows; let i = index">
+              <label>Fecha<input class="form-control" type="date" [(ngModel)]="flow.date" [ngModelOptions]="{standalone: true}" (ngModelChange)="flowChanged()" [attr.aria-label]="'Fecha del cobro ' + (i + 1)"></label>
+              <label>Valor neto (COP)<input class="form-control" type="text" inputmode="decimal" appCopInput placeholder="$ 0,00" [(ngModel)]="flow.amount" [ngModelOptions]="{standalone: true}" (ngModelChange)="flowChanged()" [attr.aria-label]="'Valor del cobro ' + (i + 1)"></label>
+              <label>Concepto<input class="form-control" [(ngModel)]="flow.concept" [ngModelOptions]="{standalone: true}" (ngModelChange)="flowChanged()" [attr.aria-label]="'Concepto del cobro ' + (i + 1)"></label>
+              <button type="button" class="btn btn-outline-danger" (click)="removeFlow(i)" [attr.aria-label]="'Eliminar cobro ' + (i + 1)">×</button>
+            </div>
+            <button type="button" class="btn btn-outline-primary" (click)="addFlow()">+ Agregar cobro</button>
+          </div>
+          </div>
+          <div class="form-section" *ngIf="formStep === 2">
+            <h3 class="step-title">3. Revisa costos y condiciones</h3>
+            <p class="form-text">El cálculo usa los valores indicados abajo. Si tu certificado tiene otras condiciones, ajústalas antes de continuar.</p>
+            <div class="settings-summary"><span>Costos: {{ money(form.value.costs || 0) }}</span><ng-container *ngIf="form.value.mode === 'schedule'"><span>Retención: {{ percent(form.value.withholding) }}</span><span>Base: {{ form.value.basis }} días</span></ng-container></div>
+            <details class="optional-settings"><summary>Ajustar costos, retención y base de días</summary>
+              <div class="row g-3 mt-1">
+                <div class="col-md-6"><label for="costs" class="form-label">Costos al comprar (COP)</label><input id="costs" class="form-control" formControlName="costs" type="text" inputmode="decimal" appCopInput placeholder="$ 0,00"><small>Comisiones u otros gastos que pagas al inicio.</small></div>
+                <ng-container *ngIf="form.value.mode === 'schedule'">              <div class="col-md-6"><label for="basis" class="form-label">Base de causación</label><select id="basis" class="form-select" formControlName="basis"><option [ngValue]="365">Días reales / 365</option><option [ngValue]="360">Días reales / 360</option></select></div>
+              <div class="col-md-6"><label for="withholding" class="form-label">Retención sobre intereses (%)</label><input id="withholding" class="form-control" type="number" min="0" max="100" step="any" formControlName="withholding"><small>Ingresa la aplicable a tu inversión. No se presume una tarifa.</small></div>
+                </ng-container>
+              </div>
+            </details>
+            <div class="mt-3"><label for="notes" class="form-label">Notas (opcional)</label><textarea id="notes" rows="2" class="form-control" formControlName="notes" maxlength="2000" placeholder="Condiciones o referencias que quieras recordar"></textarea></div>
+          </div>
+          <div class="form-actions step-actions">
+            <button type="button" class="btn btn-outline-secondary" *ngIf="formStep > 0" (click)="changeStep(formStep - 1)">← Anterior</button>
+            <button type="submit" class="btn btn-primary" *ngIf="formStep < 2">Siguiente →</button>
+            <ng-container *ngIf="formStep === 2"><button type="button" class="btn btn-outline-primary" (click)="calculate()">Ver resultado y gráfico</button><button type="submit" class="btn btn-primary">{{ editingId ? 'Guardar cambios' : 'Guardar inversión' }}</button></ng-container>
+          </div>
+        </form>
+      </section>
+      <section class="result-panel" *ngIf="view === 'result'">
+        <ng-container *ngIf="preview as r">
+          <div class="analysis-layout">
+            <div class="panel chart-panel">
+              <p class="eyebrow">EL RECORRIDO DE TU DINERO</p><h2>¿Cuándo sale y cuándo vuelve?</h2>
+              <p class="form-text">{{ resultMetric === 'movements' ? 'Cada barra representa un movimiento en su fecha.' : resultMetric === 'bridge' ? 'Observa qué suma y qué resta a la ganancia final.' : 'Compara los componentes de cada periodo de cobro.' }} Pasa el cursor para ver el valor.</p>
+              <p class="notice">Periodicidad pactada: <strong>{{ form.value.mode === 'custom' ? 'Fechas propias' : frequencyLabel(form.value.frequency) }}</strong>. {{ resultBasis === 'accrued' && form.value.mode === 'schedule' ? 'Puedes ver cómo se genera el interés durante el plazo. Si el pago es al vencimiento, la vista automática lo desglosa mes a mes.' : 'La vista de pagos muestra cada cobro con su fecha, incluido el último periodo si es incompleto.' }}</p>
+              <label for="result-metric" class="form-label">Nivel de detalle</label>
+              <select id="result-metric" class="form-select" [(ngModel)]="resultMetric" (ngModelChange)="prepareResultChart()"><option value="movements">Todos los movimientos</option><option value="periods">Capital, intereses y retención por periodo</option><option value="interest">Solo intereses y retención (sin capital)</option><option value="bridge">¿Cómo se forma la ganancia?</option></select>
+              <div class="mt-3" *ngIf="(resultMetric === 'periods' || resultMetric === 'interest') && form.value.mode === 'schedule'"><label for="result-basis" class="form-label">¿Qué quieres medir?</label><select id="result-basis" class="form-select" [(ngModel)]="resultBasis" (ngModelChange)="prepareResultChart()"><option value="accrued">Intereses que se van generando durante el plazo</option><option value="cash">Intereses pagados en cada fecha de cobro</option></select></div>
+              <div class="mt-3" *ngIf="resultMetric === 'periods' || resultMetric === 'interest'"><label for="result-grouping" class="form-label">Ver evolución por</label><select id="result-grouping" class="form-select" [(ngModel)]="resultGrouping" (ngModelChange)="prepareResultChart()"><option value="auto">Según periodicidad pactada (automático)</option><option value="month">Mes a mes</option><option value="quarter">Trimestre a trimestre</option><option value="semester">Semestre a semestre</option><option value="year">Año a año</option></select></div>
+              <div class="chart-frame"><canvas baseChart [datasets]="resultChartData" [labels]="resultChartLabels" [options]="resultChartOptions" [chartType]="'bar'" [legend]="resultLegend" role="img" aria-label="Gráfico desglosado de los movimientos de la inversión"></canvas></div>
+              <p class="form-text" *ngIf="resultMetric === 'movements'">Rojo: dinero que pagas. Verde: dinero que recibes. Selecciona “Solo intereses” para ver los pagos pequeños con mayor claridad.</p>
+              <p class="notice mt-3" *ngIf="resultMetric === 'bridge'">Las primeras barras explican el resultado; la última es el total, no otro ingreso. Las barras negativas restan a la ganancia.</p>
+              <p class="form-text" *ngIf="resultMetric === 'periods' || resultMetric === 'interest'">{{ resultBasis === 'accrued' && form.value.mode === 'schedule' ? 'Se muestra el interés del título generado en cada periodo según la tasa pactada. La retención es una estimación distribuida, no un descuento mensual ya realizado. Capital y cobros netos conservan sus fechas reales de pago. No es la ganancia total de la inversión ni dinero disponible para retirar.' : 'Se muestran los intereses pagados en cada fecha. Si el pago es al vencimiento, se verá al final aunque el interés se genere durante todo el plazo.' }} Puedes ocultar series pulsando su nombre en la leyenda.</p>
+              <p class="notice" *ngIf="form.value.mode === 'custom' && resultMetric !== 'movements'">Los flujos manuales solo indican cobros netos. No se inventa un reparto entre capital, intereses y retención.</p>
+              <details class="mt-3"><summary>Ver cifras por periodo</summary><div class="table-responsive flow-table"><table class="table table-sm"><thead><tr><th>Periodo</th><th>Capital</th><th>Interés bruto {{ resultBasis === 'accrued' && form.value.mode === 'schedule' ? 'generado' : 'pagado' }}</th><th>Retención {{ resultBasis === 'accrued' ? 'estimada' : '' }}</th><th>Interés neto {{ resultBasis === 'accrued' && form.value.mode === 'schedule' ? 'generado' : 'pagado' }}</th><th>Cobro neto real programado</th></tr></thead><tbody><tr *ngFor="let row of resultPeriods"><td>{{ row.label }}</td><td>{{ row.principal === null ? 'Sin desglose' : money(row.principal) }}</td><td>{{ row.gross === null ? 'Sin desglose' : money(row.gross) }}</td><td>{{ row.tax === null ? 'Sin desglose' : money(row.tax) }}</td><td>{{ row.interest === null ? 'Sin desglose' : money(row.interest) }}</td><td>{{ money(row.net) }}</td></tr></tbody></table></div></details>
+              <div class="money-story"><div><small>Pagas al inicio</small><strong>{{ money(-r.flows[0].amount) }}</strong></div><span>→</span><div><small>Recibes en total</small><strong>{{ money(r.income) }}</strong></div><span>=</span><div><small>{{ r.profit < 0 ? 'Pérdida neta' : 'Ganancia neta' }}</small><strong [class.negative]="r.profit < 0">{{ money(r.profit) }}</strong></div></div>
+              <div class="notice">El total recibido incluye la devolución del capital. La ganancia es lo que queda después de recuperar lo pagado, incluidos los costos iniciales.</div>
+              <details class="method-note"><summary>Entender los indicadores</summary><p><strong>TIR anual:</strong> permite comparar el rendimiento anual considerando las fechas de los pagos.</p><p><strong>Rentabilidad del plazo:</strong> ganancia frente al desembolso durante los {{ r.days }} días de esta inversión.</p><p>Estos son flujos proyectados, no un registro de pagos recibidos. No se presupone reinversión.</p><a href="https://www.superfinanciera.gov.co/publicaciones/13243/glosario-t-13243/" target="_blank" rel="noopener noreferrer">Conoce las tasas nominales y efectivas · Superfinanciera ↗</a></details>
+            </div>
+            <aside class="panel investment-facts">
+              <p class="eyebrow">TU INVERSIÓN EN DETALLE</p><h2>{{ form.value.name }}</h2><p class="form-text">{{ form.value.type }} · {{ form.value.issuer || 'Sin emisor registrado' }}</p>
+              <div class="irr-highlight"><span>TIR anual efectiva · neta</span><strong [class.negative]="r.irr !== null && r.irr < 0">{{ percent(r.irr === null ? null : r.irr * 100) }}</strong><small>Rentabilidad del plazo: {{ percent(r.returnPct) }}</small></div>
+              <dl class="result-list">
+                <div><dt>Compra → vencimiento</dt><dd>{{ date(form.value.start) }} → {{ date(form.value.end) }}</dd></div>
+                <div><dt>Duración</dt><dd>{{ r.days }} días</dd></div>
+                <div><dt>Precio de compra</dt><dd>{{ money(form.value.purchase) }}</dd></div>
+                <div><dt>Capital del título</dt><dd>{{ money(form.value.nominal) }}</dd></div>
+                <div><dt>Costos iniciales</dt><dd>{{ money(form.value.costs) }}</dd></div>
+                <ng-container *ngIf="form.value.mode === 'schedule'">
+                  <div><dt>Tasa pactada</dt><dd>{{ rateLabel(form.value) }}</dd></div>
+                  <div><dt>Pago de intereses</dt><dd>{{ frequencyLabel(form.value.frequency) }}</dd></div>
+                  <div><dt>Base de intereses / TIR</dt><dd>{{ editedSource ? 'Cupón fijo / TIR 365 días' : form.value.basis + ' / 365 días' }}</dd></div>
+                  <div><dt>Intereses antes de retención</dt><dd>{{ money(r.interest) }}</dd></div>
+                  <div><dt>Retención ({{ percent(form.value.withholding) }})</dt><dd>− {{ money(r.tax) }}</dd></div>
+                  <div><dt>Intereses después de retención</dt><dd>{{ money(r.interest - r.tax) }}</dd></div>
+                  <div><dt>Diferencia capital − compra</dt><dd>{{ money(form.value.nominal - form.value.purchase) }}</dd></div>
+                </ng-container>
+                <div><dt>Cobros netos totales</dt><dd>{{ money(r.income) }}</dd></div>
+                <div><dt>Ganancia / pérdida neta</dt><dd [class.negative]="r.profit < 0">{{ money(r.profit) }}</dd></div>
+              </dl>
+              <p class="form-text" *ngIf="form.value.mode === 'custom'">Flujos propios: los cobros ya incluyen capital, gastos y retenciones. No se separan intereses ni impuestos automáticamente.</p>
+              <p class="notice" *ngIf="form.value.rateType === 'indexed' && form.value.mode === 'schedule'">Índice supuesto constante durante el plazo; el resultado puede variar si cambia.</p>
+              <p class="form-text" *ngIf="form.value.notes">{{ form.value.notes }}</p>
+              <div class="form-actions"><button class="btn btn-outline-primary" (click)="navigate('form')">Ajustar condiciones</button><button class="btn btn-primary" (click)="save()">{{ editingId ? 'Guardar cambios' : 'Guardar inversión' }}</button></div>
+            </aside>
+          </div>
+          <details class="panel mt-4"><summary>Ver todos los movimientos usados en el cálculo ({{ r.flows.length }})</summary><div class="table-responsive flow-table"><table class="table table-sm"><thead><tr><th>Fecha</th><th>Concepto</th><th class="text-end">Valor neto</th></tr></thead><tbody><tr *ngFor="let flow of r.flows"><td>{{ date(flow.date) }}</td><td>{{ flow.concept }}</td><td class="text-end" [class.negative]="flow.amount < 0">{{ money(flow.amount) }}</td></tr></tbody></table></div></details>
+        </ng-container>
+      </section>
+    </div>
+    <section class="panel" *ngIf="view === 'list'">
+      <div class="section-heading"><div><p class="eyebrow">PORTAFOLIO</p><h2>Mis inversiones</h2></div></div>
+      <div class="row g-3 mb-3"><div class="col-md-8"><label for="search" class="visually-hidden">Buscar inversiones</label><input id="search" class="form-control" [(ngModel)]="search" placeholder="Buscar por nombre, emisor o tipo…"></div><div class="col-md-4"><label for="status" class="visually-hidden">Filtrar por estado</label><select id="status" class="form-select" [(ngModel)]="statusFilter"><option value="all">Todos los estados</option><option>Vigente</option><option>Vencida</option><option>Programada</option></select></div></div>
+      <div class="table-responsive" *ngIf="filtered.length; else emptyRecords"><table class="table align-middle portfolio-table"><thead><tr><th>Comparar</th><th>Inversión / emisor</th><th>Fechas / estado</th><th>Compra + costos</th><th>TIR anual neta</th><th>Ganancia neta</th><th>Acciones</th></tr></thead><tbody><tr *ngFor="let v of filtered"><td><input class="form-check-input" type="checkbox" [checked]="selected.has(v.id)" (change)="toggle(v.id)" [attr.aria-label]="'Comparar ' + v.name"></td><td><strong>{{ v.name }}</strong><small>{{ v.type }} · {{ v.issuer || 'Sin emisor' }}</small><small *ngIf="v.sourceReport">{{ v.sourceReport.fund }}</small><small *ngIf="v.rateType === 'indexed' && v.mode === 'schedule'">Índice supuesto constante</small></td><td><span class="badge text-bg-light">{{ status(v) }}</span><small>{{ date(v.start) }} → {{ date(v.end) }}</small></td><td class="text-nowrap">{{ money(v.purchase + v.costs) }}</td><td class="rate-cell">{{ percent(results.get(v.id)?.irr == null ? null : results.get(v.id)!.irr! * 100) }}</td><td class="text-nowrap" [class.negative]="results.get(v.id)!.profit < 0">{{ money(results.get(v.id)!.profit) }}</td><td><div class="record-actions"><button class="btn btn-sm btn-outline-primary" (click)="viewInvestment(v)">Ver análisis</button><button class="btn btn-sm btn-outline-secondary" (click)="edit(v)">Editar</button><button class="btn btn-sm btn-outline-secondary" (click)="duplicate(v)">Duplicar</button><button class="btn btn-sm btn-outline-danger" (click)="deleteId = v.id">Eliminar</button></div><div class="delete-confirm" *ngIf="deleteId === v.id"><span>¿Eliminar este registro?</span><button class="btn btn-sm btn-danger" (click)="remove(v)">Sí, eliminar</button><button class="btn btn-sm btn-light" (click)="deleteId = null">Cancelar</button></div></td></tr></tbody></table></div>
+      <ng-template #emptyRecords><div class="empty-records">{{ investments.length ? 'No hay inversiones que coincidan con los filtros.' : 'Tu portafolio empieza aquí. Agrega tu primera inversión para calcular su rentabilidad.' }}</div></ng-template>
+      <details class="storage-tools" *ngIf="reports.length"><summary>Informes universitarios registrados ({{ reports.length }})</summary><div class="toolbar"><button class="btn btn-sm btn-outline-primary" *ngFor="let report of reports" (click)="showReport(report)">{{ report.filename }} · {{ date(report.cutoff) }}</button></div></details>
+      <details class="storage-tools"><summary>Respaldo y registros anteriores</summary><div class="toolbar"><button class="btn btn-outline-secondary btn-sm" (click)="backup()" [disabled]="!investments.length">Descargar respaldo JSON</button><label class="btn btn-outline-secondary btn-sm mb-0" for="restore">Recuperar respaldo</label><input id="restore" class="visually-hidden" type="file" accept=".json,application/json" (change)="restore($event)"></div>
+      <p class="form-text">Datos guardados en este navegador y origen (host + puerto). No se sincronizan entre equipos. Conserva un respaldo antes de borrar datos del navegador. Los registros anteriores permanecen en sus claves originales.</p>
+      <div class="mb-3"><button class="btn btn-sm btn-outline-secondary" (click)="loadLegacy()">Revisar registros del sistema anterior</button><div class="d-flex flex-wrap gap-2 mt-2" *ngIf="legacyRecords.length"><button class="btn btn-sm btn-light" *ngFor="let item of legacyRecords" (click)="reviewLegacy(item.value)">{{ item.label }} · cargar borrador</button></div></div>
+      </details>
+    </section>
+    <section class="panel" *ngIf="view === 'comparison'">
+      <div class="section-heading"><div><p class="eyebrow">ALTERNATIVAS SELECCIONADAS</p><h2>Alternativas lado a lado</h2></div><span class="badge text-bg-light">{{ comparison.length }} seleccionadas</span></div>
+      <p class="form-text">Elige qué quieres comparar. El color de cada inversión se mantiene en el gráfico y en su ficha.</p>
+      <div class="alert alert-info comparison-scenario"><strong>Prueba distintos plazos aquí mismo.</strong> Cambia el vencimiento en la ficha de cada inversión. Los gráficos y resultados se recalculan con las mismas condiciones. Las inversiones originales se conservan hasta guardar.
+        <button class="btn btn-primary btn-sm ms-2" *ngIf="comparisonDrafts.size" (click)="saveComparisonDates()">Guardar fechas simuladas ({{ comparisonDrafts.size }})</button>
+      </div>
+      <div class="alert alert-danger" role="alert" *ngIf="comparisonError">{{ comparisonError }}</div>
+      <div class="analysis-layout comparison-layout">
+        <div class="chart-panel">
+          <label for="chart-metric" class="form-label">¿Qué quieres ver?</label><select id="chart-metric" class="form-select mb-3" [(ngModel)]="chartMetric" (ngModelChange)="updateComparisonChart()"><option value="irr">Rendimiento anual · TIR neta (%)</option><option value="profit">Ganancia o pérdida neta (COP)</option><option value="capital">Dinero invertido al inicio (COP)</option><option value="breakdown">Desglose de la ganancia: intereses, retención y costos</option><option value="periods">Pagos por periodo: intereses, retención o capital</option><option value="timeline">Dinero pagado y recuperado por fecha (COP)</option></select>
+          <div class="mb-3" *ngIf="chartMetric === 'periods'"><label for="comparison-basis" class="form-label">¿Qué quieres medir?</label><select id="comparison-basis" class="form-select" [(ngModel)]="comparisonBasis" (ngModelChange)="updateComparisonChart()"><option value="accrued">Intereses generados durante el plazo</option><option value="cash">Pagos según fecha de cobro</option></select></div>
+          <div class="row g-3 mb-3" *ngIf="chartMetric === 'periods'"><div class="col-md-6"><label for="comparison-grouping" class="form-label">Agrupar por</label><select id="comparison-grouping" class="form-select" [(ngModel)]="comparisonGrouping" (ngModelChange)="updateComparisonChart()"><option value="auto">Según periodicidad pactada (automático)</option><option value="month">Mes a mes</option><option value="quarter">Trimestre a trimestre</option><option value="semester">Semestre a semestre</option><option value="year">Año a año</option></select></div><div class="col-md-6"><label for="comparison-period-metric" class="form-label">Concepto</label><select id="comparison-period-metric" class="form-select" [(ngModel)]="comparisonPeriodMetric" (ngModelChange)="updateComparisonChart()"><option value="interest">Intereses netos (sin capital)</option><option value="gross">Intereses brutos</option><option value="tax">Retención descontada</option><option value="principal">Capital devuelto</option><option value="net">Cobros netos totales</option></select></div></div>
+          <div class="chart-frame comparison-chart"><canvas baseChart [datasets]="chartData" [labels]="chartLabels" [options]="chartOptions" [chartType]="chartType" [legend]="comparisonLegend" role="img" aria-label="Comparación gráfica de las inversiones seleccionadas"></canvas></div>
+          <div class="notice mt-3" *ngIf="chartMetric === 'timeline'">Cada línea empieza con el dinero pagado en negativo y sube al recibir cada cobro. Al llegar a cero recuperas lo invertido. El saldo final es la ganancia o pérdida; no es el valor de mercado del título. Las líneas empiezan y terminan en las fechas de cada inversión.</div>
+          <div class="notice mt-3" *ngIf="chartMetric === 'irr'">La TIR compara el rendimiento anual neto. Una ganancia mayor en pesos también puede deberse a invertir más dinero o durante más tiempo. Si no se puede calcular una TIR, no se dibuja una barra para ella.</div>
+          <div class="notice mt-3" *ngIf="chartMetric === 'profit'">Esta es la ganancia del plazo completo. Revisa al lado cuánto dinero se invierte y por cuántos días.</div>
+          <div class="notice mt-3" *ngIf="chartMetric === 'breakdown'">Las barras muestran qué suma y qué resta. “Ganancia / pérdida” es el resultado total; no se suma otra vez. En flujos manuales solo se conocen los costos iniciales y el resultado neto, sin reparto estimado.</div>
+          <div class="notice mt-3" *ngIf="chartMetric === 'periods'">{{ comparisonBasis === 'accrued' ? 'Los intereses se distribuyen según se generan dentro de cada periodo de pago, respetando la tasa simple o efectiva pactada. En automático se comparan mes a mes. La retención distribuida es estimada; capital y cobros netos siguen sus fechas de pago.' : 'Cada periodo muestra los pagos pactados. La vista automática mantiene sus fechas; cero significa que no se paga ese concepto en ese periodo.' }} Los flujos manuales no permiten estimar intereses generados. Pulsa la leyenda para aislar inversiones.</div>
+          <p class="form-text mt-3">Resultados proyectados. Revisa también el riesgo del emisor, la liquidez y los supuestos; el gráfico no determina por sí solo qué inversión elegir.</p>
+        </div>
+        <aside class="comparison-facts">
+          <article class="investment-card" *ngFor="let v of comparison; let i = index" [style.border-left-color]="palette[i % palette.length]">
+            <h3><i [style.background]="palette[i % palette.length]"></i>{{ v.name }}</h3>
+            <div class="comparison-date-editor">
+              <label class="form-label" [for]="'comparison-end-' + v.id">Vencimiento para comparar</label>
+              <div class="date-controls"><input class="form-control" type="date" [id]="'comparison-end-' + v.id" [(ngModel)]="comparisonDates[v.id]" [min]="v.start"><button class="btn btn-sm btn-outline-primary" (click)="applyComparisonDate(v)">Aplicar</button></div>
+              <div class="toolbar mt-2"><button class="btn btn-sm btn-light" *ngFor="let months of [1, 3, 6, 12]" (click)="extendComparison(v, months)">+{{ months }} {{ months === 1 ? 'mes' : 'meses' }}</button><button class="btn btn-sm btn-link" *ngIf="comparisonDrafts.has(v.id)" (click)="resetComparisonDate(v.id)">Restablecer</button></div>
+              <small *ngIf="comparisonDrafts.has(v.id)">Plazo simulado · pendiente de guardar</small>
+              <p class="form-text" *ngIf="v.mode === 'custom'">Esta inversión tiene cobros manuales: cambiar el vencimiento conserva sus pagos y fechas. Para añadir o mover cobros, edita sus flujos desde el registro.</p>
+              <p class="form-text" *ngIf="v.mode === 'schedule'">Se proyectan los pagos hasta la nueva fecha, con la tasa actual. No supone una renovación confirmada por el emisor.</p>
+            </div><p class="form-text">{{ v.type }} · {{ v.issuer || 'Sin emisor' }} · {{ status(v) }}</p>
+            <dl class="result-list">
+              <div><dt>TIR anual neta</dt><dd>{{ percent(comparisonResults.get(v.id)!.irr === null ? null : comparisonResults.get(v.id)!.irr! * 100) }}</dd></div>
+              <div><dt>Ganancia neta</dt><dd [class.negative]="comparisonResults.get(v.id)!.profit < 0">{{ money(comparisonResults.get(v.id)!.profit) }}</dd></div>
+              <div><dt>Compra + costos</dt><dd>{{ money(v.purchase + v.costs) }}</dd></div>
+              <div><dt>Capital del título</dt><dd>{{ money(v.nominal) }}</dd></div>
+              <div><dt>Fechas ({{ comparisonResults.get(v.id)!.days }} días)</dt><dd>{{ date(v.start) }} → {{ date(v.end) }}</dd></div>
+              <div><dt>Rentabilidad del plazo</dt><dd>{{ percent(comparisonResults.get(v.id)!.returnPct) }}</dd></div>
+              <div><dt>Cobros netos totales</dt><dd>{{ money(comparisonResults.get(v.id)!.income) }}</dd></div>
+            </dl>
+            <details><summary>Condiciones y movimientos</summary><dl class="result-list"><div><dt>Precio de compra</dt><dd>{{ money(v.purchase) }}</dd></div><div><dt>Costos iniciales</dt><dd>{{ money(v.costs) }}</dd></div><div><dt>Tasa / modelo</dt><dd>{{ rateLabel(v) }}</dd></div><ng-container *ngIf="v.mode === 'schedule'"><div><dt>Pago de intereses</dt><dd>{{ frequencyLabel(v.frequency) }}</dd></div><div><dt>Intereses brutos</dt><dd>{{ money(comparisonResults.get(v.id)!.interest) }}</dd></div><div><dt>Retención ({{ percent(v.withholding) }})</dt><dd>{{ money(comparisonResults.get(v.id)!.tax) }}</dd></div><div><dt>Base intereses / TIR</dt><dd>{{ v.couponConvention === 'fixed-period' ? 'Cupón fijo / TIR 365 días' : v.basis + ' / 365 días' }}</dd></div><div><dt>Diferencia capital − compra</dt><dd>{{ money(v.nominal - v.purchase) }}</dd></div></ng-container></dl><p class="form-text">{{ v.notes || 'Sin observaciones' }}</p><div class="table-responsive flow-table"><table class="table table-sm"><thead><tr><th>Fecha / concepto</th><th>Flujo neto</th></tr></thead><tbody><tr *ngFor="let flow of comparisonResults.get(v.id)!.flows"><td>{{ date(flow.date) }}<small class="d-block">{{ flow.concept }}</small></td><td>{{ money(flow.amount) }}</td></tr></tbody></table></div></details>
+          </article>
+        </aside>
+      </div>
+      <details class="mt-4"><summary>Ver tabla comparativa completa</summary>
+      <div class="table-responsive" *ngIf="comparison.length > 1"><table class="table comparison-table"><thead><tr><th>Indicador</th><th *ngFor="let v of comparison">{{ v.name }}</th></tr></thead><tbody><tr class="featured-row"><th>TIR anual neta</th><td *ngFor="let v of comparison">{{ percent(comparisonResults.get(v.id)!.irr === null ? null : comparisonResults.get(v.id)!.irr! * 100) }}</td></tr><tr><th>Desembolso inicial</th><td *ngFor="let v of comparison">{{ money(v.purchase + v.costs) }}</td></tr><tr><th>Plazo real</th><td *ngFor="let v of comparison">{{ comparisonResults.get(v.id)!.days }} días</td></tr><tr><th>Ganancia neta</th><td *ngFor="let v of comparison">{{ money(comparisonResults.get(v.id)!.profit) }}</td></tr><tr><th>Rentabilidad del plazo</th><td *ngFor="let v of comparison">{{ percent(comparisonResults.get(v.id)!.returnPct) }}</td></tr><tr><th>Total de cobros netos</th><td *ngFor="let v of comparison">{{ money(comparisonResults.get(v.id)!.income) }}</td></tr><tr><th>Modelo</th><td *ngFor="let v of comparison">{{ v.mode === 'custom' ? 'Flujos propios' : v.rateType === 'indexed' ? 'Índice + spread supuesto' : v.rateType === 'effective' ? 'Tasa EA' : 'Anual simple' }}</td></tr><tr><th>Observaciones</th><td *ngFor="let v of comparison">{{ v.notes || 'Sin observaciones' }}</td></tr></tbody></table></div>
+      </details>
+    </section>
+    <section class="panel" *ngIf="view === 'report' && activeReport as report">
+      <div class="section-heading"><div><p class="eyebrow">{{ report.institution }}</p><h2>{{ report.title }}</h2><p class="form-text">{{ report.filename }} · Corte {{ date(report.cutoff) }} · {{ report.positions.length }} posiciones · IPC del corte {{ percent(report.ipc) }}</p></div><button class="btn btn-primary" (click)="registerReport()">Registrar posiciones y guardar informe</button></div>
+      <div class="alert alert-danger" role="alert" *ngIf="reportError">{{ reportError }}</div>
+      <div class="summary-grid"><article><span>Posiciones por fondo</span><strong>{{ report.positions.length }}</strong><small>El mismo título en fondos distintos se conserva por separado.</small></article><article><span>Diferencias mayores a $ 0,01</span><strong>{{ reportDifferences }}</strong><small>Comparación de intereses brutos por mes.</small></article><article><span>Celdas de cobro pendientes</span><strong>{{ reportBlanks }}</strong><small>Los vacíos no equivalen a cero confirmado.</small></article></div>
+      <div class="notice">Este informe al corte contiene cobros previstos para los meses indicados, no un historial completo de pagos recibidos. IPC + spread se calcula con el IPC del corte constante. No certifica la TIR histórica, retenciones, costos adicionales ni el interés causado contablemente. Esos datos no están completos en el Excel.</div>
+      <h3 class="mt-4">Totales verificados contra el Excel</h3>
+      <div class="table-responsive"><table class="table"><thead><tr><th>Fondo</th><th>Nominal</th><th>Compra</th><th *ngFor="let month of report.positions[0].months">{{ month.period }}</th><th>Diferencias de totales</th></tr></thead><tbody><tr *ngFor="let total of report.totals"><td>{{ total.label }}</td><td>{{ money(total.nominal) }}</td><td>{{ money(total.purchase) }}</td><td *ngFor="let amount of total.months">{{ money(amount) }}</td><td><span *ngFor="let difference of total.differences">{{ difference === null ? 'No informado' : money(difference) }} · </span></td></tr></tbody></table></div>
+      <h3 class="mt-4">Revisión de cada posición</h3><p class="form-text">Se conserva la tasa original de Excel (fracción) y se convierte a porcentaje al registrar: 0,0629 = 6,29 %. “Sistema” reproduce el cupón y el calendario del informe; no cambia sus datos de origen.</p>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Origen / fondo</th><th>Título / emisor</th><th>Tasa y fechas</th><th>Nominal / compra</th><th>Mes · Excel / sistema / diferencia</th><th>Observaciones</th></tr></thead><tbody><tr *ngFor="let p of report.positions"><td>{{ report.sheet }} · fila {{ p.row }}<small class="d-block">{{ p.fund }}</small></td><td><strong>{{ p.investment.name }}</strong><small class="d-block">{{ p.investment.type }} · {{ p.investment.issuer }}</small></td><td>{{ p.reference }} · {{ percent(p.investment.rate) }}<small class="d-block">{{ frequencyLabel(p.investment.frequency) }}</small><small class="d-block">Emisión {{ date(p.investment.couponAnchor!) }}</small><small class="d-block">Compra {{ date(p.investment.start) }}</small><small class="d-block">Vence {{ date(p.investment.end) }}</small></td><td>{{ money(p.investment.nominal) }}<small class="d-block">Compra {{ money(p.investment.purchase) }}</small></td><td><div class="mb-2" *ngFor="let month of p.months"><strong>{{ month.period }}</strong><small class="d-block">Excel: {{ month.reported === null ? 'Vacío / pendiente' : money(month.reported) }}</small><small class="d-block">Sistema: {{ money(month.calculated) }}</small><small class="d-block" [class.negative]="month.difference !== null && (month.difference > 0.01 || month.difference < -0.01)">Diferencia: {{ month.difference === null ? 'No verificable' : money(month.difference) }}</small><small class="d-block" *ngIf="month.formula">{{ month.cell }} = {{ month.formula }}</small></div></td><td><p class="form-text" *ngFor="let warning of p.warnings">{{ warning }}</p></td></tr></tbody></table></div>
+      <details class="mt-4"><summary>Datos y fórmulas originales conservados ({{ report.cells.length }} celdas)</summary><div class="table-responsive flow-table"><table class="table table-sm"><thead><tr><th>Celda</th><th>Valor original</th><th>Fórmula</th><th>Formato Excel</th></tr></thead><tbody><tr *ngFor="let cell of report.cells"><td>{{ cell.address }}</td><td>{{ cell.value }}</td><td>{{ cell.formula || 'Valor ingresado' }}</td><td>{{ cell.format }}</td></tr></tbody></table></div></details>
+      <p class="form-text mt-3">Se guardan informe, fondos, posiciones y celdas en este navegador. La importación repetida conserva los registros existentes y no mezcla títulos de fondos diferentes. Descarga el respaldo JSON para trasladarlos a otro equipo.</p>
+    </section>
+    <section class="panel" *ngIf="view === 'export'">
+      <h2>Informe de las inversiones guardadas</h2><p class="form-text">Se exportan las {{ investments.length }} posiciones actuales, no solo las seleccionadas para comparar. Los registros eliminados no se incluyen.</p>
+      <div class="row g-3 mt-2"><div class="col-md-5"><label for="export-month" class="form-label">Mes de corte del informe</label><input id="export-month" class="form-control" type="month" [(ngModel)]="exportMonth"><small>La hoja principal mostrará los tres meses siguientes al corte, como en el archivo que enviaste.</small></div></div>
+      <div class="summary-grid mt-4"><article><span>1. Informe principal</span><strong>Por fondo</strong><small>Formato de la universidad: títulos, emisor, tasas, fechas, nominal, compra, pagos y totales.</small></article><article><span>2. Resumen didáctico</span><strong>Tu portafolio</strong><small>Composición por tipo y emisor, totales por fondo y explicación de los indicadores.</small></article><article><span>3. Detalle y calendario</span><strong>Cada inversión</strong><small>Condiciones actuales, TIR del escenario, notas, capital, interés, retención y pagos previstos.</small></article></div>
+      <div class="notice">Los pagos son proyecciones de las condiciones guardadas. El IPC usa el supuesto de cada inversión; no se reemplaza por un dato futuro oficial. Si el registro es manual, se conserva como cobro neto sin inventar intereses. Las inversiones sin fondo quedan en un bloque separado.</div>
+      <button class="btn btn-primary mt-4" [disabled]="exporting || !exportMonth || !investments.length" (click)="exportUniversityReport()">{{ exporting ? 'Preparando Excel…' : 'Descargar informe Excel' }}</button>
+    </section>
+    <footer>Los informes se incorporarán cuando se defina su formato.</footer>
+  </main>
 </div>
