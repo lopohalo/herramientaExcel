@@ -8,20 +8,21 @@ const assert = require('assert/strict');
 const XLSX = require('xlsx-js-style');
 const base = path.resolve(__dirname, '../src/app/component/prueba');
 function cargar(nombre) {
-  const contexto = { exports: {}, require: ruta => cargar(path.relative(base, path.resolve(base, path.dirname(nombre), ruta + '.ts'))) };
+  const contexto = { exports: {}, require: ruta => ruta.startsWith('.') ? cargar(path.relative(base, path.resolve(base, path.dirname(nombre), ruta + '.ts'))) : require(ruta) };
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(base, nombre), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText, contexto);
   return contexto.exports;
 }
 const { crearLectorBalance } = cargar('fuente-balance.ts');
+const { crearEstadosInstitucionales } = cargar('estados-institucionales.ts');
 const { leerBalanceOficialTxt, limpiarFilasBalance } = cargar('importar-balance.ts');
 const { leerSaldosCiclo, revisarSaldosCiclo } = cargar('saldos-ciclo.ts');
 const source = ts.createSourceFile('component.ts', fs.readFileSync(path.join(base, 'prueba.component.ts'), 'utf8'), ts.ScriptTarget.Latest, true);
 const clase = source.statements.find(ts.isClassDeclaration);
 let exportado;
 const contexto = {
-  crearLectorBalance, leerSaldosCiclo, revisarSaldosCiclo,
+  crearEstadosInstitucionales, crearLectorBalance, leerSaldosCiclo, revisarSaldosCiclo,
   XLSXStyle: { ...XLSX, writeFile: libro => { exportado = libro; } },
   Swal: { fire() {} },
 };
@@ -60,6 +61,22 @@ function verificar(fuente, esperado, etiqueta) {
     cerca(situacion.filter(f => f.seccion === seccion && !f.esTotal).reduce((n, f) => n + f.nuevoSaldo, 0), porCodigo(codigo), `${etiqueta} suma ${seccion}`);
   }
   c.exportarEstadoSituacionFinanciera();
+  assert.deepEqual(Array.from(exportado.SheetNames), ['Balance institucional', 'Resultados institucionales', 'Situacion financiera', 'Estado de resultados']);
+  const institucional = releerHoja('Balance institucional');
+  const totalInstitucional = nombre => institucional.find(f => f[1] === nombre)?.[3];
+  for (const [nombre, codigo] of [['Total Activos', 'TOTAL-A'], ['Total Pasivo ', 'TOTAL-P'], ['Total Patrimonio', 'TOTAL-PAT'], ['Patrimonio + Resultado del periodo', 'TOTAL-PAT-R'], ['Total Pasivo + Patrimonio + Resultado del periodo', 'TOTAL-PP']]) {
+    cerca(totalInstitucional(nombre), porCodigo(codigo), `${etiqueta} primera hoja ${nombre}`);
+  }
+  const institucionalResultados = releerHoja('Resultados institucionales');
+  for (const [nombre, codigo] of [['TOTAL INGRESOS', 'TOTAL-I'], ['TOTAL COSTOS Y GASTOS', 'TOTAL-CG'], ['RESULTADO DEL EJERCICIO', 'RESULTADO']]) {
+    cerca(institucionalResultados.find(f => f[1] === nombre)[3], c.construirEstadoResultadosFinancieros().find(f => f.codigo === codigo).valor, `${etiqueta} segunda hoja ${nombre}`);
+  }
+  for (const nombre of exportado.SheetNames.slice(0, 2)) {
+    assert.equal(XLSX.utils.decode_range(exportado.Sheets[nombre]['!ref']).e.c, 3);
+    const textos = Object.values(exportado.Sheets[nombre]).filter(v => v && v.t === 's').map(v => v.v).join(' ');
+    assert(!/2025|2024|VARIACI[ÓO]N|Junio 30 2016/.test(textos), 'Sin comparativo ni fechas del ejemplo');
+    assert(exportado.Sheets[nombre]['!merges'].length >= 4);
+  }
   const filas = releerHoja('Situacion financiera').slice(6);
   assert.equal(filas.length, situacion.length);
   situacion.forEach((fila, i) => {

@@ -1,3 +1,4 @@
+import { crearEstadosInstitucionales } from './estados-institucionales';
 import { leerSaldosCiclo, revisarSaldosCiclo, RevisionSaldoCiclo } from './saldos-ciclo';
 import { crearLectorBalance } from './fuente-balance';
 import { limpiarFilasBalance, leerBalanceOficialTxt } from './importar-balance';
@@ -28311,6 +28312,11 @@ export class PruebaComponent implements OnInit {
       }
     });
     const libro = XLSXStyle.utils.book_new();
+    const institucionales = crearEstadosInstitucionales(
+      this.tablaInicialGuardada, datos, this.construirEstadoResultadosFinancieros(), new Date().getFullYear()
+    );
+    XLSXStyle.utils.book_append_sheet(libro, institucionales[0], 'Balance institucional');
+    XLSXStyle.utils.book_append_sheet(libro, institucionales[1], 'Resultados institucionales');
     XLSXStyle.utils.book_append_sheet(libro, hoja, 'Situacion financiera');
     XLSXStyle.utils.book_append_sheet(
       libro,
