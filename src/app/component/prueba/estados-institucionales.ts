@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx-js-style';
-import { crearLectorBalance } from './fuente-balance';
+import { crearLectorBalance, normalizarFuenteBalance } from './fuente-balance';
 import { estilosInstitucionales, plantillasInstitucionales } from './formato-institucional';
 
 const formatoImporte = '#,##0;[Red](#,##0);"-"';
@@ -59,6 +59,7 @@ function insertar(hoja: any, antes: number, filas: Array<[string, number]>): voi
 }
 
 export function crearEstadosInstitucionales(fuente: any[], situacion: any[], resultados: any[], anio: number): any[] {
+  fuente = normalizarFuenteBalance(fuente);
   const leer = crearLectorBalance(fuente);
   const saldo = (codigo: string): number => leer(codigo, 'nuevoSaldo');
   const cuentas = fuente.filter(cuenta => /^\d/.test(cuenta.codigo) && !fuente.some(otra => String(otra.codigo).startsWith(`${cuenta.codigo}.`)));
@@ -87,6 +88,10 @@ export function crearEstadosInstitucionales(fuente: any[], situacion: any[], res
     59: redondear(valor('3.1.45') + transicion), 60: valor('3.1.51'), 61: valor('TOTAL-PAT'), 63: valor('TOTAL-PP'),
     66: valor('8'), 67: valor('9'), 68: redondear(valor('8') + valor('9')),
   };
+  for (const [fila, codigo, seccion] of [[41, '2.5.12', 'Pasivo corriente'], [48, '2.5.14', 'Pasivo no corriente'], [49, '2.5.12', 'Pasivo no corriente']] as const) {
+    const cuenta = situacion.find(f => f.codigo === codigo && f.seccion === seccion);
+    if (cuenta) celda(hoja1, fila, 1, cuenta.nombre);
+  }
   Object.entries(valores1).forEach(([fila, v]) => celda(hoja1, Number(fila), 3, v));
   celda(hoja1, 63, 1, 'Total Pasivo + Patrimonio + Resultado del periodo');
   const extras = (seccion: string, incluidos: string[]): Array<[string, number]> => situacion

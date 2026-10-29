@@ -1,6 +1,9 @@
+import { interpretarImportePegado } from './modall/importe-pegado';
+import { prepararDetalleHistorico, agruparDetalleHistorico } from './balance-historico';
+import { agregarNotasFinancieras, leerFuenteNotasBase, FuenteNotasBase, validarNotasFinancieras } from './notas-financieras';
 import { crearEstadosInstitucionales } from './estados-institucionales';
 import { leerSaldosCiclo, revisarSaldosCiclo, RevisionSaldoCiclo } from './saldos-ciclo';
-import { crearLectorBalance } from './fuente-balance';
+import { crearLectorBalance, normalizarFuenteBalance } from './fuente-balance';
 import { limpiarFilasBalance, leerBalanceOficialTxt } from './importar-balance';
 import {
   Component,
@@ -28037,7 +28040,7 @@ export class PruebaComponent implements OnInit {
     const totalAC = sumar(ac, 'tipoDeCuenta');
 
     const propiedadInversion = noCorriente('1.9.51') + noCorriente('1.9.52');
-    const intangibles = noCorriente('1.9.70');
+    const intangibles = noCorriente('1.9.70') + noCorriente('1.9.75') + noCorriente('1.9.76');
     const otrosANC = noCorriente('1.9') - propiedadInversion - intangibles;
     const anc = [
       filaNoCorriente('1.1', 'EFECTIVO Y EQUIVALENTES AL EFECTIVO', 'Activo no corriente'),
@@ -28057,8 +28060,8 @@ export class PruebaComponent implements OnInit {
     const pc = [
       filaCorriente('2.4', 'CUENTAS POR PAGAR', 'Pasivo corriente'),
       filaCorriente('2.5.11', 'BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO', 'Pasivo corriente'),
-      filaCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo corriente'),
-      filaCorriente('2.5.14', 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO', 'Pasivo corriente'),
+      filaCorriente('2.5.12', nombreCuenta('2.5.12') === '2.5.12' ? 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO' : nombreCuenta('2.5.12'), 'Pasivo corriente'),
+      filaCorriente('2.5.14', nombreCuenta('2.5.14') === '2.5.14' ? 'BENEFICIOS POSEMPLEO - PENSIONES' : nombreCuenta('2.5.14'), 'Pasivo corriente'),
       filaCorriente('2.7', 'PROVISIONES', 'Pasivo corriente'),
       filaCorriente('2.9', 'OTROS PASIVOS CORRIENTES', 'Pasivo corriente'),
     ];
@@ -28068,8 +28071,8 @@ export class PruebaComponent implements OnInit {
     const pnc = [
       filaNoCorriente('2.4', 'CUENTAS POR PAGAR', 'Pasivo no corriente'),
       filaNoCorriente('2.5.11', 'BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO', 'Pasivo no corriente'),
-      filaNoCorriente('2.5.14', 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO', 'Pasivo no corriente'),
-      filaNoCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo no corriente'),
+      filaNoCorriente('2.5.14', nombreCuenta('2.5.14') === '2.5.14' ? 'BENEFICIOS POSEMPLEO - PENSIONES' : nombreCuenta('2.5.14'), 'Pasivo no corriente'),
+      filaNoCorriente('2.5.12', nombreCuenta('2.5.12') === '2.5.12' ? 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO' : nombreCuenta('2.5.12'), 'Pasivo no corriente'),
       filaNoCorriente('2.7', 'PROVISIONES', 'Pasivo no corriente'),
       filaNoCorriente('2.9', 'OTROS PASIVOS NO CORRIENTES', 'Pasivo no corriente'),
     ];
@@ -28323,6 +28326,9 @@ export class PruebaComponent implements OnInit {
       this.crearHojaEstadoResultadosFinancieros(),
       'Estado de resultados'
     );
+    agregarNotasFinancieras(libro, this.tablaInicialGuardada, String(new Date().getFullYear()), datos);
+    try { validarNotasFinancieras(libro, datos); }
+    catch (error) { Swal.fire('Revisar notas antes de descargar', error instanceof Error ? error.message : 'Hay saldos pendientes de conciliar.', 'error'); return; }
     const fecha = new Date();
     const sello = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
     XLSXStyle.writeFile(libro, `UIS_Estados_Financieros_${sello}.xlsx`, {
@@ -28457,22 +28463,25 @@ export class PruebaComponent implements OnInit {
           <strong style="display:block;margin-bottom:7px">¿Cómo generar el reporte?</strong>
           <ol style="margin:0;padding-left:20px;line-height:1.55">
             <li>Selecciona el mes y año del balance actualmente cargado en el sistema.</li>
-            <li>Selecciona el mes y el año histórico que deseas tomar del archivo.</li>
-            <li>Adjunta el Excel que contiene las hojas de Balance y Estado de Resultados.</li>
-            <li>Presiona <b>Guardar y seguir</b> para descargar el resultado.</li>
+            <li>Selecciona el mes y año del periodo base. Sus archivos se procesan por separado.</li>
+            <li>Adjunta el balance original del periodo base (Excel o TXT) y, si corresponde, sus saldos por ciclo.</li>
+            <li>Revisa el histórico antes de descargar. El balance actual conserva sus ediciones.</li>
           </ol>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:left">
           <label>Mes periodo actual<select id="mes-actual" class="swal2-input" style="margin:6px 0;width:100%">${opcionesMes(hoy.getMonth() + 1)}</select></label>
           <label>Año periodo actual<input id="anio-actual" class="swal2-input" type="number" min="2000" max="2100" value="${hoy.getFullYear()}" style="margin:6px 0;width:100%"></label>
-          <label>Mes histórico<select id="mes-base" class="swal2-input" style="margin:6px 0;width:100%">${opcionesMes(6)}</select></label>
-          <label>Año histórico<select id="anio-base" class="swal2-input" style="margin:6px 0;width:100%"><option value="2025">2025</option><option value="2024">2024</option></select></label>
+          <label>Mes histórico<select id="mes-base" class="swal2-input" style="margin:6px 0;width:100%">${opcionesMes(hoy.getMonth() + 1)}</select></label>
+          <label>Año histórico<input id="anio-base" class="swal2-input" type="number" min="2000" max="2100" value="${hoy.getFullYear() - 1}" style="margin:6px 0;width:100%"></label>
         </div>
-        <label style="display:block;margin-top:18px;text-align:left;font-weight:600;color:#425b50">Archivo comparativo</label>
+        <label style="display:block;margin-top:16px;text-align:left">Formato del periodo base<select id="formato-base" class="swal2-input" style="width:100%;margin:6px 0"><option value="original">Balance original: procesar desde cero</option><option value="informe">Informe de estados financieros ya generado</option></select></label>
+        <label style="display:block;margin-top:18px;text-align:left;font-weight:600;color:#425b50">Balance del periodo base</label>
         <label for="archivo-balance-comparativo" style="display:flex;align-items:center;gap:10px;margin-top:7px;padding:15px;border:1px dashed #6fa78d;border-radius:10px;background:#f8fbf9;cursor:pointer;text-align:left">
-          <span style="font-size:23px">📄</span><span id="nombre-archivo-comparativo">Seleccionar archivo .xls o .xlsx</span>
+          <span style="font-size:23px">📄</span><span id="nombre-archivo-comparativo">Seleccionar balance .xls, .xlsx o .txt</span>
         </label>
-        <input id="archivo-balance-comparativo" type="file" accept=".xls,.xlsx" style="display:none">`,
+        <input id="archivo-balance-comparativo" type="file" accept=".xls,.xlsx,.txt" style="display:none">
+        <label style="display:block;margin-top:16px;text-align:left">Saldos por ciclo del periodo base (opcional)<input id="archivo-ciclos-base" type="file" accept=".xls,.xlsx" style="display:block;margin-top:8px;width:100%"></label>
+        <p style="font-size:12px;text-align:left;color:#64748b">El ciclo se aplica solamente al balance original del periodo base. Se usa SC Año Vigente del archivo de ese año.</p>`,
       showCancelButton: true,
       confirmButtonText: 'Guardar y seguir',
       cancelButtonText: 'Cancelar',
@@ -28482,7 +28491,7 @@ export class PruebaComponent implements OnInit {
         const selector = document.getElementById('archivo-balance-comparativo') as HTMLInputElement;
         selector?.addEventListener('change', () => {
           const nombre = document.getElementById('nombre-archivo-comparativo');
-          if (nombre) nombre.textContent = selector.files?.[0]?.name || 'Seleccionar archivo .xls o .xlsx';
+          if (nombre) nombre.textContent = selector.files?.[0]?.name || 'Seleccionar balance .xls, .xlsx o .txt';
         });
       },
       preConfirm: () => {
@@ -28491,7 +28500,9 @@ export class PruebaComponent implements OnInit {
         const mesBase = Number((document.getElementById('mes-base') as HTMLSelectElement)?.value);
         const anioBase = Number((document.getElementById('anio-base') as HTMLSelectElement)?.value);
         const archivo = (document.getElementById('archivo-balance-comparativo') as HTMLInputElement)?.files?.[0];
-        if (!mesActual || !mesBase || anioActual < 2000) {
+        const formato = (document.getElementById('formato-base') as HTMLSelectElement)?.value;
+        const ciclos = (document.getElementById('archivo-ciclos-base') as HTMLInputElement)?.files?.[0];
+        if (!mesActual || !mesBase || anioActual < 2000 || anioActual > 2100 || anioBase < 2000 || anioBase > 2100 || anioActual === anioBase && mesActual === mesBase) {
           Swal.showValidationMessage('Selecciona meses y años válidos.');
           return false;
         }
@@ -28499,17 +28510,25 @@ export class PruebaComponent implements OnInit {
           Swal.showValidationMessage('Debes seleccionar el archivo del balance comparativo.');
           return false;
         }
-        if (!/\.xlsx?$/i.test(archivo.name)) {
-          Swal.showValidationMessage('El archivo debe tener formato .xls o .xlsx.');
+        if (!(formato === 'original' ? /\.(xlsx?|txt)$/i : /\.xlsx?$/i).test(archivo.name)) {
+          Swal.showValidationMessage('Revisa el formato del archivo para el modo seleccionado.');
           return false;
         }
-        return { mesActual, anioActual, mesBase, anioBase, archivo };
+        if (ciclos && (formato !== 'original' || !/\.xlsx?$/i.test(ciclos.name))) {
+          Swal.showValidationMessage('Los saldos por ciclo requieren un balance original y un archivo de ciclo Excel.');
+          return false;
+        }
+        return { mesActual, anioActual, mesBase, anioBase, archivo, formato, ciclos };
       },
     });
     if (!seleccion.isConfirmed || !seleccion.value) return;
     const valor = seleccion.value as any;
     const archivo = valor.archivo as File;
     try {
+      if (valor.formato === 'original') {
+        await this.generarComparativoDesdeOriginal(archivo, valor.ciclos, `${meses[valor.mesActual - 1]} ${valor.anioActual}`, `${meses[valor.mesBase - 1]} ${valor.anioBase}`);
+        return;
+      }
       const libroBase = XLSX.read(await archivo.arrayBuffer(), { type: 'array', cellDates: false });
       const estructura = this.detectarEstructuraBalanceComparativo(libroBase, 'balance');
       if (!estructura) throw new Error('No se encontró la hoja de Balance con las columnas de años.');
@@ -28536,11 +28555,94 @@ export class PruebaComponent implements OnInit {
         `${meses[valor.mesActual - 1]} ${valor.anioActual}`,
         `${meses[valor.mesBase - 1]} ${valor.anioBase}`,
         datosResultados,
-        resultadosActuales
+        resultadosActuales,
+        leerFuenteNotasBase(libroBase, valor.anioBase)
       );
     } catch (error: any) {
       Swal.fire('No fue posible generar el comparativo', error?.message || 'Revisa el archivo seleccionado.', 'error');
     }
+  }
+
+  private async generarComparativoDesdeOriginal(archivo: File, archivoCiclos: File | undefined, periodoActual: string, periodoBase: string): Promise<void> {
+    const contenido = await archivo.arrayBuffer();
+    let filas: any[] = [];
+    if (/\.txt$/i.test(archivo.name)) {
+      let texto: string;
+      try { texto = new TextDecoder('utf-8', { fatal: true }).decode(contenido); }
+      catch (_error) { texto = new TextDecoder('windows-1252').decode(contenido); }
+      filas = leerBalanceOficialTxt(texto);
+    } else {
+      const libro = XLSX.read(contenido, { type: 'array' });
+      for (const nombre of libro.SheetNames) {
+        const candidatas = limpiarFilasBalance(XLSX.utils.sheet_to_json(libro.Sheets[nombre]));
+        if (candidatas.length) { filas = candidatas; break; }
+      }
+    }
+    if (!filas.length) throw new Error('No se encontraron cuentas en el balance original del periodo base.');
+    const aislado = new PruebaComponent(this.router, this.dialog);
+    aislado.modeloDeDatosContabilidad = this.clonarDatos(this.modeloDeDatosContabilidad);
+    aislado.modeloPorcentajes = this.clonarDatos(this.modeloPorcentajes);
+    aislado.datosTabla = prepararDetalleHistorico(filas, aislado.modeloDeDatosContabilidad);
+    aislado.aplicarDistribucionAutomaticaInicial();
+    aislado.datosTabla.forEach((cuenta: any) => {
+      cuenta.tipoDeCuenta = this.redondearImporte(Number(cuenta.tipoDeCuenta || 0));
+      cuenta.compartidoTipo = this.redondearImporte(cuenta.nuevoSaldo - cuenta.tipoDeCuenta);
+    });
+    let revision: RevisionSaldoCiclo[] = [];
+    if (archivoCiclos) {
+      const libro = XLSX.read(await archivoCiclos.arrayBuffer(), { type: 'array' });
+      const registros = leerSaldosCiclo(libro.SheetNames.map(nombre => XLSX.utils.sheet_to_json<any[]>(libro.Sheets[nombre], { header: 1, defval: null })));
+      revision = revisarSaldosCiclo(registros, aislado.datosTabla);
+      revision.filter(fila => !fila.motivo).forEach(fila => {
+        const cuenta = aislado.datosTabla.find((c: any) => c.codigo === fila.codigo);
+        cuenta.tipoDeCuenta = fila.corriente;
+        cuenta.compartidoTipo = fila.noCorriente;
+        cuenta.clasificacionPendiente = false;
+      });
+    }
+    aislado.tablaInicialGuardada = agruparDetalleHistorico(aislado.datosTabla, this.modeloDeDatosSistemaContaduria);
+    const resultadoBase = aislado.construirEstadoResultadosFinancieros();
+    const escapar = (texto: any): string => String(texto ?? '').replace(/[&<>"']/g, caracter => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[caracter]!));
+    const moneda = (valor: number) => valor.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pendientes = aislado.datosTabla.filter((c: any) => c.clasificacionPendiente && c.nuevoSaldo !== 0).length;
+    const confirmado = await Swal.fire({
+      title: `Revisar periodo base: ${periodoBase}`, width: 1000,
+      html: `<p>${aislado.datosTabla.length} cuentas procesadas. ${pendientes} distribuciones pendientes de revisión.</p>
+        <p>${revision.filter(f => !f.motivo).length} rubros del ciclo aplicables · ${revision.filter(f => f.motivo).length} omitidos.</p>
+        <p>Los saldos sin plazo definido se conservan en no corriente y se identifican en el detalle. El periodo actual no se modifica.</p>
+        <p>Puedes editar corriente aquí. No corriente se calcula restando al saldo; los cambios solo afectan al periodo base.</p>
+        <div style="max-height:330px;overflow:auto;text-align:left"><table style="width:100%;font-size:12px"><thead><tr><th>Cuenta</th><th>Saldo</th><th>Corriente</th><th>No corriente</th></tr></thead><tbody>${aislado.datosTabla.map((f: any, i: number) => `<tr><td>${escapar(f.codigo)} ${escapar(f.nombre)} ${f.clasificacionPendiente ? '(Revisar distribución)' : ''}</td><td>${moneda(f.nuevoSaldo)}</td><td><input type="text" inputmode="decimal" data-corriente-base="${i}" value="${f.tipoDeCuenta}" style="width:140px"></td><td data-no-corriente-base="${i}">${moneda(f.compartidoTipo)}</td></tr>`).join('')}</tbody></table></div>
+        <details style="margin-top:12px;text-align:left"><summary>Rubros de ciclo omitidos (${revision.filter(f => f.motivo).length})</summary>${revision.filter(f => f.motivo).map(f => `<p>${escapar(f.codigo)}: ${escapar(f.motivo)}</p>`).join('')}</details>`,
+      showCancelButton: true, confirmButtonText: 'Descargar comparativo', cancelButtonText: 'Cancelar', confirmButtonColor: '#176b4d',
+      didOpen: () => {
+        document.querySelectorAll<HTMLInputElement>('[data-corriente-base]').forEach(input => {
+          input.addEventListener('input', () => {
+            const indice = Number(input.dataset['corrienteBase']);
+            const corriente = interpretarImportePegado(input.value);
+            const destino = document.querySelector(`[data-no-corriente-base="${indice}"]`);
+            if (destino) destino.textContent = corriente === null ? 'Importe inválido' : moneda(this.redondearImporte(aislado.datosTabla[indice].nuevoSaldo - corriente));
+          });
+        });
+      },
+      preConfirm: () => {
+        const entradas = Array.from(document.querySelectorAll<HTMLInputElement>('[data-corriente-base]'));
+        const valores = entradas.map(input => interpretarImportePegado(input.value));
+        if (valores.some(v => v === null)) { Swal.showValidationMessage('Revisa los importes de corriente del periodo base.'); return false; }
+        valores.forEach((corriente, i) => {
+          const cuenta = aislado.datosTabla[i];
+          if (cuenta.tipoDeCuenta !== corriente) cuenta.clasificacionPendiente = false;
+          cuenta.tipoDeCuenta = corriente;
+          cuenta.compartidoTipo = this.redondearImporte(cuenta.nuevoSaldo - Number(corriente));
+        });
+        return true;
+      },
+    });
+    if (!confirmado.isConfirmed) return;
+    this.asegurarTablaInicial();
+    aislado.tablaInicialGuardada = agruparDetalleHistorico(aislado.datosTabla, this.modeloDeDatosSistemaContaduria);
+    this.exportarBalanceComparativo(this.construirEstadoSituacionFinanciera(), aislado.construirEstadoSituacionFinanciera(), periodoActual, periodoBase,
+      resultadoBase.map(fila => ({ ...fila, nuevoSaldo: fila.valor })), this.construirEstadoResultadosFinancieros(),
+      { cuentas: aislado.tablaInicialGuardada, completa: true });
   }
 
   private detectarEstructuraBalanceComparativo(libro: XLSX.WorkBook, tipo: 'balance' | 'resultados' = 'balance'): any | null {
@@ -28620,7 +28722,7 @@ export class PruebaComponent implements OnInit {
     return Number.isFinite(numero) ? (negativo ? -Math.abs(numero) : numero) : 0;
   }
 
-  private exportarBalanceComparativo(actuales: any[], base: any[], periodoActual: string, periodoBase: string, baseResultados: any[] = [], actualesResultados: any[] = []): void {
+  private exportarBalanceComparativo(actuales: any[], base: any[], periodoActual: string, periodoBase: string, baseResultados: any[] = [], actualesResultados: any[] = [], fuenteNotasBase?: FuenteNotasBase): void {
     const claveNombre = (valor: any): string => String(valor ?? '')
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
       .replace(/\btotal\b/g, '').replace(/[^a-z0-9]/g, '');
@@ -28702,6 +28804,16 @@ export class PruebaComponent implements OnInit {
       const hojaResultados = this.crearHojaResultadosComparativa(actualesResultados, baseResultados, periodoActual, periodoBase);
       XLSXStyle.utils.book_append_sheet(libro, hojaResultados, 'Estado resultados');
     }
+    if (fuenteNotasBase?.completa) {
+      const detalle = (cuentas: any[]) => XLSXStyle.utils.aoa_to_sheet([
+        ['Código', 'Cuenta', 'Saldo anterior', 'Débito', 'Crédito', 'Saldo final', 'Corriente', 'No corriente', 'Estado'],
+        ...cuentas.map(c => [c.codigo, c.nombre, c.saldoAnterior, c.debito, c.credito, c.nuevoSaldo, c.tipoDeCuenta, c.compartidoTipo, c.clasificacionPendiente ? 'Revisar distribución' : 'Clasificada']),
+      ]);
+      XLSXStyle.utils.book_append_sheet(libro, detalle(this.tablaInicialGuardada), 'Detalle periodo actual');
+      XLSXStyle.utils.book_append_sheet(libro, detalle(fuenteNotasBase.cuentas), 'Detalle periodo base');
+    }
+    agregarNotasFinancieras(libro, this.tablaInicialGuardada, periodoActual, actuales, fuenteNotasBase, periodoBase);
+    validarNotasFinancieras(libro, actuales);
     const sello = `${periodoActual.replace(/\s+/g, '_')}_vs_${periodoBase.replace(/\s+/g, '_')}`;
     const nombreArchivo = `UIS_Balance_Comprobacion_Comparativo_${sello}.xlsx`;
     XLSXStyle.writeFile(libro, nombreArchivo, { bookType: 'xlsx', cellStyles: true, compression: true });
@@ -29071,17 +29183,17 @@ export class PruebaComponent implements OnInit {
         try {
           const datos = JSON.parse(persistida);
           if (Array.isArray(datos) && datos.length) {
-            this.tablaInicialGuardada = this.clonarDatos(datos);
+            this.tablaInicialGuardada = normalizarFuenteBalance(datos);
             return;
           }
         } catch (_error) {}
       }
-      this.tablaInicialGuardada = this.clonarDatos(this.datosTabla);
+      this.tablaInicialGuardada = normalizarFuenteBalance(this.datosTabla);
     }
   }
 
   guardarFuenteOriginal(datos: any[] = this.tablaInicialGuardada): void {
-    const copia = this.clonarDatos(datos);
+    const copia = normalizarFuenteBalance(datos);
     this.tablaInicialGuardada = copia;
     localStorage.setItem('reporteFuenteOriginal', JSON.stringify(copia));
 
