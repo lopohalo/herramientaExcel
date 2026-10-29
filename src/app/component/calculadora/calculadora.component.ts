@@ -296,16 +296,26 @@ export class CaculadoraComponent implements OnInit {
     if (this.storageDamaged) return;
     try {
       if (localStorage.getItem(this.initialSeedKey)) return;
-      const report = await this.initialReport.load();
-      if (!report) return;
-      if (this.reports.some(existing => existing.id === report.id)) {
-        localStorage.setItem(this.initialSeedKey, report.id); return;
+      const initial = await this.initialReport.load();
+      if (!initial) return;
+      // An already imported source report means the user may have removed some of
+      // its positions deliberately; do not resurrect them during the migration.
+      if (initial.reports.length && initial.reports.every(report => this.reports.some(existing => existing.id === report.id))) {
+        localStorage.setItem(this.initialSeedKey, 'json-v1'); return;
       }
-      const previousReport = this.activeReport;
-      this.activeReport = report; this.registerReport(); this.activeReport = previousReport;
-      if (this.reportError) { this.error = this.reportError; return; }
-      localStorage.setItem(this.initialSeedKey, report.id);
-    } catch { this.error = 'No se pudo precargar el informe de septiembre. Revisa el almacenamiento o el archivo local del proyecto.'; }
+      const additions = initial.investments.filter(v => !this.investments.some(existing => existing.id === v.id));
+      const next = [...this.investments, ...additions];
+      const reports = [...this.reports, ...initial.reports.filter(report => !this.reports.some(existing => existing.id === report.id))];
+      const previousReports = localStorage.getItem(this.reportsKey);
+      localStorage.setItem(this.reportsKey, JSON.stringify(reports));
+      if (!this.persist(next)) {
+        if (previousReports === null) localStorage.removeItem(this.reportsKey); else localStorage.setItem(this.reportsKey, previousReports);
+        return;
+      }
+      this.reports = reports; additions.forEach(v => this.results.set(v.id, calculateInvestment(v)));
+      localStorage.setItem(this.initialSeedKey, 'json-v1');
+      this.message = `${additions.length} inversiones cargadas desde inversiones-iniciales.json. Tus cambios se guardan en este navegador.`;
+    } catch { this.error = 'No se pudo cargar inversiones-iniciales.json. Revisa el almacenamiento o que assets/informes/inversiones-iniciales.json esté incluido en el despliegue.'; }
   }
   ngOnInit(): void {
     try {

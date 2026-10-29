@@ -135,7 +135,7 @@ describe('Calculadora de inversiones', () => {
     expect(component.investments.length).toBe(0); expect(component.reports.length).toBe(0); expect(component.reportError).toBeTruthy();
   });
   it('precarga una sola vez y no restaura inversiones eliminadas por el usuario', async () => {
-    seedLoader.and.resolveTo(exampleReport());
+    const initial = exampleReport(); seedLoader.and.resolveTo({ investments: initial.positions.map(p => p.investment), reports: [initial] });
     await component.seedInitialReport();
     expect(component.investments.length).toBe(2); expect(component.reports.length).toBe(1);
     const removed = component.investments[0]; component.remove(removed);
@@ -145,7 +145,7 @@ describe('Calculadora de inversiones', () => {
   it('precarga sin sobrescribir los registros existentes', async () => {
     const report = exampleReport();
     component.investments = [{ ...report.positions[0].investment, name: 'Registro editado' }];
-    seedLoader.and.resolveTo(report); await component.seedInitialReport();
+    seedLoader.and.resolveTo({ investments: report.positions.map(p => p.investment), reports: [report] }); await component.seedInitialReport();
     expect(component.investments.length).toBe(2);
     expect(component.investments[0].name).toBe('Registro editado');
   });

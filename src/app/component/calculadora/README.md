@@ -169,44 +169,38 @@ celdas se almacenan en `inversiones.university-reports.v1`, y las posiciones en
 reconstruye desde sus celdas y se recalcula la conciliación.
 
 `localStorage` no es nube. Los datos son de ese navegador y origen, sin sincronización.
-Los archivos privados preparados para este usuario quedan en `.local-data/`, excluida
-de Git y de los recursos públicos de Angular. No se añaden a `src/assets`.
+Los respaldos de trabajo quedan en `.local-data/`, excluida de Git.
+Los datos iniciales y la plantilla que debe recibir Netlify están en `src/assets/informes/`.
 
-### Precarga local del informe proporcionado
+### Precarga del informe proporcionado
 
-En desarrollo, Angular sirve el respaldo privado de `.local-data/informes` como
-`assets/local-informes/uis-septiembre-2026-respaldo.json`. Al abrir la calculadora
-en localhost, se valida y registra automáticamente, sin selector de archivo.
-La marca `inversiones.initial-seed.uis-2026-09` evita repetir la carga y respeta
-las eliminaciones posteriores. Las posiciones existentes no se sobrescriben.
-Si el informe ya estaba importado, se conserva el registro tal como está.
+Angular sirve `src/assets/informes/inversiones-iniciales.json` tanto en desarrollo
+como en producción. La colección `investments` contiene las 35 posiciones y
+`reports` conserva la evidencia del Excel. La marca
+`inversiones.initial-seed.uis-2026-09` evita repetir la carga y respeta las
+eliminaciones posteriores. Las posiciones existentes no se sobrescriben.
 
-Esta configuración de assets solo existe en `development`; la carga también
-comprueba `isDevMode()` y el host local. El respaldo universitario no se copia
-a los assets comunes ni a la configuración de producción.
+### JSON inicial y cambios del usuario
 
-## Exportación en formato universitario
+`src/assets/informes/inversiones-iniciales.json` es la fuente de la primera carga, independiente de la
+lectura/importación del Excel. Se validan las inversiones y se guardan en
+`localStorage['inversiones.v2']`. Desde entonces prevalece el almacenamiento del
+navegador: altas, cambios y bajas persisten al recargar. No se modifica el JSON
+del disco desde el navegador. Descargar respaldo JSON genera un archivo nuevo
+con la cartera actual y los informes, incluyendo los cambios guardados.
 
-Exportar informe Excel toma todas las inversiones actualmente guardadas (no solo
-las seleccionadas para comparar) y permite elegir el mes de corte. La primera
-hoja sigue la plantilla original: encabezados, colores, estilos numéricos, fondos,
-columnas A–S, tres meses posteriores al corte, subtotales y total general.
-Las posiciones sin fondo se incluyen en un bloque propio. La agenda y los
-importes se recalculan desde las condiciones actuales. Los cambios sin guardar
-no participan. Los vacíos originales sin nuevos pagos calculados se conservan.
+## Precarga en Netlify y producción
 
-Se añaden tres hojas dinámicas: Resumen didáctico, Detalle de inversiones y
-Calendario de pagos. Explican los conceptos, muestran composición por tipo y
-emisor (sobre nominal), tasas/TIR del escenario, notas y pagos proyectados. Los
-cobros manuales no se convierten en intereses ni se descomponen arbitrariamente.
-Las tasas se escriben como fracciones con formato de porcentaje; el dinero y los
-conteos usan formatos diferentes.
+La fuente inicial distribuida con la aplicación es
+`src/assets/informes/inversiones-iniciales.json`. La plantilla de exportación
+está en `src/assets/informes/plantilla-universidad.xlsx`. Ambos se incluyen en
+los assets comunes de Angular, tanto en desarrollo como en producción.
+La carga no depende de isDevMode ni del hostname. Esta sección sustituye las
+restricciones de precarga local descritas antes: los archivos de esta carpeta
+se publican con el sitio y pueden descargarse desde su URL. `.local-data/`
+sigue siendo una carpeta de respaldos locales, no una dependencia del build.
 
-El exportador conserva los estilos de la plantilla y crea el libro con celdas
-actuales y fórmulas propias con valores calculados. No arrastra sharedStrings,
-referencias externas ni metadatos personales de ubicación del libro de origen;
-las filas eliminadas no quedan escondidas en el archivo exportado.
-
-La plantilla original privada está en `.local-data/informes/plantilla-universidad.xlsx`
-y solo se sirve en desarrollo local, igual que la precarga de datos. Para un
-despliegue distinto se debe configurar una plantilla de esa instalación.
+Después de publicar un nuevo build en Netlify, la primera visita carga el JSON
+y lo guarda en localStorage; las visitas posteriores conservan las ediciones
+y eliminaciones del navegador. localhost y Netlify tienen almacenamientos
+diferentes. No se sincronizan cambios entre navegadores o equipos.
