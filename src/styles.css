@@ -81,3 +81,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .account-adjustment-dialog .save-action { min-height: 38px !important; padding: 0 14px !important; font-size: 11px !important; font-weight: 750 !important; border-radius: 8px !important; }
 .account-adjustment-dialog .cancel-action { color: #536176 !important; background: #fff !important; border: 1px solid #d8dfe7 !important; }
 .account-adjustment-dialog .save-action { color: #fff !important; background: #177447 !important; border: 1px solid #177447 !important; }
+
+/* El contenedor del modal vive en el overlay de Angular Material. */
+.cycle-upload-dialog .mat-dialog-container,
+.cycle-upload-dialog .mdc-dialog__surface {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+}

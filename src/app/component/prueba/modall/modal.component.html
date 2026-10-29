@@ -69,13 +69,13 @@
         <div class="balance-summary"><small>Total clasificado</small><strong>{{ totalesDistribucion[i] | number:'1.2-2' }}</strong></div>
       </div>
       <div class="previous-balance-row">
-        <label class="previous-balance-input"><span>Saldo anterior</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="saldosAnteriores[i]" (ngModelChange)="actualizarSaldoAnterior(i)" /></div></label>
+        <label class="previous-balance-input"><span>Saldo anterior</span><div class="money-input"><span>$</span><input type="number" step="any" (paste)="pegarImporte($event, i, 'saldoAnterior')" [(ngModel)]="saldosAnteriores[i]" (ngModelChange)="actualizarSaldoAnterior(i)" /></div></label>
         <div class="calculated-balance"><div><small>Nuevo saldo calculado</small><span>Débito y crédito se conservan</span></div><strong>{{ nuevosSaldos[i] | number:'1.2-2' }}</strong></div>
       </div>
       <div class="distribution-fields">
-        <label><span>Valor corriente</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="valoresCorrientes[i]" (ngModelChange)="actualizarDesdeCorriente(i)" /></div></label>
+        <label><span>Valor corriente</span><div class="money-input"><span>$</span><input type="number" step="any" (paste)="pegarImporte($event, i, 'corriente')" [(ngModel)]="valoresCorrientes[i]" (ngModelChange)="actualizarDesdeCorriente(i)" /></div></label>
         <button type="button" class="balance-action" (click)="intercambiarDistribucion(i)" matTooltip="Intercambiar corriente y no corriente" aria-label="Intercambiar los valores corriente y no corriente"><mat-icon>sync_alt</mat-icon></button>
-        <label><span>Valor no corriente</span><div class="money-input"><span>$</span><input type="number" [(ngModel)]="valoresNoCorrientes[i]" (ngModelChange)="actualizarDesdeNoCorriente(i)" /></div></label>
+        <label><span>Valor no corriente</span><div class="money-input"><span>$</span><input type="number" step="any" (paste)="pegarImporte($event, i, 'noCorriente')" [(ngModel)]="valoresNoCorrientes[i]" (ngModelChange)="actualizarDesdeNoCorriente(i)" /></div></label>
         <div class="distribution-total" [class.matches]="diferenciaAjuste(i) === 0"><small>Total distribuido</small><strong>{{ totalDistribuido(i) | number:'1.2-2' }}</strong><span *ngIf="diferenciaAjuste(i) !== 0">Diferencia informativa: {{ diferenciaAjuste(i) | number:'1.2-2' }}</span><span *ngIf="diferenciaAjuste(i) === 0"><mat-icon>check_circle</mat-icon>Coincide</span></div>
       </div>
     </article>

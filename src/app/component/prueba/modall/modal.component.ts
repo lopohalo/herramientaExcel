@@ -1,3 +1,4 @@
+import { interpretarImportePegado } from './importe-pegado';
 import { Component, Inject, LOCALE_ID, OnInit, Output } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
@@ -81,6 +82,27 @@ export class ModalTablaComponent implements OnInit {
       cuentaCorriente: this.cuentaCorriente,
     };
     this.dialogRef1.close(obj);
+  }
+
+  pegarImporte(evento: ClipboardEvent, indice: number, campo: 'corriente' | 'noCorriente' | 'saldoAnterior'): void {
+    evento.preventDefault();
+    const valor = interpretarImportePegado(evento.clipboardData?.getData('text/plain') || '');
+    if (valor === null) {
+      this.errorAjuste = 'El valor pegado no es válido. Pega un solo importe, por ejemplo 1.739.891.084,50.';
+      return;
+    }
+    this.errorAjuste = '';
+    if (campo === 'corriente') {
+      this.valoresCorrientes[indice] = valor;
+      this.actualizarDesdeCorriente(indice);
+    } else if (campo === 'noCorriente') {
+      this.valoresNoCorrientes[indice] = valor;
+      this.actualizarDesdeNoCorriente(indice);
+    } else {
+      this.saldosAnteriores[indice] = valor;
+      this.actualizarSaldoAnterior(indice);
+    }
+    (evento.target as HTMLInputElement).value = String(valor);
   }
 
   totalDistribuido(index: number): number {

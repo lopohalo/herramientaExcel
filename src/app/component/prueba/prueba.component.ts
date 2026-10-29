@@ -1,9 +1,13 @@
+import { leerSaldosCiclo, revisarSaldosCiclo, RevisionSaldoCiclo } from './saldos-ciclo';
+import { crearLectorBalance } from './fuente-balance';
+import { limpiarFilasBalance, leerBalanceOficialTxt } from './importar-balance';
 import {
   Component,
   ElementRef,
   EventEmitter,
   Input,
   OnInit,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import * as XLSX from 'xlsx';
@@ -12,7 +16,7 @@ import { debounceTime } from 'rxjs/operators';
 import { formatNumber } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ModalTablaComponent } from './modall/modal.component';
 import { ModalTablaNuevasComponent } from './modal-tabla/modal-tabla.component';
 import Swal from 'sweetalert2';
@@ -22,6 +26,90 @@ import Swal from 'sweetalert2';
   styleUrls: ['./prueba.component.scss'],
 })
 export class PruebaComponent implements OnInit {
+  @ViewChild('modalSaldosCiclo') modalSaldosCiclo!: TemplateRef<any>;
+  private dialogoSaldosCiclo?: MatDialogRef<any>;
+
+  abrirSaldosCiclo(): void {
+    this.revisionSaldosCiclo = [];
+    this.archivoSaldosCiclo = '';
+    this.dialogoSaldosCiclo = this.dialog.open(this.modalSaldosCiclo, {
+      width: '760px', maxWidth: '96vw', maxHeight: '92vh',
+      ariaLabelledBy: 'cycle-modal-title',
+      autoFocus: false, panelClass: 'cycle-upload-dialog',
+    });
+  }
+
+  cerrarSaldosCiclo(): void {
+    this.dialogoSaldosCiclo?.close();
+  }
+
+  revisionSaldosCiclo: RevisionSaldoCiclo[] = [];
+  archivoSaldosCiclo = '';
+  private fuenteRevisionSaldosCiclo = '';
+  cargandoSaldosCiclo = false;
+  get cantidadSaldosAplicables(): number {
+    return this.revisionSaldosCiclo.filter(fila => !fila.motivo).length;
+  }
+
+  async cargarSaldosCiclo(evento: any): Promise<void> {
+    const archivo: File | undefined = evento.target.files?.[0];
+    if (!archivo) return;
+    this.revisionSaldosCiclo = [];
+    this.cargandoSaldosCiclo = true;
+    try {
+      this.asegurarTablaInicial();
+      const libro = XLSX.read(await archivo.arrayBuffer(), { type: 'array' });
+      const registros = leerSaldosCiclo(libro.SheetNames.map(nombre =>
+        XLSX.utils.sheet_to_json<any[]>(libro.Sheets[nombre], { header: 1, defval: null })
+      ));
+      this.revisionSaldosCiclo = revisarSaldosCiclo(registros, this.tablaInicialGuardada);
+      this.archivoSaldosCiclo = archivo.name;
+      this.dialogoSaldosCiclo?.updateSize('1100px');
+      this.fuenteRevisionSaldosCiclo = JSON.stringify(this.tablaInicialGuardada);
+    } catch (error) {
+      Swal.fire('No se pudieron leer los saldos por ciclo',
+        error instanceof Error ? error.message : 'Revisa el archivo.', 'error');
+    } finally {
+      this.cargandoSaldosCiclo = false;
+      evento.target.value = '';
+    }
+  }
+
+  aplicarSaldosCiclo(): void {
+    if (!this.cantidadSaldosAplicables) return;
+    if (this.fuenteRevisionSaldosCiclo !== JSON.stringify(this.tablaInicialGuardada)) {
+      Swal.fire('El balance cambió', 'Vuelve a cargar los saldos por ciclo para revisar los valores actualizados.', 'info');
+      this.revisionSaldosCiclo = [];
+      return;
+    }
+    const tipo = this.reporteActivo || 'original';
+    const fuente = this.clonarDatos(this.tablaInicialGuardada);
+    const leer = crearLectorBalance(this.tablaInicialGuardada);
+    fuente.forEach(cuenta => {
+      cuenta.tipoDeCuenta = leer(cuenta.codigo, 'tipoDeCuenta');
+      cuenta.compartidoTipo = leer(cuenta.codigo, 'compartidoTipo');
+    });
+    const ajustes = this.revisionSaldosCiclo.filter(fila => !fila.motivo).map(fila => ({
+      ...fuente.find(cuenta => cuenta.codigo === fila.codigo),
+      tipoDeCuenta: fila.corriente,
+      compartidoTipo: fila.noCorriente,
+    }));
+    this.datosTabla = fuente;
+    // Las diferencias se propagan a los padres usando el mismo flujo de edición.
+    this.reporteActivo = 'original';
+    this.aplicarAjustesDirectosAlReporte(ajustes);
+    this.guardarFuenteOriginal(this.datosTabla);
+    this.limpiarSeleccionTabla();
+    this.revisionSaldosCiclo = [];
+    this.cerrarSaldosCiclo();
+    if (tipo === 'chip') this.generarReporteChip();
+    else if (tipo === 'balance') this.generarReporteGeneral();
+    else if (tipo === 'situacion') this.generarEstadoSituacionFinanciera();
+    else if (tipo === 'resultados') this.generarReporteSecundario();
+    else this.mostrarInformacionOriginal();
+    Swal.fire('Distribución actualizada', `${ajustes.length} cuentas actualizadas desde SC Año Vigente. Los rubros omitidos no se modificaron.`, 'success');
+  }
+
   private readonly columnasTablaBase: string[] = [
     'tipo',
     'codigo',
@@ -26051,11 +26139,7 @@ export class PruebaComponent implements OnInit {
       this.filterValue = value.trim().toLocaleLowerCase('es-CO');
       this.currentPage = 1;
       this.actualizarPaginacionTabla();
-      this.selectAll = false;
-      this.seleccionados = [];
-      this.dataTareasPaginated.forEach((row: any) => {
-        row.tipo = this.selectAll;
-      });
+      this.limpiarSeleccionTabla();
     });
   }
   recibirValor(valor: any) {
@@ -26195,51 +26279,71 @@ export class PruebaComponent implements OnInit {
       this.seleccionados = [];
     }
   }
-  fileUpload(event: any) {
-    this.reporteActivo = '';
-    this.mostrarSelectorColumnas = false;
-    this.columnasReporteDisponibles = this.columnasTablaBase.filter(
-      (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
-    );
-    this.displayedColumns = [...this.columnasReporteDisponibles];
-    this.tablaInicialGuardada = [];
-    this.reporteChipGuardado = [];
-    this.datosReporteActual = [];
-    localStorage.removeItem('reporteChipModificado');
-    localStorage.removeItem('reporteFuenteOriginal');
-    ['original', 'chip', 'balance', 'situacion'].forEach((tipo: string) => {
-      localStorage.removeItem(`reporteIndependiente_${tipo}`);
-    });
-    this.reportesIndependientes = {};
-    this.reporteEnRecalculo = '';
-    if (!this.displayedColumns.includes('tipo')) {
-      this.displayedColumns = ['tipo', ...this.displayedColumns];
-    }
-    if (!this.columnasReporteDisponibles.includes('tipo')) {
-      this.columnasReporteDisponibles = ['tipo', ...this.columnasReporteDisponibles];
-    }
-    this.currentPage = 1;
-    this.pageSize = 100;
-    this.cargandoPaginaSpinner = 0;
-    const selectedFile = event.target.files[0];
-    const fileReader = new FileReader();
-    fileReader.readAsBinaryString(selectedFile);
-    fileReader.onload = (event: any) => {
-      let binaryData = event.target.result;
-      let workbook = XLSX.read(binaryData, { type: 'binary' });
-      workbook.SheetNames.forEach((sheet) => {
-        const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
-        this.convertedJson = JSON.stringify(data, undefined, 4);
-        this.datosTabla = data;
-        this.datosTabla2Recorrido = data;
-        this.datosHijosTabla = data;
+  async fileUpload(event: any): Promise<void> {
+    const archivo: File | undefined = event.target.files?.[0];
+    if (!archivo) return;
+    try {
+      const contenido = await archivo.arrayBuffer();
+      let datos: any[];
+      if (/\.txt$/i.test(archivo.name)) {
+        let texto: string;
+        try {
+          texto = new TextDecoder('utf-8', { fatal: true }).decode(contenido);
+        } catch (_error) {
+          texto = new TextDecoder('windows-1252').decode(contenido);
+        }
+        datos = leerBalanceOficialTxt(texto);
+      } else {
+        const libro = XLSX.read(contenido, { type: 'array' });
+        // Mantener la selección de hoja usada por el importador existente.
+        const hoja = libro.Sheets[libro.SheetNames[libro.SheetNames.length - 1]];
+        datos = limpiarFilasBalance(XLSX.utils.sheet_to_json(hoja));
+      }
+      if (!datos.length) {
+        throw new Error('No se encontraron cuentas de detalle. Revisa el archivo y sus columnas.');
+      }
+      this.reporteActivo = '';
+      this.mostrarSelectorColumnas = false;
+      this.columnasReporteDisponibles = this.columnasTablaBase.filter(
+        (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
+      );
+      this.displayedColumns = [...this.columnasReporteDisponibles];
+      this.tablaInicialGuardada = [];
+      this.reporteChipGuardado = [];
+      this.datosReporteActual = [];
+      localStorage.removeItem('reporteChipModificado');
+      localStorage.removeItem('reporteFuenteOriginal');
+      ['original', 'chip', 'balance', 'situacion'].forEach((tipo: string) => {
+        localStorage.removeItem(`reporteIndependiente_${tipo}`);
       });
-      console.log(this.datosTabla);
-      setTimeout(() => {
-        this.separarNumerosDelNombre(this.datosTabla);
-      }, 1000);
+      this.reportesIndependientes = {};
+      this.reporteEnRecalculo = '';
+      if (!this.displayedColumns.includes('tipo')) {
+        this.displayedColumns = ['tipo', ...this.displayedColumns];
+      }
+      if (!this.columnasReporteDisponibles.includes('tipo')) {
+        this.columnasReporteDisponibles = ['tipo', ...this.columnasReporteDisponibles];
+      }
+      this.currentPage = 1;
+      this.pageSize = 100;
+      this.cargandoPaginaSpinner = 0;
+      this.revisionSaldosCiclo = [];
+      this.convertedJson = JSON.stringify(datos, undefined, 4);
+      this.datosTabla = datos;
+      this.datosTabla2Recorrido = datos;
+      this.datosHijosTabla = datos;
+      this.filterValue = '';
+      this.seleccionados = [];
+      this.seleccionadosNewTable = [];
+      this.separarNumerosDelNombre(datos);
       this.validartabla = 1;
-    };
+    } catch (error) {
+      this.cargandoPaginaSpinner = 1;
+      Swal.fire('No se pudo importar el balance',
+        error instanceof Error ? error.message : 'Revisa el formato del archivo.', 'error');
+    } finally {
+      event.target.value = '';
+    }
   }
 
   separarNumerosDelNombre(objetos: any) {
@@ -26887,7 +26991,7 @@ export class PruebaComponent implements OnInit {
                 codigoArray[0] === '1' &&
                 element.tipoSaldoAnterior === 'CR'
               ) {
-                p = p - Math.round(element.saldoAnterior);
+                p = p - this.redondearImporte(element.saldoAnterior);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -26896,9 +27000,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '6') &&
                   element.tipoSaldoAnterior === 'DB'
                 ) {
-                  p = p - Math.round(element.saldoAnterior);
+                  p = p - this.redondearImporte(element.saldoAnterior);
                 } else {
-                  p = p + Math.round(element.saldoAnterior);
+                  p = p + this.redondearImporte(element.saldoAnterior);
                 }
               }
             }
@@ -26927,7 +27031,7 @@ export class PruebaComponent implements OnInit {
                 codigoArray[0] === '1' &&
                 element.tipoSaldoAnterior === 'CR'
               ) {
-                p = p - Math.round(element.saldoAnterior);
+                p = p - this.redondearImporte(element.saldoAnterior);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -26936,9 +27040,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '6' ) &&
                   element.tipoSaldoAnterior === 'DB'
                 ) {
-                  p = p - Math.round(element.saldoAnterior);
+                  p = p - this.redondearImporte(element.saldoAnterior);
                 } else {
-                  p = p + Math.round(element.saldoAnterior);
+                  p = p + this.redondearImporte(element.saldoAnterior);
                 }
               }
               localStorage.setItem(
@@ -26960,7 +27064,7 @@ export class PruebaComponent implements OnInit {
               w = 0;
             } else {
               const debitoNumero = parseFloat(element.debito); // convierte a número decimal
-              w = w + Math.round(debitoNumero);
+              w = w + this.redondearImporte(debitoNumero);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -26979,7 +27083,7 @@ export class PruebaComponent implements OnInit {
               w = w + 0;
             } else {
               const debitoNumero = parseFloat(element.debito); // convierte a número decimal
-              w = w + Math.round(debitoNumero);
+              w = w + this.redondearImporte(debitoNumero);
 
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
@@ -27004,7 +27108,7 @@ export class PruebaComponent implements OnInit {
                 codigoArray[0] === '1' &&
                 element.tipoSaldoAnterior === 'CR'
               ) {
-                c = c - Math.round(element.tipoDeCuenta);
+                c = c - this.redondearImporte(element.tipoDeCuenta);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27014,9 +27118,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoAnterior === 'DB'
                 ) {
-                  c = c - Math.round(element.tipoDeCuenta);
+                  c = c - this.redondearImporte(element.tipoDeCuenta);
                 } else {
-                  c = c + Math.round(element.tipoDeCuenta);
+                  c = c + this.redondearImporte(element.tipoDeCuenta);
                 }
               }
             }
@@ -27041,7 +27145,7 @@ export class PruebaComponent implements OnInit {
             } else {
               const codigoArray = element.codigo.split('.');
               if (codigoArray[0] === '1' && element.tipoSaldoNuevo === 'CR') {
-                c = c - Math.round(element.tipoDeCuenta);
+                c = c - this.redondearImporte(element.tipoDeCuenta);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27052,9 +27156,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoNuevo === 'DB'
                 ) {
-                  c = c - Math.round(element.tipoDeCuenta);
+                  c = c - this.redondearImporte(element.tipoDeCuenta);
                 } else {
-                  c = c + Math.round(element.tipoDeCuenta);
+                  c = c + this.redondearImporte(element.tipoDeCuenta);
                 }
               }
               localStorage.setItem(
@@ -27077,7 +27181,7 @@ export class PruebaComponent implements OnInit {
             } else {
               const codigoArray = element.codigo.split('.');
               if (codigoArray[0] === '1' && element.tipoSaldoNuevo === 'CR') {
-                x = x - Math.round(element.nuevoSaldo);
+                x = x - this.redondearImporte(element.nuevoSaldo);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27088,9 +27192,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoNuevo === 'DB'
                 ) {
-                  x = x - Math.round(element.nuevoSaldo);
+                  x = x - this.redondearImporte(element.nuevoSaldo);
                 } else {
-                  x = x + Math.round(element.nuevoSaldo);
+                  x = x + this.redondearImporte(element.nuevoSaldo);
                 }
               }
             }
@@ -27112,7 +27216,7 @@ export class PruebaComponent implements OnInit {
             } else {
               const codigoArray = element.codigo.split('.');
               if (codigoArray[0] === '1' && element.tipoSaldoNuevo === 'CR') {
-                x = x - Math.round(element.nuevoSaldo);
+                x = x - this.redondearImporte(element.nuevoSaldo);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27123,9 +27227,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoNuevo === 'DB'
                 ) {
-                  x = x - Math.round(element.nuevoSaldo);
+                  x = x - this.redondearImporte(element.nuevoSaldo);
                 } else {
-                  x = x + Math.round(element.nuevoSaldo);
+                  x = x + this.redondearImporte(element.nuevoSaldo);
                 }
               }
 
@@ -27150,7 +27254,7 @@ export class PruebaComponent implements OnInit {
             } else {
               const codigoArray = element.codigo.split('.');
               if (codigoArray[0] === '1' && element.tipoSaldoNuevo === 'CR') {
-                n = n - Math.round(element.compartidoTipo);
+                n = n - this.redondearImporte(element.compartidoTipo);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27161,9 +27265,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoNuevo === 'DB'
                 ) {
-                  n = n - Math.round(element.compartidoTipo);
+                  n = n - this.redondearImporte(element.compartidoTipo);
                 } else {
-                  n = n + Math.round(element.compartidoTipo);
+                  n = n + this.redondearImporte(element.compartidoTipo);
                 }
               }
             }
@@ -27188,7 +27292,7 @@ export class PruebaComponent implements OnInit {
             } else {
               const codigoArray = element.codigo.split('.');
               if (codigoArray[0] === '1' && element.tipoSaldoNuevo === 'CR') {
-                n = n - Math.round(element.compartidoTipo);
+                n = n - this.redondearImporte(element.compartidoTipo);
               } else {
                 if (
                   (codigoArray[0] === '3' ||
@@ -27199,9 +27303,9 @@ export class PruebaComponent implements OnInit {
                     codigoArray[0] === '7') &&
                   element.tipoSaldoNuevo === 'DB'
                 ) {
-                  n = n - Math.round(element.compartidoTipo);
+                  n = n - this.redondearImporte(element.compartidoTipo);
                 } else {
-                  n = n + Math.round(element.compartidoTipo);
+                  n = n + this.redondearImporte(element.compartidoTipo);
                 }
               }
 
@@ -27225,7 +27329,7 @@ export class PruebaComponent implements OnInit {
               y = 0;
             } else {
               const credito = parseFloat(element.credito); // convierte a número decimal
-              y = y + Math.round(credito);
+              y = y + this.redondearImporte(credito);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -27244,7 +27348,7 @@ export class PruebaComponent implements OnInit {
               y = y + 0;
             } else {
               const credito = parseFloat(element.credito); // convierte a número decimal
-              y = y + Math.round(credito);
+              y = y + this.redondearImporte(credito);
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
                 JSON.stringify({
@@ -27344,27 +27448,27 @@ export class PruebaComponent implements OnInit {
           codigoArray[0] === '8'
         ) {
           objeto.nuevoSaldo =
-            (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-            (objeto.debito ? Math.round(objeto.debito) : 0) -
-            (objeto.credito ? Math.round(objeto.credito) : 0);
+            (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+            (objeto.debito ? this.redondearImporte(objeto.debito) : 0) -
+            (objeto.credito ? this.redondearImporte(objeto.credito) : 0);
         } else {
           objeto.nuevoSaldo =
-            (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-            (objeto.credito ? Math.round(objeto.credito) : 0) -
-            (objeto.debito ? Math.round(objeto.debito) : 0);
+            (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+            (objeto.credito ? this.redondearImporte(objeto.credito) : 0) -
+            (objeto.debito ? this.redondearImporte(objeto.debito) : 0);
         }
-        objeto.compartidoTipo = (objeto.nuevoSaldo ? Math.round(objeto.nuevoSaldo) : 0) -( objeto.tipoDeCuenta ? Math.round(objeto.tipoDeCuenta) : 0);
+        objeto.compartidoTipo = (objeto.nuevoSaldo ? this.redondearImporte(objeto.nuevoSaldo) : 0) -( objeto.tipoDeCuenta ? this.redondearImporte(objeto.tipoDeCuenta) : 0);
       });
 
       mergedArray.filter((objeto: any) => {
         objeto.nuevoSaldo = objeto.nuevoSaldo
-          ? Math.round(objeto.nuevoSaldo)
+          ? this.redondearImporte(objeto.nuevoSaldo)
           : 0;
         objeto.saldoAnterior = objeto.saldoAnterior
-          ? Math.round(objeto.saldoAnterior)
+          ? this.redondearImporte(objeto.saldoAnterior)
           : 0;
-        objeto.debito = objeto.debito ? Math.round(objeto.debito) : 0;
-        objeto.credito = objeto.credito ? Math.round(objeto.credito) : 0;
+        objeto.debito = objeto.debito ? this.redondearImporte(objeto.debito) : 0;
+        objeto.credito = objeto.credito ? this.redondearImporte(objeto.credito) : 0;
       });
 
       this.datosTabla = mergedArray;
@@ -27826,1263 +27930,37 @@ export class PruebaComponent implements OnInit {
   }
 
   generarReporteGeneral() {
-    this.mostrarTabla = false;
     this.asegurarTablaInicial();
-    this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
-    this.asegurarCuentasParaBalanceDeComprobacion();
-    let suma1 = {
-      1: JSON.parse(localStorage.getItem('1.1.05') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.1.10') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.1.32') ?? '{}'),
+    // Todos los informes leen la misma fuente; el balance solo define su presentación.
+    const fuente = new Map<string, any>(this.tablaInicialGuardada.map(
+      (fila: any) => [String(fila.codigo || '').trim(), fila]
+    ));
+    const leer = crearLectorBalance(this.tablaInicialGuardada);
+    const totales = new Map<string, any>(this.construirEstadoSituacionFinanciera().map(
+      (fila: any) => [fila.codigo, fila]
+    ));
+    const equivalencias: { [codigo: string]: string } = {
+      subtotal1: 'TOTAL-AC', subtotal2: 'TOTAL-ANC', totalactivos: 'TOTAL-A',
+      subtotal3: 'TOTAL-PC', subtotal4: 'TOTAL-PNC', totalpasivos: 'TOTAL-P',
+      totalpatrimonio: 'TOTAL-PAT', totalambos: 'TOTAL-PP',
     };
-    let suma2 = {
-      2: JSON.parse(localStorage.getItem('1.2.21') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.2.23') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.2.24') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('1.2.80') ?? '{}'),
-    };
-    let suma2N = {
-      1: JSON.parse(localStorage.getItem('1.2.01') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.2.21') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.2.23') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.2.80') ?? '{}'),
-    };
-    let suma9N = {
-      1: JSON.parse(localStorage.getItem('1.9.51') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.9.70.02') ?? '{}'),
-    };
-    let suma3 = {
-      1: JSON.parse(localStorage.getItem('1.3.17') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.3.19') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.3.22') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.3.24') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('1.3.37') ?? '{}'),
-      6: JSON.parse(localStorage.getItem('1.3.84') ?? '{}'),
-      7: JSON.parse(localStorage.getItem('1.3.85') ?? '{}'),
-      8: JSON.parse(localStorage.getItem('1.3.86') ?? '{}'),
-      9: JSON.parse(localStorage.getItem('1.3.90') ?? '{}'),
-    };
-    let suma5 = {
-      1: JSON.parse(localStorage.getItem('1.5.05') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.5.10') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.5.14') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.5.30') ?? '{}'),
-    };
-    let suma9 = {
-      1: JSON.parse(localStorage.getItem('1.9.04') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.9.05') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.9.06') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.9.09') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('1.9.26') ?? '{}'),
-      6: JSON.parse(localStorage.getItem('1.9.51') ?? '{}'),
-      7: JSON.parse(localStorage.getItem('1.9.52') ?? '{}'),
-      8: JSON.parse(localStorage.getItem('1.9.70') ?? '{}'),
-      9: JSON.parse(localStorage.getItem('1.9.75') ?? '{}'),
-    };
-    let suma6 = {
-      1: JSON.parse(localStorage.getItem('1.6.05') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.6.15') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.6.25') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('1.6.35') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('1.6.40') ?? '{}'),
-      6: JSON.parse(localStorage.getItem('1.6.45') ?? '{}'),
-      7: JSON.parse(localStorage.getItem('1.6.50') ?? '{}'),
-      8: JSON.parse(localStorage.getItem('1.6.55') ?? '{}'),
-      9: JSON.parse(localStorage.getItem('1.6.60') ?? '{}'),
-      10: JSON.parse(localStorage.getItem('1.6.65') ?? '{}'),
-      11: JSON.parse(localStorage.getItem('1.6.70') ?? '{}'),
-      12: JSON.parse(localStorage.getItem('1.6.75') ?? '{}'),
-      13: JSON.parse(localStorage.getItem('1.6.81') ?? '{}'),
-      14: JSON.parse(localStorage.getItem('1.6.85') ?? '{}'),
-      15: JSON.parse(localStorage.getItem('1.6.95') ?? '{}'),
-    };
-    let sumaTOTAL1 = {
-      1: JSON.parse(localStorage.getItem('1.1') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.2') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('1.3') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('1.5') ?? '{}'),
-      6: JSON.parse(localStorage.getItem('1.9') ?? '{}'),
-    };
-    console.log(sumaTOTAL1);
-    let sumaTOTAL2 = {
-      1: JSON.parse(localStorage.getItem('1.6') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('1.7') ?? '{}'),
-    };
-    let sumaTOTALActivos = {
-      1: JSON.parse(localStorage.getItem('1') ?? '{}'),
-    };
-    let suma24 = {
-      1: JSON.parse(localStorage.getItem('2.4.01') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('2.4.07') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('2.4.24') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('2.4.36') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('2.4.60') ?? '{}'),
-      6: JSON.parse(localStorage.getItem('2.4.90') ?? '{}'),
-      7: JSON.parse(localStorage.getItem('2.4.40') ?? '{}'),
-      8: JSON.parse(localStorage.getItem('2.4.81') ?? '{}'),
-    };
-    let suma25 = {
-      1: JSON.parse(localStorage.getItem('2.5.11') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('2.5.14') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('2.5.12') ?? '{}'),
-    };
-    let suma27 = {
-      1: JSON.parse(localStorage.getItem('2.7.01') ?? '{}'),
-    };
-    let suma27N = {
-      1: JSON.parse(localStorage.getItem('2.7.90') ?? '{}'),
-    };
-    let sumaTotalPasivos = {
-      1: JSON.parse(localStorage.getItem('2') ?? '{}'),
-    };
-    let sumacorrientePasivos = {
-      1: JSON.parse(localStorage.getItem('2.4') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('2.5') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('2.7.01') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('2.9') ?? '{}'),
-    };
-    let sumanoccorientesPasivos = {
-      1: JSON.parse(localStorage.getItem('2.7.90') ?? '{}'),
-    };
-    let sumaTotalPatrimonio = {
-      1: JSON.parse(localStorage.getItem('3.1.05') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('3.1.09') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('3.1.10') ?? '{}'),
-      4: JSON.parse(localStorage.getItem('3.1.45') ?? '{}'),
-      5: JSON.parse(localStorage.getItem('3.1.51') ?? '{}'),
-    };
-    let sumaTotalPatrimonioyPasivos = {
-      1: JSON.parse(localStorage.getItem('3') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('2') ?? '{}'),
-    };
-    let sumaTotalochoynueve = {
-      1: JSON.parse(localStorage.getItem('8') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('9') ?? '{}'),
-    };
-    let suma29 = {
-      1: JSON.parse(localStorage.getItem('2.9.02') ?? '{}'),
-      2: JSON.parse(localStorage.getItem('2.9.10') ?? '{}'),
-      3: JSON.parse(localStorage.getItem('2.9.90') ?? '{}'),
-    };
-    console.log(suma24);
-    let x: any = [];
-    let obj: any;
-    this.modeloDatosReporte.forEach((element: any) => {
-      if (element.codigo === '1.1') {
-        console.log(suma1[1].credito + suma1[2].credito + suma1[3].credito);
-        obj = {
-          codigo: '1.1',
-          nombre: 'EFECTIVO',
-          credito: suma1[1].credito + suma1[2].credito + suma1[3].credito,
-          debito: suma1[1].debito + suma1[2].debito + suma1[3].debito,
-          saldoAnterior:
-            suma1[1].saldoAnterior +
-            suma1[2].saldoAnterior +
-            suma1[3].saldoAnterior,
-          tipoDeCuenta:
-            suma1[1].corriente + suma1[2].corriente + suma1[3].corriente,
-          compartidoTipo:
-            suma1[1].noCorriente + suma1[2].noCorriente + suma1[3].noCorriente,
-          nuevoSaldo:
-            suma1[1].nuevoSaldo + suma1[2].nuevoSaldo + suma1[3].nuevoSaldo,
-        };
-        x.push(obj);
-        console.log(x);
-      } else {
-        if (element.codigo === '1.2' && element.tipo == 'C') {
-          obj = {
-            codigo: '1.2',
-            nombre: 'INVERSIONES E INSTRUMENTOS DERIVADOS',
-            credito:
-              suma2[2].credito +
-              suma2[3].credito +
-              suma2[4].credito +
-              suma2[5].credito,
-            debito:
-              suma2[2].debito +
-              suma2[3].debito +
-              suma2[4].debito +
-              suma2[5].debito,
-            saldoAnterior:
-              suma2[2].saldoAnterior +
-              suma2[3].saldoAnterior +
-              suma2[4].saldoAnterior +
-              suma2[5].saldoAnterior,
-            tipoDeCuenta:
-              suma2[2].corriente +
-              suma2[3].corriente +
-              suma2[4].corriente +
-              suma2[5].corriente,
-            compartidoTipo:
-              suma2[2].noCorriente +
-              suma2[3].noCorriente +
-              suma2[4].noCorriente +
-              suma2[5].noCorriente,
-            nuevoSaldo:
-              suma2[2].nuevoSaldo +
-              suma2[3].nuevoSaldo +
-              suma2[4].nuevoSaldo +
-              suma2[5].nuevoSaldo,
-          };
-          x.push(obj);
-        } else {
-          if (element.codigo === '1.3') {
-            obj = {
-              codigo: '1.3',
-              nombre: 'CUENTAS POR COBRAR',
-              credito:
-                suma3[1].credito +
-                suma3[2].credito +
-                suma3[3].credito +
-                suma3[4].credito +
-                suma3[5].credito +
-                suma3[6].credito +
-                suma3[7].credito +
-                suma3[8].credito,
-              debito:
-                suma3[1].debito +
-                suma3[2].debito +
-                suma3[3].debito +
-                suma3[4].debito +
-                suma3[5].debito +
-                suma3[6].debito +
-                suma3[7].debito +
-                suma3[8].debito,
-              saldoAnterior:
-                suma3[1].saldoAnterior +
-                suma3[2].saldoAnterior +
-                suma3[3].saldoAnterior +
-                suma3[4].saldoAnterior +
-                suma3[5].saldoAnterior +
-                suma3[6].saldoAnterior +
-                suma3[7].saldoAnterior +
-                suma3[8].saldoAnterior,
-              tipoDeCuenta:
-                suma3[1].corriente +
-                suma3[2].corriente +
-                suma3[3].corriente +
-                suma3[4].corriente +
-                suma3[5].corriente +
-                suma3[6].corriente +
-                suma3[7].corriente +
-                suma3[8].corriente,
-              compartidoTipo:
-                suma3[1].noCorriente +
-                suma3[2].noCorriente +
-                suma3[3].noCorriente +
-                suma3[4].noCorriente +
-                suma3[5].noCorriente +
-                suma3[6].noCorriente +
-                suma3[7].noCorriente +
-                suma3[8].noCorriente,
-              nuevoSaldo:
-                suma3[1].nuevoSaldo +
-                suma3[2].nuevoSaldo +
-                suma3[3].nuevoSaldo +
-                suma3[4].nuevoSaldo +
-                suma3[5].nuevoSaldo +
-                suma3[6].nuevoSaldo +
-                suma3[7].nuevoSaldo +
-                suma3[8].nuevoSaldo,
-            };
-            x.push(obj);
-          } else {
-            if (element.codigo === '1.5') {
-              obj = {
-                codigo: '1.5',
-                nombre: 'INVENTARIOS',
-                credito:
-                  suma5[1].credito +
-                  suma5[2].credito +
-                  suma5[3].credito +
-                  suma5[4].credito,
-                debito:
-                  suma5[1].debito +
-                  suma5[2].debito +
-                  suma5[3].debito +
-                  suma5[4].debito,
-                saldoAnterior:
-                  suma5[1].saldoAnterior +
-                  suma5[2].saldoAnterior +
-                  suma5[3].saldoAnterior +
-                  suma5[4].saldoAnterior,
-                tipoDeCuenta:
-                  suma5[1].corriente +
-                  suma5[2].corriente +
-                  suma5[3].corriente +
-                  suma5[4].corriente,
-                compartidoTipo:
-                  suma5[1].noCorriente +
-                  suma5[2].noCorriente +
-                  suma5[3].noCorriente +
-                  suma5[4].noCorriente,
-                nuevoSaldo:
-                  suma5[1].nuevoSaldo +
-                  suma5[2].nuevoSaldo +
-                  suma5[3].nuevoSaldo +
-                  suma5[4].nuevoSaldo,
-              };
-              x.push(obj);
-            } else {
-              if (element.codigo === '1.9' && element.tipo == 'C') {
-                obj = {
-                  codigo: '1.9',
-                  nombre: 'OTROS ACTIVOS',
-                  credito:
-                    suma9[1].credito +
-                    suma9[2].credito +
-                    suma9[3].credito +
-                    suma9[4].credito +
-                    suma9[5].credito +
-                    suma9[6].credito +
-                    suma9[7].credito +
-                    suma9[8].credito +
-                    suma9[9].credito,
-                  debito:
-                    suma9[1].debito +
-                    suma9[2].debito +
-                    suma9[3].debito +
-                    suma9[4].debito +
-                    suma9[5].debito +
-                    suma9[6].debito +
-                    suma9[7].debito +
-                    suma9[8].debito +
-                    suma9[9].debito,
-                  saldoAnterior:
-                    suma9[1].saldoAnterior +
-                    suma9[2].saldoAnterior +
-                    suma9[3].saldoAnterior +
-                    suma9[4].saldoAnterior +
-                    suma9[5].saldoAnterior +
-                    suma9[6].saldoAnterior +
-                    suma9[7].saldoAnterior +
-                    suma9[8].saldoAnterior +
-                    suma9[9].saldoAnterior,
-                  tipoDeCuenta:
-                    suma9[1].corriente +
-                    suma9[2].corriente +
-                    suma9[3].corriente +
-                    suma9[4].corriente +
-                    suma9[5].corriente +
-                    suma9[6].corriente +
-                    suma9[7].corriente +
-                    suma9[8].corriente +
-                    suma9[9].corriente,
-                  compartidoTipo:
-                    suma9[1].noCorriente +
-                    suma9[2].noCorriente +
-                    suma9[3].noCorriente +
-                    suma9[4].noCorriente +
-                    suma9[5].noCorriente +
-                    suma9[6].noCorriente +
-                    suma9[7].noCorriente +
-                    suma9[8].noCorriente +
-                    suma9[9].noCorriente,
-                  nuevoSaldo:
-                    suma9[1].nuevoSaldo +
-                    suma9[2].nuevoSaldo +
-                    suma9[3].nuevoSaldo +
-                    suma9[4].nuevoSaldo +
-                    suma9[5].nuevoSaldo +
-                    suma9[6].nuevoSaldo +
-                    suma9[7].nuevoSaldo +
-                    suma9[8].nuevoSaldo +
-                    suma9[9].nuevoSaldo,
-                };
-                x.push(obj);
-              } else {
-                if (element.codigo === 'subtotal1') {
-                  obj = {
-                    codigo: 'subtotal 1',
-                    nombre: 'Sub Total ( 1 ) Activo Corriente',
-                    credito:
-                      sumaTOTAL1[1].credito +
-                      sumaTOTAL1[2].credito +
-                      sumaTOTAL1[3].credito +
-                      sumaTOTAL1[5].credito +
-                      sumaTOTAL1[6].credito,
-                    debito:
-                      sumaTOTAL1[1].debito +
-                      sumaTOTAL1[2].debito +
-                      sumaTOTAL1[3].debito +
-                      sumaTOTAL1[5].debito +
-                      sumaTOTAL1[6].debito,
-                    saldoAnterior:
-                      sumaTOTAL1[1].saldoAnterior +
-                      sumaTOTAL1[2].saldoAnterior +
-                      sumaTOTAL1[3].saldoAnterior +
-                      sumaTOTAL1[5].saldoAnterior +
-                      sumaTOTAL1[6].saldoAnterior,
-                    tipoDeCuenta:
-                      sumaTOTAL1[1].corriente +
-                      sumaTOTAL1[2].corriente +
-                      sumaTOTAL1[3].corriente +
-                      sumaTOTAL1[5].corriente +
-                      sumaTOTAL1[6].corriente,
-                    compartidoTipo:
-                      sumaTOTAL1[1].noCorriente +
-                      sumaTOTAL1[2].noCorriente +
-                      sumaTOTAL1[3].noCorriente +
-                      sumaTOTAL1[5].noCorriente +
-                      sumaTOTAL1[6].noCorriente,
-                    nuevoSaldo:
-                      sumaTOTAL1[1].nuevoSaldo +
-                      sumaTOTAL1[2].nuevoSaldo +
-                      sumaTOTAL1[3].nuevoSaldo +
-                      sumaTOTAL1[5].nuevoSaldo +
-                      sumaTOTAL1[6].nuevoSaldo,
-                  };
-                  x.push(obj);
-                } else {
-                  if (element.codigo === '1.2' && element.tipo == 'N') {
-                    obj = {
-                      //  codigo: '1.2',
-                      //  credito: suma2N[1].credito + suma2N[2].credito + suma2N[3].credito + suma2N[4].credito,
-                      //  debito: suma2N[1].debito + suma2N[2].debito + suma2N[3].debito + suma2N[4].debito,
-                      //  saldoAnterior:  suma2N[1].saldoAnterior + suma2N[2].saldoAnterior + suma2N[3].saldoAnterior + suma2N[4].saldoAnterior,
-                      //  tipoDeCuenta: suma2N[1].corriente + suma2N[2].corriente + suma2N[3].corriente + suma2N[4].corriente,
-                      //  compartidoTipo: suma2N[1].noCorriente + suma2N[2].noCorriente + suma2N[3].noCorriente  + suma2N[4].noCorriente,
-                      //  nuevoSaldo: suma2N[1].nuevoSaldo + suma2N[2].nuevoSaldo + suma2N[3].nuevoSaldo + suma2N[4].nuevoSaldo,
-                      codigo: '1.2',
-                      nombre: 'INVERSIONES E INSTRUMENTOS DERIVADOS',
-                      credito: 0,
-                      debito: 0,
-                      saldoAnterior: 0,
-                      tipoDeCuenta: 0,
-                      compartidoTipo: 0,
-                      nuevoSaldo: 0,
-                    };
-                    x.push(obj);
-                  } else {
-                    if (element.codigo === '1.6') {
-                      obj = {
-                        codigo: '1.6',
-                        nombre: 'PROPIEDADES, PLANTA Y EQUIPO',
-                        credito:
-                          suma6[1].credito +
-                          suma6[2].credito +
-                          suma6[3].credito +
-                          suma6[4].credito +
-                          suma6[5].credito +
-                          suma6[6].credito +
-                          suma6[7].credito +
-                          suma6[8].credito +
-                          suma6[9].credito +
-                          suma6[10].credito +
-                          suma6[11].credito +
-                          suma6[12].credito +
-                          suma6[13].credito +
-                          suma6[14].credito +
-                          suma6[15].credito,
-                        debito:
-                          suma6[1].debito +
-                          suma6[2].debito +
-                          suma6[3].debito +
-                          suma6[4].debito +
-                          suma6[5].debito +
-                          suma6[6].debito +
-                          suma6[7].debito +
-                          suma6[8].debito +
-                          suma6[9].debito +
-                          suma6[10].debito +
-                          suma6[11].debito +
-                          suma6[12].debito +
-                          suma6[13].debito +
-                          suma6[14].debito +
-                          suma6[15].debito,
-                        saldoAnterior:
-                          suma6[1].saldoAnterior +
-                          suma6[2].saldoAnterior +
-                          suma6[3].saldoAnterior +
-                          suma6[4].saldoAnterior +
-                          suma6[5].saldoAnterior +
-                          suma6[6].saldoAnterior +
-                          suma6[7].saldoAnterior +
-                          suma6[8].saldoAnterior +
-                          suma6[9].saldoAnterior +
-                          suma6[10].saldoAnterior +
-                          suma6[11].saldoAnterior +
-                          suma6[12].saldoAnterior +
-                          suma6[13].saldoAnterior +
-                          suma6[14].saldoAnterior +
-                          suma6[15].saldoAnterior,
-                        tipoDeCuenta:
-                          suma6[1].corriente +
-                          suma6[2].corriente +
-                          suma6[3].corriente +
-                          suma6[4].corriente +
-                          suma6[5].corriente +
-                          suma6[6].corriente +
-                          suma6[7].corriente +
-                          suma6[8].corriente +
-                          suma6[9].corriente +
-                          suma6[10].corriente +
-                          suma6[11].corriente +
-                          suma6[12].corriente +
-                          suma6[13].corriente +
-                          suma6[14].corriente +
-                          suma6[15].corriente,
-                        compartidoTipo:
-                          suma6[1].noCorriente +
-                          suma6[2].noCorriente +
-                          suma6[3].noCorriente +
-                          suma6[4].noCorriente +
-                          suma6[5].noCorriente +
-                          suma6[6].noCorriente +
-                          suma6[7].noCorriente +
-                          suma6[8].noCorriente +
-                          suma6[9].noCorriente +
-                          suma6[10].noCorriente +
-                          suma6[11].noCorriente +
-                          suma6[12].noCorriente +
-                          suma6[13].noCorriente +
-                          suma6[14].noCorriente +
-                          suma6[15].noCorriente,
-                        nuevoSaldo:
-                          suma6[1].nuevoSaldo +
-                          suma6[2].nuevoSaldo +
-                          suma6[3].nuevoSaldo +
-                          suma6[4].nuevoSaldo +
-                          suma6[5].nuevoSaldo +
-                          suma6[6].nuevoSaldo +
-                          suma6[7].nuevoSaldo +
-                          suma6[8].nuevoSaldo +
-                          suma6[9].nuevoSaldo +
-                          suma6[10].nuevoSaldo +
-                          suma6[11].nuevoSaldo +
-                          suma6[12].nuevoSaldo +
-                          suma6[13].nuevoSaldo +
-                          suma6[14].nuevoSaldo +
-                          suma6[15].nuevoSaldo,
-                      };
-                      x.push(obj);
-                    } else {
-                      if (element.codigo === '1.9' && element.tipo == 'N') {
-                        obj = {
-                          // codigo: '1.9',
-                          // credito: suma9N[1].credito + suma9N[2].credito ,
-                          // debito: suma9N[1].debito + suma9N[2].debito ,
-                          // saldoAnterior:  suma9N[1].saldoAnterior + suma9N[2].saldoAnterior,
-                          // tipoDeCuenta: suma9N[1].corriente + suma9N[2].corriente,
-                          // compartidoTipo: suma9N[1].noCorriente + suma9N[2].noCorriente,
-                          // nuevoSaldo: suma9N[1].nuevoSaldo + suma9N[2].nuevoSaldo ,
-                          codigo: '1.9',
-                          nombre: 'OTROS ACTIVOS',
-                          credito: 0,
-                          debito: 0,
-                          saldoAnterior: 0,
-                          tipoDeCuenta: 0,
-                          compartidoTipo: 0,
-                          nuevoSaldo: 0,
-                        };
-                        x.push(obj);
-                      } else {
-                        if (element.codigo === 'subtotal2') {
-                          obj = {
-                            codigo: 'subtotal2',
-                            nombre: 'Sub Total ( 2 ) Activo no Corriente',
-                            saldoAnterior:
-                              sumaTOTAL2[1].saldoAnterior +
-                              sumaTOTAL2[2].saldoAnterior,
-                            credito:
-                              sumaTOTAL2[1].credito + sumaTOTAL2[2].credito,
-                            debito: sumaTOTAL2[1].debito + sumaTOTAL2[2].debito,
-                            tipoDeCuenta:
-                              sumaTOTAL2[1].corriente + sumaTOTAL2[2].corriente,
-                            compartidoTipo:
-                              sumaTOTAL2[1].noCorriente +
-                              sumaTOTAL2[2].noCorriente,
-                            nuevoSaldo:
-                              sumaTOTAL2[1].nuevoSaldo +
-                              sumaTOTAL2[2].nuevoSaldo,
-                          };
-                          x.push(obj);
-                        } else {
-                          if (element.codigo === 'totalactivos') {
-                            obj = {
-                              codigo: 'totalactivos',
-                              nombre: 'TOTAL ACTIVOS ',
-                              saldoAnterior: sumaTOTALActivos[1].saldoAnterior,
-                              credito: sumaTOTALActivos[1].credito,
-                              debito: sumaTOTALActivos[1].debito,
-                              tipoDeCuenta: sumaTOTALActivos[1].corriente,
-                              compartidoTipo: sumaTOTALActivos[1].noCorriente,
-                              nuevoSaldo: sumaTOTALActivos[1].nuevoSaldo,
-                            };
-                            x.push(obj);
-                          } else {
-                            if (element.codigo === '2.4') {
-                              obj = {
-                                codigo: '2.4',
-                                nombre: 'CUENTAS POR PAGAR',
-                                credito:
-                                  suma24[1].credito +
-                                  suma24[2].credito +
-                                  suma24[3].credito +
-                                  suma24[4].credito +
-                                  suma24[5].credito +
-                                  suma24[6].credito +
-                                  suma24[7].credito +
-                                  suma24[8].credito,
-                                debito:
-                                  suma24[1].debito +
-                                  suma24[2].debito +
-                                  suma24[3].debito +
-                                  suma24[4].debito +
-                                  suma24[5].debito +
-                                  suma24[6].debito +
-                                  suma24[7].debito +
-                                  suma24[8].debito,
-                                saldoAnterior:
-                                  suma24[1].saldoAnterior +
-                                  suma24[2].saldoAnterior +
-                                  suma24[3].saldoAnterior +
-                                  suma24[4].saldoAnterior +
-                                  suma24[5].saldoAnterior +
-                                  suma24[6].saldoAnterior +
-                                  suma24[7].saldoAnterior +
-                                  suma24[8].saldoAnterior,
-                                tipoDeCuenta:
-                                  suma24[1].corriente +
-                                  suma24[2].corriente +
-                                  suma24[3].corriente +
-                                  suma24[4].corriente +
-                                  suma24[5].corriente +
-                                  suma24[6].corriente +
-                                  suma24[7].corriente +
-                                  suma24[8].corriente,
-                                compartidoTipo:
-                                  suma24[1].noCorriente +
-                                  suma24[2].noCorriente +
-                                  suma24[3].noCorriente +
-                                  suma24[4].noCorriente +
-                                  suma24[5].noCorriente +
-                                  suma24[6].noCorriente +
-                                  suma24[7].noCorriente +
-                                  suma24[8].noCorriente,
-                                nuevoSaldo:
-                                  suma24[1].nuevoSaldo +
-                                  suma24[2].nuevoSaldo +
-                                  suma24[3].nuevoSaldo +
-                                  suma24[4].nuevoSaldo +
-                                  suma24[5].nuevoSaldo +
-                                  suma24[6].nuevoSaldo +
-                                  suma24[7].nuevoSaldo +
-                                  suma24[8].nuevoSaldo,
-                              };
-                              x.push(obj);
-                            } else {
-                              if (
-                                element.codigo === '2.5' &&
-                                element.tipo === 'C'
-                              ) {
-                                obj = {
-                                  codigo: '2.5',
-                                  nombre:
-                                    'OBLIGACIONES LABORALES Y DE SEGURIDAD SOCIAL INTEGRAL',
-                                  credito:
-                                    suma25[1].credito +
-                                    suma25[2].credito +
-                                    suma25[3].credito,
-                                  saldoAnterior:
-                                    suma25[1].saldoAnterior +
-                                    suma25[2].saldoAnterior +
-                                    suma25[3].saldoAnterior,
-                                  debito:
-                                    suma25[1].debito +
-                                    suma25[2].debito +
-                                    suma25[3].debito,
-                                  tipoDeCuenta:
-                                    suma25[1].corriente +
-                                    suma25[2].corriente +
-                                    suma25[3].corriente,
-                                  compartidoTipo:
-                                    suma25[1].noCorriente +
-                                    suma25[2].noCorriente +
-                                    suma25[3].noCorriente,
-                                  nuevoSaldo:
-                                    suma25[1].nuevoSaldo +
-                                    suma25[2].nuevoSaldo +
-                                    suma25[3].nuevoSaldo,
-                                };
-                                x.push(obj);
-                              } else {
-                                if (element.codigo === '2.9') {
-                                  obj = {
-                                    codigo: '2.9',
-                                    nombre: 'OTROS PASIVOS',
-                                    credito:
-                                      suma29[1].credito +
-                                      suma29[2].credito +
-                                      suma29[3].credito,
-                                    debito:
-                                      suma29[1].debito +
-                                      suma29[2].debito +
-                                      suma29[3].debito,
-                                    saldoAnterior:
-                                      suma29[1].saldoAnterior +
-                                      suma29[2].saldoAnterior +
-                                      suma29[3].saldoAnterior,
-                                    tipoDeCuenta:
-                                      suma29[1].corriente +
-                                      suma29[2].corriente +
-                                      suma29[3].corriente,
-                                    compartidoTipo:
-                                      suma29[1].noCorriente +
-                                      suma29[2].noCorriente +
-                                      suma29[3].noCorriente,
-                                    nuevoSaldo:
-                                      suma29[1].nuevoSaldo +
-                                      suma29[2].nuevoSaldo +
-                                      suma29[3].nuevoSaldo,
-                                  };
-                                  x.push(obj);
-                                } else {
-                                  if (
-                                    element.codigo === '2.7' &&
-                                    element.tipo === 'C'
-                                  ) {
-                                    obj = {
-                                      codigo: '2.7',
-                                      nombre: 'PASIVOS ESTIMADOS',
-                                      credito: suma27[1].credito,
-                                      debito: suma27[1].debito,
-                                      saldoAnterior: suma27[1].saldoAnterior,
-                                      tipoDeCuenta: suma27[1].corriente,
-                                      compartidoTipo: suma27[1].noCorriente,
-                                      nuevoSaldo: suma27[1].nuevoSaldo,
-                                    };
-                                    x.push(obj);
-                                  } else {
-                                    if (
-                                      element.codigo === '2.7' &&
-                                      element.tipo === 'N'
-                                    ) {
-                                      obj = {
-                                        codigo: '2.7',
-                                        nombre: 'PASIVOS ESTIMADOS',
-                                        credito: suma27N[1].credito,
-                                        debito: suma27N[1].debito,
-                                        saldoAnterior: suma27N[1].saldoAnterior,
-                                        tipoDeCuenta: suma27N[1].corriente,
-                                        compartidoTipo: suma27N[1].noCorriente,
-                                        nuevoSaldo: suma27N[1].nuevoSaldo,
-                                      };
-                                      x.push(obj);
-                                    } else {
-                                      if (element.codigo === 'totalpasivos') {
-                                        obj = {
-                                          codigo: 'totalpasivos',
-                                          nombre: 'TOTAL PASIVO',
-                                          credito: sumaTotalPasivos[1].credito,
-                                          saldoAnterior:
-                                            sumaTotalPasivos[1].saldoAnterior,
-                                          debito: sumaTotalPasivos[1].debito,
-                                          tipoDeCuenta:
-                                            sumaTotalPasivos[1].corriente,
-                                          compartidoTipo:
-                                            sumaTotalPasivos[1].noCorriente,
-                                          nuevoSaldo:
-                                            sumaTotalPasivos[1].nuevoSaldo,
-                                        };
-                                        x.push(obj);
-                                      } else {
-                                        if (
-                                          element.codigo === 'totalpatrimonio'
-                                        ) {
-                                          obj = {
-                                            codigo: 'totalpatrimonio',
-                                            nombre: 'TOTAL PATRIMONIO ',
-                                            credito:
-                                              sumaTotalPatrimonio[2].credito +
-                                              sumaTotalPatrimonio[3].credito +
-                                              sumaTotalPatrimonio[4].credito +
-                                              sumaTotalPatrimonio[5].credito,
-                                            debito:
-                                              sumaTotalPatrimonio[1].debito +
-                                              sumaTotalPatrimonio[2].debito +
-                                              sumaTotalPatrimonio[4].debito +
-                                              sumaTotalPatrimonio[5].debito,
-                                            saldoAnterior:
-                                              sumaTotalPatrimonio[1]
-                                                .saldoAnterior +
-                                              sumaTotalPatrimonio[2]
-                                                .saldoAnterior +
-                                              sumaTotalPatrimonio[3]
-                                                .saldoAnterior +
-                                              sumaTotalPatrimonio[4]
-                                                .saldoAnterior +
-                                              sumaTotalPatrimonio[5]
-                                                .saldoAnterior,
-                                            tipoDeCuenta:
-                                              sumaTotalPatrimonio[1].corriente +
-                                              sumaTotalPatrimonio[2].corriente +
-                                              sumaTotalPatrimonio[3].corriente +
-                                              sumaTotalPatrimonio[4].corriente +
-                                              sumaTotalPatrimonio[5].corriente,
-                                            compartidoTipo:
-                                              sumaTotalPatrimonio[1]
-                                                .noCorriente +
-                                              sumaTotalPatrimonio[2]
-                                                .noCorriente +
-                                              sumaTotalPatrimonio[3]
-                                                .noCorriente +
-                                              sumaTotalPatrimonio[4]
-                                                .noCorriente +
-                                              sumaTotalPatrimonio[5]
-                                                .noCorriente,
-                                            nuevoSaldo:
-                                              sumaTotalPatrimonio[1]
-                                                .nuevoSaldo +
-                                              sumaTotalPatrimonio[2]
-                                                .nuevoSaldo +
-                                              sumaTotalPatrimonio[3]
-                                                .nuevoSaldo +
-                                              sumaTotalPatrimonio[4]
-                                                .nuevoSaldo +
-                                              sumaTotalPatrimonio[5].nuevoSaldo,
-                                          };
-                                          x.push(obj);
-                                        } else {
-                                          if (element.codigo === 'totalambos') {
-                                            obj = {
-                                              codigo: 'totalambos',
-                                              nombre:
-                                                'TOTAL  PASIVO Y PATRIMONIO ',
-                                              credito:
-                                                sumaTotalPatrimonio[4].credito +
-                                                sumaTotalPatrimonio[2].credito -
-                                                sumaTotalPatrimonio[3]
-                                                  .nuevoSaldo +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .credito,
-                                              saldoAnterior:
-                                                sumaTotalPatrimonio[1]
-                                                  .saldoAnterior +
-                                                sumaTotalPatrimonio[2]
-                                                  .saldoAnterior +
-                                                sumaTotalPatrimonio[3]
-                                                  .saldoAnterior +
-                                                sumaTotalPatrimonio[4]
-                                                  .saldoAnterior -
-                                                sumaTotalPatrimonio[5]
-                                                  .saldoAnterior +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .saldoAnterior,
-                                              debito:
-                                                sumaTotalPatrimonio[1].debito +
-                                                sumaTotalPatrimonio[2].debito +
-                                                sumaTotalPatrimonio[4].debito +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .debito,
-                                              tipoDeCuenta:
-                                                sumaTotalPatrimonio[1]
-                                                  .corriente +
-                                                sumaTotalPatrimonio[2]
-                                                  .corriente +
-                                                sumaTotalPatrimonio[3]
-                                                  .corriente +
-                                                sumaTotalPatrimonio[4]
-                                                  .corriente -
-                                                sumaTotalPatrimonio[5]
-                                                  .corriente +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .corriente,
-                                              compartidoTipo:
-                                                sumaTotalPatrimonio[1]
-                                                  .noCorriente +
-                                                sumaTotalPatrimonio[2]
-                                                  .noCorriente +
-                                                sumaTotalPatrimonio[3]
-                                                  .noCorriente +
-                                                sumaTotalPatrimonio[4]
-                                                  .noCorriente -
-                                                sumaTotalPatrimonio[5]
-                                                  .noCorriente +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .noCorriente,
-                                              nuevoSaldo:
-                                                sumaTotalPatrimonio[1]
-                                                  .nuevoSaldo +
-                                                sumaTotalPatrimonio[2]
-                                                  .nuevoSaldo +
-                                                sumaTotalPatrimonio[3]
-                                                  .nuevoSaldo +
-                                                sumaTotalPatrimonio[4]
-                                                  .nuevoSaldo -
-                                                sumaTotalPatrimonio[5]
-                                                  .nuevoSaldo +
-                                                sumaTotalPatrimonioyPasivos[2]
-                                                  .nuevoSaldo,
-                                            };
-                                            x.push(obj);
-                                          } else {
-                                            if (
-                                              element.codigo ===
-                                              'totalochoynueve'
-                                            ) {
-                                              obj = {
-                                                codigo: 'totalochoynueve',
-                                                nombre:
-                                                  'Total Cuentas de Orden',
-                                                saldoAnterior:
-                                                  sumaTotalochoynueve[1]
-                                                    .saldoAnterior +
-                                                  sumaTotalochoynueve[2]
-                                                    .saldoAnterior,
-                                                credito:
-                                                  sumaTotalochoynueve[1]
-                                                    .credito +
-                                                  sumaTotalochoynueve[2]
-                                                    .credito,
-                                                debito:
-                                                  sumaTotalochoynueve[1]
-                                                    .debito +
-                                                  sumaTotalochoynueve[2].debito,
-                                                tipoDeCuenta:
-                                                  sumaTotalochoynueve[1]
-                                                    .corriente +
-                                                  sumaTotalochoynueve[2]
-                                                    .corriente,
-                                                compartidoTipo:
-                                                  sumaTotalochoynueve[1]
-                                                    .noCorriente +
-                                                  sumaTotalochoynueve[2]
-                                                    .noCorriente,
-                                                nuevoSaldo:
-                                                  sumaTotalochoynueve[1]
-                                                    .nuevoSaldo +
-                                                  sumaTotalochoynueve[2]
-                                                    .nuevoSaldo,
-                                              };
-                                              x.push(obj);
-                                            } else {
-                                              if (
-                                                element.codigo === 'subtotal3'
-                                              ) {
-                                                obj = {
-                                                  codigo: 'subtotal3',
-                                                  nombre:
-                                                    'Sub Total (3) Total Pasivo Corriente',
-                                                  saldoAnterior:
-                                                    sumacorrientePasivos[1]
-                                                      .saldoAnterior +
-                                                    sumacorrientePasivos[2]
-                                                      .saldoAnterior +
-                                                    sumacorrientePasivos[3]
-                                                      .saldoAnterior +
-                                                    sumacorrientePasivos[4]
-                                                      .saldoAnterior,
-                                                  credito:
-                                                    sumacorrientePasivos[1]
-                                                      .credito +
-                                                    sumacorrientePasivos[2]
-                                                      .credito +
-                                                    sumacorrientePasivos[3]
-                                                      .credito +
-                                                    sumacorrientePasivos[4]
-                                                      .credito,
-                                                  debito:
-                                                    sumacorrientePasivos[1]
-                                                      .debito +
-                                                    sumacorrientePasivos[2]
-                                                      .debito +
-                                                    sumacorrientePasivos[3]
-                                                      .debito +
-                                                    sumacorrientePasivos[4]
-                                                      .debito,
-                                                  tipoDeCuenta:
-                                                    sumacorrientePasivos[1]
-                                                      .corriente +
-                                                    sumacorrientePasivos[2]
-                                                      .corriente +
-                                                    sumacorrientePasivos[3]
-                                                      .corriente +
-                                                    sumacorrientePasivos[4]
-                                                      .corriente,
-                                                  compartidoTipo:
-                                                    sumacorrientePasivos[1]
-                                                      .noCorriente +
-                                                    sumacorrientePasivos[2]
-                                                      .noCorriente +
-                                                    sumacorrientePasivos[3]
-                                                      .noCorriente +
-                                                    sumacorrientePasivos[4]
-                                                      .noCorriente,
-                                                  nuevoSaldo:
-                                                    sumacorrientePasivos[1]
-                                                      .nuevoSaldo +
-                                                    sumacorrientePasivos[2]
-                                                      .nuevoSaldo +
-                                                    sumacorrientePasivos[3]
-                                                      .nuevoSaldo +
-                                                    sumacorrientePasivos[4]
-                                                      .nuevoSaldo,
-                                                };
-                                                x.push(obj);
-                                              } else {
-                                                if (
-                                                  element.codigo === '1.9.51' &&
-                                                  element.tipo == 'N'
-                                                ) {
-                                                  obj = {
-                                                    codigo: '1.9.51',
-                                                    nombre:
-                                                      'PROPIEDADES DE INVERSION',
-                                                    saldoAnterior: 0,
-                                                    credito: 0,
-                                                    debito: 0,
-                                                    tipoDeCuenta: 0,
-                                                    compartidoTipo: 0,
-                                                    nuevoSaldo: 0,
-                                                  };
-                                                  x.push(obj);
-                                                } else {
-                                                  if (
-                                                    element.codigo ===
-                                                      '1.2.01' &&
-                                                    element.tipo == 'N'
-                                                  ) {
-                                                    obj = {
-                                                      codigo: '1.2.01',
-                                                      nombre:
-                                                        '	INVERSIONES ADMINISTRACIÓN DE LIQUIDEZ EN TÍTULOS DE DEUDA',
-                                                      saldoAnterior: 0,
-                                                      credito: 0,
-                                                      debito: 0,
-                                                      tipoDeCuenta: 0,
-                                                      compartidoTipo: 0,
-                                                      nuevoSaldo: 0,
-                                                    };
-                                                    x.push(obj);
-                                                  } else {
-                                                    if (
-                                                      element.codigo ===
-                                                        '1.2.21' &&
-                                                      element.tipo == 'N'
-                                                    ) {
-                                                      obj = {
-                                                        codigo: '1.2.21',
-                                                        nombre:
-                                                          '	INVERSIONES DE ADMINISTRACION DE LIQUIDEZ VALOR',
-                                                        saldoAnterior: 0,
-                                                        credito: 0,
-                                                        debito: 0,
-                                                        tipoDeCuenta: 0,
-                                                        compartidoTipo: 0,
-                                                        nuevoSaldo: 0,
-                                                      };
-                                                      x.push(obj);
-                                                    } else {
-                                                      if (
-                                                        element.codigo ===
-                                                          '1.2.23' &&
-                                                        element.tipo == 'N'
-                                                      ) {
-                                                        obj = {
-                                                          codigo: '1.2.23',
-                                                          nombre:
-                                                            '	INVERSIONES DE ADMINISTRACION DE LIQUIDEZ COSTO',
-                                                          saldoAnterior: 0,
-                                                          credito: 0,
-                                                          debito: 0,
-                                                          tipoDeCuenta: 0,
-                                                          compartidoTipo: 0,
-                                                          nuevoSaldo: 0,
-                                                        };
-                                                        x.push(obj);
-                                                      } else {
-                                                        if (
-                                                          element.codigo ===
-                                                            '1.2.80' &&
-                                                          element.tipo == 'N'
-                                                        ) {
-                                                          obj = {
-                                                            codigo: '1.2.80',
-                                                            nombre:
-                                                              'DETERIORO ACUMULADO DE INVERSIONES (CR)',
-                                                            saldoAnterior: 0,
-                                                            credito: 0,
-                                                            debito: 0,
-                                                            tipoDeCuenta: 0,
-                                                            compartidoTipo: 0,
-                                                            nuevoSaldo: 0,
-                                                          };
-                                                          x.push(obj);
-                                                        } else {
-                                                          if (
-                                                            element.codigo ===
-                                                              '2.5.11' &&
-                                                            element.tipo == 'N'
-                                                          ) {
-                                                            obj = {
-                                                              codigo: '2.5.11',
-                                                              nombre:
-                                                                '	BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO',
-                                                              saldoAnterior: 0,
-                                                              credito: 0,
-                                                              debito: 0,
-                                                              tipoDeCuenta: 0,
-                                                              compartidoTipo: 0,
-                                                              nuevoSaldo: 0,
-                                                            };
-                                                            x.push(obj);
-                                                          } else {
-                                                            if (
-                                                              element.codigo ===
-                                                                '2.5.12' &&
-                                                              element.tipo ==
-                                                                'N'
-                                                            ) {
-                                                              obj = {
-                                                                codigo:
-                                                                  '2.5.12',
-                                                                nombre:
-                                                                  '	BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO',
-                                                                saldoAnterior: 0,
-                                                                credito: 0,
-                                                                debito: 0,
-                                                                tipoDeCuenta: 0,
-                                                                compartidoTipo: 0,
-                                                                nuevoSaldo: 0,
-                                                              };
-                                                              x.push(obj);
-                                                            } else {
-                                                              if (
-                                                                element.codigo ===
-                                                                  '2.5.14' &&
-                                                                element.tipo ==
-                                                                  'N'
-                                                              ) {
-                                                                obj = {
-                                                                  codigo:
-                                                                    '2.5.14',
-                                                                  nombre:
-                                                                    '	BENEFICIOS POS EMPLEO PENSIONES',
-                                                                  saldoAnterior: 0,
-                                                                  credito: 0,
-                                                                  debito: 0,
-                                                                  tipoDeCuenta: 0,
-                                                                  compartidoTipo: 0,
-                                                                  nuevoSaldo: 0,
-                                                                };
-                                                                x.push(obj);
-                                                              } else {
-                                                                if (
-                                                                  element.codigo ===
-                                                                    '2.5' &&
-                                                                  element.tipo ==
-                                                                    'N'
-                                                                ) {
-                                                                  obj = {
-                                                                    codigo:
-                                                                      '2.5',
-                                                                    nombre:
-                                                                      '	OBLIGACIONES LABORALES Y DE SEGURIDAD SOCIAL INTEGRAL',
-                                                                    saldoAnterior: 0,
-                                                                    credito: 0,
-                                                                    debito: 0,
-                                                                    tipoDeCuenta: 0,
-                                                                    compartidoTipo: 0,
-                                                                    nuevoSaldo: 0,
-                                                                  };
-                                                                  x.push(obj);
-                                                                } else {
-                                                                  if (
-                                                                    element.codigo ===
-                                                                    'subtotal4'
-                                                                  ) {
-                                                                    obj = {
-                                                                      codigo:
-                                                                        'subtotal4',
-                                                                      nombre:
-                                                                        'Sub Total (4) Total Pasivo No Corriente',
-                                                                      saldoAnterior:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .saldoAnterior,
-                                                                      credito:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .credito,
-                                                                      debito:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .debito,
-                                                                      tipoDeCuenta:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .corriente,
-                                                                      compartidoTipo:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .noCorriente,
-                                                                      nuevoSaldo:
-                                                                        sumanoccorientesPasivos[1]
-                                                                          .nuevoSaldo,
-                                                                    };
-                                                                    x.push(obj);
-                                                                  } else {
-                                                                    let y =
-                                                                      this.datosTabla.filter(
-                                                                        (
-                                                                          codigo: any
-                                                                        ) =>
-                                                                          codigo.codigo ==
-                                                                          element.codigo.trim()
-                                                                      );
-                                                                    x.push(
-                                                                      y[0]
-                                                                    );
-                                                                  }
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        // let y = this.datosTabla.filter(
-        //   (codigo: any) => codigo.codigo == element.codigo
-        // );
-        // x.push(y[0]);
-        // console.log(x);
+    this.datosTabla = this.modeloDatosReporte.flatMap((elemento: any) => {
+      const codigo = String(elemento.codigo || '').trim();
+      const fila = equivalencias[codigo]
+        ? totales.get(equivalencias[codigo])
+        : fuente.get(codigo);
+      if (!fila) return [];
+      const copia = { ...fila, tipo: false };
+      if (!equivalencias[codigo]) {
+        ['saldoAnterior', 'debito', 'credito', 'nuevoSaldo', 'tipoDeCuenta', 'compartidoTipo']
+          .forEach(campo => copia[campo] = leer(codigo, campo));
+        if (codigo === '3.1.51') copia.nuevoSaldo = totales.get(codigo)?.nuevoSaldo ?? copia.nuevoSaldo;
       }
+      return [copia];
     });
-    const camposNumericos = [
-      'credito',
-      'debito',
-      'saldoAnterior',
-      'nuevoSaldo',
-      'tipoDeCuenta',
-      'compartidoTipo',
-    ];
-    this.datosTabla = x
-      .filter((item: any) => !!item)
-      .map((item: any) => {
-        const fila = { ...item };
-        camposNumericos.forEach((campo: string) => {
-          fila[campo] = this.valorNumerico(fila[campo]);
-        });
-        return fila;
-      });
+    const indicePatrimonio = this.datosTabla.findIndex((fila: any) => fila.codigo === 'TOTAL-PAT');
+    const resultadoPendiente = totales.get('RESULTADO-PENDIENTE');
+    if (indicePatrimonio >= 0 && resultadoPendiente) this.datosTabla.splice(indicePatrimonio + 1, 0, { ...resultadoPendiente }, { ...totales.get('TOTAL-PAT-R') });
     this.prepararVistaReporte('balance');
     this.mostrarTabla = true;
     this.consultarTabla();
@@ -29093,19 +27971,30 @@ export class PruebaComponent implements OnInit {
     const fuente = this.tablaInicialGuardada.length
       ? this.tablaInicialGuardada
       : this.datosTabla;
-    const buscar = (codigo: string): any =>
-      fuente.find(
-        (item: any) => String(item?.codigo || '').trim() === codigo
-      ) || {};
-    const corriente = (codigo: string): number =>
-      this.valorNumerico(buscar(codigo).tipoDeCuenta);
-    const noCorriente = (codigo: string): number =>
-      this.valorNumerico(buscar(codigo).compartidoTipo);
-    const saldo = (codigo: string): number =>
-      this.valorNumerico(buscar(codigo).nuevoSaldo);
+    const leer = crearLectorBalance(fuente);
+    const corriente = (codigo: string): number => leer(codigo, 'tipoDeCuenta');
+    const noCorriente = (codigo: string): number => leer(codigo, 'compartidoTipo');
+    const saldo = (codigo: string): number => leer(codigo, 'nuevoSaldo');
+    const codigos = new Set<string>();
+    fuente.forEach((item: any) => {
+      const partes = String(item?.codigo || '').trim().split('.');
+      for (let n = 1; n <= partes.length; n++) codigos.add(partes.slice(0, n).join('.'));
+    });
+    // Añadir grupos que no existían en la plantilla fija, sin repetir sus padres.
+    const completarGrupos = (clase: string, grupos: string[]): string[] => {
+      const candidatos = Array.from(codigos).filter(codigo =>
+        codigo.startsWith(`${clase}.`) &&
+        !grupos.some(grupo => codigo === grupo || codigo.startsWith(`${grupo}.`) || grupo.startsWith(`${codigo}.`))
+      );
+      return candidatos.filter(codigo => !candidatos.some(padre =>
+        padre !== codigo && codigo.startsWith(`${padre}.`)
+      ));
+    };
+    const nombreCuenta = (codigo: string): string => fuente.find((item: any) =>
+      String(item?.codigo || '').trim() === codigo)?.nombre || codigo;
     const sumar = (items: any[], campo: string): number =>
       items.reduce(
-        (total: number, item: any) => total + this.valorNumerico(item[campo]),
+        (total: number, item: any) => this.redondearImporte(total + this.valorNumerico(item[campo])),
         0
       );
     const fila = (
@@ -29138,14 +28027,20 @@ export class PruebaComponent implements OnInit {
       filaCorriente('1.2', 'INVERSIONES E INSTRUMENTOS DERIVADOS', 'Activo corriente'),
       filaCorriente('1.3', 'CUENTAS POR COBRAR', 'Activo corriente'),
       filaCorriente('1.5', 'INVENTARIOS', 'Activo corriente'),
+      filaCorriente('1.6', 'PROPIEDADES, PLANTA Y EQUIPO', 'Activo corriente'),
+      filaCorriente('1.7', 'BIENES DE USO PUBLICO, HISTORICOS Y CULTURALES', 'Activo corriente'),
       filaCorriente('1.9', 'OTROS ACTIVOS CORRIENTES', 'Activo corriente'),
     ];
+    const activosAdicionales = completarGrupos('1', ['1.1', '1.2', '1.3', '1.5', '1.6', '1.7', '1.9']);
+    activosAdicionales.forEach(codigo => ac.push(filaCorriente(codigo, nombreCuenta(codigo), 'Activo corriente')));
     const totalAC = sumar(ac, 'tipoDeCuenta');
 
     const propiedadInversion = noCorriente('1.9.51') + noCorriente('1.9.52');
     const intangibles = noCorriente('1.9.70');
     const otrosANC = noCorriente('1.9') - propiedadInversion - intangibles;
     const anc = [
+      filaNoCorriente('1.1', 'EFECTIVO Y EQUIVALENTES AL EFECTIVO', 'Activo no corriente'),
+      filaNoCorriente('1.5', 'INVENTARIOS', 'Activo no corriente'),
       filaNoCorriente('1.2', 'INVERSIONES E INSTRUMENTOS DERIVADOS', 'Activo no corriente'),
       filaNoCorriente('1.3', 'CUENTAS POR COBRAR', 'Activo no corriente'),
       filaNoCorriente('1.6', 'PROPIEDADES, PLANTA Y EQUIPO', 'Activo no corriente'),
@@ -29154,6 +28049,7 @@ export class PruebaComponent implements OnInit {
       fila('1.9.70', 'ACTIVOS INTANGIBLES', 0, intangibles, intangibles, 'Activo no corriente'),
       fila('1.9', 'OTROS ACTIVOS NO CORRIENTES', 0, otrosANC, otrosANC, 'Activo no corriente'),
     ];
+    activosAdicionales.forEach(codigo => anc.push(filaNoCorriente(codigo, nombreCuenta(codigo), 'Activo no corriente')));
     const totalANC = sumar(anc, 'compartidoTipo');
     const totalActivos = totalAC + totalANC;
 
@@ -29161,28 +28057,59 @@ export class PruebaComponent implements OnInit {
       filaCorriente('2.4', 'CUENTAS POR PAGAR', 'Pasivo corriente'),
       filaCorriente('2.5.11', 'BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO', 'Pasivo corriente'),
       filaCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo corriente'),
+      filaCorriente('2.5.14', 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO', 'Pasivo corriente'),
       filaCorriente('2.7', 'PROVISIONES', 'Pasivo corriente'),
       filaCorriente('2.9', 'OTROS PASIVOS CORRIENTES', 'Pasivo corriente'),
     ];
+    const pasivosAdicionales = completarGrupos('2', ['2.4', '2.5.11', '2.5.12', '2.5.14', '2.7', '2.9']);
+    pasivosAdicionales.forEach(codigo => pc.push(filaCorriente(codigo, nombreCuenta(codigo), 'Pasivo corriente')));
     const totalPC = sumar(pc, 'tipoDeCuenta');
     const pnc = [
+      filaNoCorriente('2.4', 'CUENTAS POR PAGAR', 'Pasivo no corriente'),
+      filaNoCorriente('2.5.11', 'BENEFICIOS A LOS EMPLEADOS A CORTO PLAZO', 'Pasivo no corriente'),
       filaNoCorriente('2.5.14', 'BENEFICIOS A LOS EMPLEADOS A LARGO PLAZO', 'Pasivo no corriente'),
       filaNoCorriente('2.5.12', 'BENEFICIOS POSEMPLEO - PENSIONES', 'Pasivo no corriente'),
       filaNoCorriente('2.7', 'PROVISIONES', 'Pasivo no corriente'),
       filaNoCorriente('2.9', 'OTROS PASIVOS NO CORRIENTES', 'Pasivo no corriente'),
     ];
+    pasivosAdicionales.forEach(codigo => pnc.push(filaNoCorriente(codigo, nombreCuenta(codigo), 'Pasivo no corriente')));
     const totalPNC = sumar(pnc, 'compartidoTipo');
     const totalPasivos = totalPC + totalPNC;
 
-    const patrimonio = [
-      fila('3.1.05', 'CAPITAL FISCAL', 0, 0, saldo('3.1.05'), 'Patrimonio'),
-      fila('3.1.09', 'RESULTADOS DE EJERCICIOS ANTERIORES', 0, 0, saldo('3.1.09'), 'Patrimonio'),
-      fila('3.1.10', 'RESULTADO DEL EJERCICIO', 0, 0, saldo('3.1.10'), 'Patrimonio'),
-      fila('3.1.45', 'IMPACTOS POR LA TRANSICION AL NUEVO MARCO', 0, 0, saldo('3.1.45'), 'Patrimonio'),
-      fila('3.1.51', 'GANANCIAS O PERDIDAS POR PLANES DE BENEFICIOS', 0, 0, saldo('3.1.51'), 'Patrimonio'),
-    ];
+    // La pérdida actuarial puede estar solo en el auxiliar original con marca DB.
+    // El padre del catálogo vacío no debe convertir ese débito en un aumento.
+    const saldoPatrimonio = (codigo: string): number => {
+      if (codigo !== '3.1.51' || saldo(codigo) !== 0) return saldo(codigo);
+      const detalle = fuente.filter((item: any) => {
+        const actual = String(item?.codigo || '').trim();
+        return actual.startsWith(`${codigo}.`) && !fuente.some((otro: any) =>
+          String(otro?.codigo || '').trim().startsWith(`${actual}.`));
+      });
+      return detalle.reduce((total: number, item: any) => {
+        const valor = this.valorNumerico(item.nuevoSaldo);
+        return total + (item.tipoSaldoNuevo === 'DB' && valor > 0 ? -valor : valor);
+      }, 0);
+    };
+    const conceptosPatrimonio = new Map<string, string>([
+      ['3.1.05', 'CAPITAL FISCAL'],
+      ['3.1.09', 'RESULTADOS DE EJERCICIOS ANTERIORES'],
+      ['3.1.10', 'RESULTADO DEL EJERCICIO'],
+      ['3.1.45', 'IMPACTOS POR LA TRANSICION AL NUEVO MARCO'],
+      ['3.1.51', 'GANANCIAS O PERDIDAS POR PLANES DE BENEFICIOS'],
+    ]);
+    completarGrupos('3', Array.from(conceptosPatrimonio.keys())).forEach(codigo =>
+      conceptosPatrimonio.set(codigo, nombreCuenta(codigo))
+    );
+    const patrimonio = Array.from(conceptosPatrimonio, ([codigo, nombre]) =>
+      fila(codigo, nombre, 0, 0, saldoPatrimonio(codigo), 'Patrimonio')
+    );
+    // Presentación del resultado de cuentas aún abiertas; no modifica el libro fuente.
+    const resultadoPendiente = this.redondearImporte(
+      saldo('4') - saldo('5') - saldo('6') - saldo('7')
+    );
     const totalPatrimonio = sumar(patrimonio, 'nuevoSaldo');
-    const totalPasivoPatrimonio = totalPasivos + totalPatrimonio;
+    const patrimonioConResultado = this.redondearImporte(totalPatrimonio + resultadoPendiente);
+    const totalPasivoPatrimonio = this.redondearImporte(totalPasivos + patrimonioConResultado);
 
     return [
       ...ac,
@@ -29197,8 +28124,10 @@ export class PruebaComponent implements OnInit {
       fila('TOTAL-P', 'TOTAL PASIVOS', totalPC, totalPNC, totalPasivos, 'Pasivos', true),
       ...patrimonio,
       fila('TOTAL-PAT', 'TOTAL PATRIMONIO', 0, 0, totalPatrimonio, 'Patrimonio', true),
-      fila('TOTAL-PP', 'TOTAL PASIVO Y PATRIMONIO', 0, 0, totalPasivoPatrimonio, 'Comprobacion', true),
-      fila('DIFERENCIA', 'DIFERENCIA ACTIVOS - PASIVO Y PATRIMONIO', 0, 0, totalActivos - totalPasivoPatrimonio, 'Comprobacion', true),
+      fila('RESULTADO-PENDIENTE', 'RESULTADO DEL PERIODO', 0, 0, resultadoPendiente, 'Resultado del periodo'),
+      fila('TOTAL-PAT-R', 'PATRIMONIO + RESULTADO DEL PERIODO', 0, 0, patrimonioConResultado, 'Patrimonio con resultado', true),
+      fila('TOTAL-PP', 'PASIVO + PATRIMONIO + RESULTADO DEL PERIODO', 0, 0, totalPasivoPatrimonio, 'Comprobacion', true),
+      fila('DIFERENCIA', 'DIFERENCIA ACTIVOS - PASIVO Y PATRIMONIO', 0, 0, this.redondearImporte(totalActivos - totalPasivoPatrimonio), 'Comprobacion', true),
       fila('8', 'CUENTAS DE ORDEN DEUDORAS', 0, 0, saldo('8'), 'Cuentas de orden'),
       fila('9', 'CUENTAS DE ORDEN ACREEDORAS', 0, 0, saldo('9'), 'Cuentas de orden'),
     ];
@@ -29218,12 +28147,8 @@ export class PruebaComponent implements OnInit {
     const fuente = this.tablaInicialGuardada.length
       ? this.tablaInicialGuardada
       : this.datosTabla;
-    const saldo = (codigo: string): number => {
-      const item = fuente.find(
-        (cuenta: any) => String(cuenta?.codigo || '').trim() === codigo
-      );
-      return this.valorNumerico(item?.nuevoSaldo);
-    };
+    const leer = crearLectorBalance(fuente);
+    const saldo = (codigo: string): number => leer(codigo, 'nuevoSaldo');
     const fila = (
       codigo: string,
       nombre: string,
@@ -29236,8 +28161,8 @@ export class PruebaComponent implements OnInit {
     const gastos = saldo('5');
     const costosVenta = saldo('6');
     const costosTransformacion = saldo('7');
-    const costosYGastos = gastos + costosVenta + costosTransformacion;
-    const resultado = ingresos - costosYGastos;
+    const costosYGastos = this.redondearImporte(gastos + costosVenta + costosTransformacion);
+    const resultado = this.redondearImporte(ingresos - costosYGastos);
     const resultadoPatrimonio = saldo('3.1.10');
 
     return [
@@ -29269,7 +28194,10 @@ export class PruebaComponent implements OnInit {
       fila('TOTAL-CG', 'TOTAL COSTOS Y GASTOS', costosYGastos, 'Resultado', true),
       fila('RESULTADO', 'RESULTADO DEL EJERCICIO', resultado, 'Resultado', true),
       fila('3.1.10', 'RESULTADO REGISTRADO EN EL PATRIMONIO', resultadoPatrimonio, 'Comprobacion'),
-      fila('DIFERENCIA', 'DIFERENCIA RESULTADO - PATRIMONIO', resultado - resultadoPatrimonio, 'Comprobacion', true),
+      fila('RESULTADO-PENDIENTE', 'RESULTADO INCORPORADO SOLO EN LA PRESENTACION DEL BALANCE', resultado, 'Comprobacion'),
+      fila('RESULTADO-PRESENTADO', 'RESULTADO TOTAL PRESENTADO EN EL PATRIMONIO', this.redondearImporte(resultadoPatrimonio + resultado), 'Comprobacion', true),
+      fila('DIFERENCIA', 'DIFERENCIA ENTRE RESULTADO Y SU PRESENTACION', this.redondearImporte(resultado -
+        this.valorNumerico(this.construirEstadoSituacionFinanciera().find(item => item.codigo === 'RESULTADO-PENDIENTE')?.nuevoSaldo)), 'Comprobacion', true),
     ];
   }
 
@@ -29498,6 +28426,10 @@ export class PruebaComponent implements OnInit {
       case 'original': return 'Información procesada';
       default: return 'Informe contable';
     }
+  }
+
+  redondearImporte(valor: number): number {
+    return Math.round((valor + Math.sign(valor) * Number.EPSILON) * 100) / 100;
   }
 
   valorNumerico(valor: any): number {
@@ -29899,23 +28831,37 @@ export class PruebaComponent implements OnInit {
   }
 
   crearHojaResumen(datos: any[]): any {
-    const sumar = (campo: string) => datos.reduce(
-      (total: number, item: any) => total + this.valorNumerico(item[campo]), 0
-    );
+    const unicas = new Map<string, any>();
+    datos.forEach(item => {
+      const codigo = String(item?.codigo || '').trim();
+      if (/^\d+(?:\.\d+)*$/.test(codigo)) unicas.set(codigo, item);
+    });
+    const cuentas = Array.from(unicas.values()).filter(item => {
+      const codigo = String(item.codigo).trim();
+      return !Array.from(unicas.keys()).some(padre => codigo.startsWith(`${padre}.`));
+    });
+    const leer = crearLectorBalance(Array.from(unicas.values()));
+    const sumar = (campo: string) => cuentas.reduce((total: number, item: any) =>
+      total + leer(String(item.codigo).trim(), campo), 0);
+    const indicadores = ['balance', 'situacion'].includes(this.reporteActivo)
+      ? this.construirEstadoSituacionFinanciera()
+          .filter(item => item.esTotal || item.codigo === 'RESULTADO-PENDIENTE')
+          .map(item => [item.nombre, item.nuevoSaldo])
+      : [
+          ['Saldo anterior', sumar('saldoAnterior')],
+          ['Débitos', sumar('debito')],
+          ['Créditos', sumar('credito')],
+          ['Saldo actual', sumar('nuevoSaldo')],
+          ['Total corriente', sumar('tipoDeCuenta')],
+          ['Total no corriente', sumar('compartidoTipo')],
+        ];
     const filas = [
       ['UNIVERSIDAD INDUSTRIAL DE SANTANDER'],
       ['Resumen ejecutivo', this.nombreReporteActual()],
       [''],
       ['Indicador', 'Valor'],
-      ['Total de cuentas', datos.length],
-      ['Saldo anterior', sumar('saldoAnterior')],
-      ['Débitos', sumar('debito')],
-      ['Créditos', sumar('credito')],
-      ['Saldo actual', sumar('nuevoSaldo')],
-      ['Total corriente', sumar('tipoDeCuenta')],
-      ['Total no corriente', sumar('compartidoTipo')],
-      ['Cuentas con saldo corriente', datos.filter((x: any) => this.valorNumerico(x.tipoDeCuenta) !== 0).length],
-      ['Cuentas con saldo no corriente', datos.filter((x: any) => this.valorNumerico(x.compartidoTipo) !== 0).length],
+      ['Total de cuentas', unicas.size],
+      ...indicadores,
     ];
     const hoja: any = XLSXStyle.utils.aoa_to_sheet(filas);
     hoja['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
@@ -29924,7 +28870,7 @@ export class PruebaComponent implements OnInit {
     ['A4', 'B4'].forEach((ref) => hoja[ref].s = this.estiloEncabezado());
     for (let fila = 4; fila < filas.length; fila++) {
       const valor = hoja[XLSXStyle.utils.encode_cell({ r: fila, c: 1 })];
-      if (valor && typeof valor.v === 'number' && fila >= 5 && fila <= 10) {
+      if (valor && typeof valor.v === 'number' && fila >= 5) {
         valor.z = '#,##0.00;[Red](#,##0.00);-';
         valor.s = this.estiloCeldaNumerica(fila);
       }
@@ -30279,7 +29225,19 @@ export class PruebaComponent implements OnInit {
     );
   }
   secuenciaDecodigosNuevos() {}
+  limpiarSeleccionTabla(): void {
+    // Limpiar también las filas fuera de la página o búsqueda actual.
+    [this.datosTabla, this.datosReporteActual, this.dataTareasPaginated,
+      this.seleccionados, this.seleccionadosNewTable].forEach((filas: any[]) => {
+      filas.forEach((fila: any) => { if (fila) fila.tipo = false; });
+    });
+    this.selectAll = false;
+    this.seleccionados = [];
+    this.seleccionadosNewTable = [];
+  }
+
   applyFilter(event: any) {
+    this.limpiarSeleccionTabla();
     const value = (event.target as HTMLInputElement).value;
     this.filterSubject.next(value);
   }
@@ -30313,6 +29271,7 @@ export class PruebaComponent implements OnInit {
         // Si el row no está en la lista de seleccionados, lo agregamos
         this.seleccionadosNewTable.push(row);
       }
+      row.tipo = this.seleccionadosNewTable.includes(row);
       return;
     }
     if (this.seleccionados.includes(row)) {
@@ -30324,6 +29283,7 @@ export class PruebaComponent implements OnInit {
       // Si el row no está en la lista de seleccionados, lo agregamos
       this.seleccionados.push(row);
     }
+    row.tipo = this.seleccionados.includes(row);
   }
 
   puedeEditarDistribucion(row: any): boolean {
@@ -30374,6 +29334,7 @@ export class PruebaComponent implements OnInit {
     const pc = sumar('2', 'tipoDeCuenta');
     const pnc = sumar('2', 'compartidoTipo');
     const patrimonio = this.valorNumerico(
+      datos.find((item: any) => item.codigo === 'TOTAL-PAT-R')?.nuevoSaldo ??
       datos.find((item: any) => item.codigo === 'TOTAL-PAT')?.nuevoSaldo
     );
     asignar('TOTAL-AC', ac, 0, ac);
@@ -30453,15 +29414,31 @@ export class PruebaComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (!result) {
+        this.limpiarSeleccionTabla();
         return;
       }
 
       const tipoReporte = this.reporteActivo || 'original';
       if (tipoReporte === 'original') {
+        this.datosTabla = this.datosReporteActual.length ? this.datosReporteActual : this.datosTabla;
         this.aplicarAjustesDirectosAlReporte(result);
         this.guardarFuenteOriginal(this.datosTabla);
       } else {
-        const vistaActual = this.datosTabla;
+        this.asegurarTablaInicial();
+        const vistaActual = this.datosReporteActual.length ? this.datosReporteActual : this.datosTabla;
+        // Aplicar la diferencia de la vista a la fuente, incluso en filas resumidas.
+        result = result.map((ajuste: any) => {
+          const anterior = vistaActual.find((fila: any) => fila.codigo === ajuste.codigo &&
+            String(fila.seccion || '') === String(ajuste.seccion || ''));
+          const original = this.tablaInicialGuardada.find((fila: any) => fila.codigo === ajuste.codigo);
+          if (!anterior || !original) return ajuste;
+          const actualizado = { ...original };
+          ['saldoAnterior', 'nuevoSaldo', 'tipoDeCuenta', 'compartidoTipo'].forEach((campo: string) => {
+            actualizado[campo] = this.valorNumerico(original[campo]) +
+              this.valorNumerico(ajuste[campo]) - this.valorNumerico(anterior[campo]);
+          });
+          return actualizado;
+        });
         this.asegurarTablaInicial();
         this.datosTabla = this.clonarDatos(this.tablaInicialGuardada);
         this.aplicarAjustesDirectosAlReporte(result);
@@ -30469,9 +29446,7 @@ export class PruebaComponent implements OnInit {
         this.datosTabla = vistaActual;
       }
 
-      this.seleccionadosNewTable = [];
-      this.selectAll = false;
-      this.datosTabla.forEach((item: any) => (item.tipo = false));
+      this.limpiarSeleccionTabla();
       if (tipoReporte === 'original') {
         this.datosReporteActual = this.datosTabla;
         this.consultarTabla();
@@ -30511,9 +29486,9 @@ export class PruebaComponent implements OnInit {
             ) {
               objeto.nuevoSaldoDespues = objeto.nuevoSaldo;
               objeto.nuevoSaldo =
-                (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-                (objeto.debito ? Math.round(objeto.debito) : 0) -
-                (objeto.credito ? Math.round(objeto.credito) : 0);
+                (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+                (objeto.debito ? this.redondearImporte(objeto.debito) : 0) -
+                (objeto.credito ? this.redondearImporte(objeto.credito) : 0);
               if (objeto.tipoDeCuenta !== 0 && objeto.compartidoTipo !== 0) {
                 if (objetosCambiadosCompartidos.includes(objeto)) {
                   // Si el row ya está en la lista de seleccionados, lo eliminamos
@@ -30537,9 +29512,9 @@ export class PruebaComponent implements OnInit {
             } else {
               objeto.nuevoSaldoDespues = objeto.nuevoSaldo;
               objeto.nuevoSaldo =
-                (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-                (objeto.credito ? Math.round(objeto.credito) : 0) -
-                (objeto.debito ? Math.round(objeto.debito) : 0);
+                (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+                (objeto.credito ? this.redondearImporte(objeto.credito) : 0) -
+                (objeto.debito ? this.redondearImporte(objeto.debito) : 0);
               if (objeto.tipoDeCuenta !== 0 && objeto.compartidoTipo !== 0) {
                 if (objetosCambiadosCompartidos.includes(objeto)) {
                   // Si el row ya está en la lista de seleccionados, lo eliminamos
@@ -30630,7 +29605,9 @@ export class PruebaComponent implements OnInit {
       ? this.datosTabla.filter((fila: any) => {
         const codigo = String(fila?.codigo || '').toLocaleLowerCase('es-CO');
         const nombre = String(fila?.nombre || '').toLocaleLowerCase('es-CO');
-        return codigo.includes(termino) || nombre.includes(termino);
+        return /^[0-9.]+$/.test(termino)
+          ? codigo.replace(/\./g, '').startsWith(termino.replace(/\./g, ''))
+          : codigo.includes(termino) || nombre.includes(termino);
       })
       : this.datosTabla;
 
@@ -30749,7 +29726,7 @@ export class PruebaComponent implements OnInit {
             if (element.saldoAnterior == undefined) {
               p = 0;
             } else {
-              p = p + Math.round(element.saldoAnterior);
+              p = p + this.redondearImporte(element.saldoAnterior);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30773,7 +29750,7 @@ export class PruebaComponent implements OnInit {
               }
               p = p + 0;
             } else {
-              p = p + Math.round(element.saldoAnterior);
+              p = p + this.redondearImporte(element.saldoAnterior);
 
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
@@ -30794,7 +29771,7 @@ export class PruebaComponent implements OnInit {
               w = 0;
             } else {
               const debitoNumero = parseFloat(element.debito); // convierte a número decimal
-              w = w + Math.round(debitoNumero);
+              w = w + this.redondearImporte(debitoNumero);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30813,7 +29790,7 @@ export class PruebaComponent implements OnInit {
               w = w + 0;
             } else {
               const debitoNumero = parseFloat(element.debito); // convierte a número decimal
-              w = w + Math.round(debitoNumero);
+              w = w + this.redondearImporte(debitoNumero);
 
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
@@ -30833,7 +29810,7 @@ export class PruebaComponent implements OnInit {
             if (element.tipoDeCuenta == undefined) {
               c = 0;
             } else {
-              c = c + Math.round(element.tipoDeCuenta);
+              c = c + this.redondearImporte(element.tipoDeCuenta);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30854,7 +29831,7 @@ export class PruebaComponent implements OnInit {
             ) {
               c = c + 0;
             } else {
-              c = c + Math.round(element.tipoDeCuenta);
+              c = c + this.redondearImporte(element.tipoDeCuenta);
 
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
@@ -30874,7 +29851,7 @@ export class PruebaComponent implements OnInit {
             if (element.nuevoSaldo == undefined) {
               x = 0;
             } else {
-              x = x + Math.round(element.nuevoSaldo);
+              x = x + this.redondearImporte(element.nuevoSaldo);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30892,7 +29869,7 @@ export class PruebaComponent implements OnInit {
             if (element.nuevoSaldo == undefined || element.nuevoSaldo == null) {
               x = x + 0;
             } else {
-              x = x + Math.round(element.nuevoSaldo);
+              x = x + this.redondearImporte(element.nuevoSaldo);
 
               // x = x + element.nuevoSaldo;
               localStorage.setItem(
@@ -30913,7 +29890,7 @@ export class PruebaComponent implements OnInit {
             if (element.compartidoTipo == undefined) {
               n = 0;
             } else {
-              n = n + Math.round(element.compartidoTipo);
+              n = n + this.redondearImporte(element.compartidoTipo);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30934,7 +29911,7 @@ export class PruebaComponent implements OnInit {
             ) {
               n = n + 0;
             } else {
-              n = n + Math.round(element.compartidoTipo);
+              n = n + this.redondearImporte(element.compartidoTipo);
 
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
@@ -30955,7 +29932,7 @@ export class PruebaComponent implements OnInit {
               y = 0;
             } else {
               const credito = parseFloat(element.credito); // convierte a número decimal
-              y = y + Math.round(credito);
+              y = y + this.redondearImporte(credito);
             }
             localStorage.setItem(
               element.codigo.trim().slice(0, contadorValor),
@@ -30974,7 +29951,7 @@ export class PruebaComponent implements OnInit {
               y = y + 0;
             } else {
               const credito = parseFloat(element.credito); // convierte a número decimal
-              y = y + Math.round(credito);
+              y = y + this.redondearImporte(credito);
               localStorage.setItem(
                 element.codigo.trim().slice(0, contadorValor),
                 JSON.stringify({
@@ -31075,26 +30052,26 @@ export class PruebaComponent implements OnInit {
           codigoArray[0] === '8'
         ) {
           objeto.nuevoSaldo =
-            (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-            (objeto.debito ? Math.round(objeto.debito) : 0) -
-            (objeto.credito ? Math.round(objeto.credito) : 0);
+            (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+            (objeto.debito ? this.redondearImporte(objeto.debito) : 0) -
+            (objeto.credito ? this.redondearImporte(objeto.credito) : 0);
         } else {
           objeto.nuevoSaldo =
-            (objeto.saldoAnterior ? Math.round(objeto.saldoAnterior) : 0) +
-            (objeto.credito ? Math.round(objeto.credito) : 0) -
-            (objeto.debito ? Math.round(objeto.debito) : 0);
+            (objeto.saldoAnterior ? this.redondearImporte(objeto.saldoAnterior) : 0) +
+            (objeto.credito ? this.redondearImporte(objeto.credito) : 0) -
+            (objeto.debito ? this.redondearImporte(objeto.debito) : 0);
         }
       });
 
       mergedArray.filter((objeto: any) => {
         objeto.nuevoSaldo = objeto.nuevoSaldo
-          ? Math.round(objeto.nuevoSaldo)
+          ? this.redondearImporte(objeto.nuevoSaldo)
           : 0;
         objeto.saldoAnterior = objeto.saldoAnterior
-          ? Math.round(objeto.saldoAnterior)
+          ? this.redondearImporte(objeto.saldoAnterior)
           : 0;
-        objeto.debito = objeto.debito ? Math.round(objeto.debito) : 0;
-        objeto.credito = objeto.credito ? Math.round(objeto.credito) : 0;
+        objeto.debito = objeto.debito ? this.redondearImporte(objeto.debito) : 0;
+        objeto.credito = objeto.credito ? this.redondearImporte(objeto.credito) : 0;
       });
 
       this.datosTabla = mergedArray;

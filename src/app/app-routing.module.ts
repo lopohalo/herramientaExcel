@@ -16,7 +16,7 @@ const routes: Routes = [
     {path: "calculadora", component: CaculadoraComponent},
     {path: "ingresos", component: IngresosComponent},
     {path: "gastos", component: GastosComponent},
-    {path: "", component: CaculadoraComponent},
+    {path: "", component: PruebaComponent},
     {path: "auditoria-liquidaciones", component: AuditoriaLiquidacionesComponent},
     {path: "pdf", component: PdfAnalyzerComponent},
     {path: "contabilidad", component: PruebaComponent},
