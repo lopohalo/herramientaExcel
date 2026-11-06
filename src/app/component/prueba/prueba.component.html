@@ -1,6 +1,7 @@
 <main class="accounting-workspace">
   <header class="app-header">
     <div class="brand-block"><div class="brand-mark"><img src="assets/img/logo.png" alt="Logo" /></div><div><span class="eyebrow">Herramienta contable</span><h1>{{ titulo || 'Procesamiento de balances' }}</h1></div></div>
+    <div><small role="status">{{ estadoGuardado }}</small><button *ngIf="mostrarTabla" class="secondary-action" type="button" (click)="eliminarProgreso()"><mat-icon>delete_outline</mat-icon>Eliminar datos de este equipo</button></div>
     <div class="header-status" [class.is-ready]="mostrarTabla"><span class="status-dot"></span>{{ mostrarTabla ? 'Archivo procesado' : 'Listo para comenzar' }}</div>
   </header>
 

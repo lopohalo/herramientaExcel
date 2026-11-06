@@ -130,6 +130,8 @@ export class PruebaComponent implements OnInit {
   displayedColumns: string[] = this.columnasTablaBase.filter(
     (columna: string) => !['tipoSaldoAnterior', 'tipoSaldoNuevo'].includes(columna)
   );
+  private preferenciasColumnas: { [tipo: string]: string[] } = {};
+  estadoGuardado = '';
   columnasReporteDisponibles: string[] = [...this.displayedColumns];
   readonly opcionesColumnasTabla = [
     { id: 'codigo', etiqueta: 'Código' },
@@ -26121,21 +26123,16 @@ export class PruebaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // if (localStorage.getItem('datosTabla')) {
-    //   this.datosTabla = JSON.parse(localStorage.getItem('datosTabla')!);
-    //   this.validartabla = 1;
-    //   this.mostrarTabla = true;
-    //   this.consultarTabla();
-    // }
     if (localStorage.getItem('modeloDeDatosContabilidad')) {
       this.modeloDeDatosContabilidad = JSON.parse(
         localStorage.getItem('modeloDeDatosContabilidad')!
       );
     }
+    this.restaurarProgreso();
     if (localStorage.getItem('ruta')) {
       this.titulo = localStorage.getItem('ruta');
     } else {
-      if (this.titulo == '') {
+      if (this.titulo == '' && !this.mostrarTabla) {
         this.router.navigate(['/']);
       }
     }
@@ -27764,12 +27761,14 @@ export class PruebaComponent implements OnInit {
     // }
     this.actualizarPaginacionTabla();
     this.secuenciaDecodigosExistentes();
+    this.guardarProgreso();
   }
   consultarTabla2() {
     // for (let index = 0; index < this.datosTabla.length; index++) {
     //   this.datosTabla[index].tipo = false;
     // }
     this.actualizarPaginacionTabla();
+    this.guardarProgreso();
   }
 
   secuenciaDecodigosExistentes() {
@@ -29308,7 +29307,100 @@ export class PruebaComponent implements OnInit {
     this.columnasReporteDisponibles = ['original', 'chip', 'balance', 'situacion'].includes(tipo)
       ? ['tipo', ...columnasSinSeleccion]
       : columnasSinSeleccion;
-    this.displayedColumns = [...this.columnasReporteDisponibles];
+    const preferidas = this.preferenciasColumnas[tipo];
+    this.displayedColumns = preferidas
+      ? this.columnasReporteDisponibles.filter(columna => columna === 'codigo' || preferidas.includes(columna))
+      : [...this.columnasReporteDisponibles];
+  }
+
+  private guardarPreferenciasColumnas(): void {
+    this.preferenciasColumnas[this.reporteActivo || 'original'] = [...this.displayedColumns];
+    this.guardarProgreso();
+  }
+
+  guardarProgreso(): void {
+    if (!this.datosTabla.length) return;
+    try {
+      localStorage.setItem('progresoContable_v1', JSON.stringify({
+        version: 1,
+        fuente: this.tablaInicialGuardada.length ? this.tablaInicialGuardada : this.datosTabla,
+        vista: this.datosTabla,
+        reporte: this.reporteActivo || 'original',
+        columnas: this.preferenciasColumnas,
+        titulo: this.titulo,
+      }));
+      this.estadoGuardado = 'Progreso guardado en este equipo';
+    } catch (_error) {
+      this.estadoGuardado = 'No se pudo guardar el progreso: revisa el espacio del navegador';
+    }
+  }
+
+  private restaurarProgreso(): void {
+    try {
+      const guardado = JSON.parse(localStorage.getItem('progresoContable_v1') || 'null');
+      const fuente = guardado?.fuente || JSON.parse(localStorage.getItem('reporteFuenteOriginal') || 'null');
+      if (!Array.isArray(fuente) || !fuente.length) return;
+      this.tablaInicialGuardada = normalizarFuenteBalance(fuente);
+      this.preferenciasColumnas = guardado?.columnas || {};
+      this.titulo = guardado?.titulo || this.titulo;
+      this.datosTabla = Array.isArray(guardado?.vista) && guardado.vista.length
+        ? guardado.vista : this.clonarDatos(this.tablaInicialGuardada);
+      const tipo = guardado?.reporte;
+      this.prepararVistaReporte(['original', 'chip', 'balance', 'situacion', 'resultados'].includes(tipo) ? tipo : 'original');
+      this.validartabla = 1;
+      this.mostrarTabla = true;
+      this.cargandoPaginaSpinner = 1;
+      this.limpiarSeleccionTabla();
+      this.consultarTabla();
+    } catch (_error) {
+      this.estadoGuardado = 'No se pudo recuperar el progreso guardado';
+    }
+  }
+
+  async eliminarProgreso(): Promise<void> {
+    const respuesta = await Swal.fire({
+      title: '¿Eliminar el progreso de este equipo?',
+      text: 'Se borrarán el balance cargado y sus ajustes para empezar de cero.',
+      icon: 'warning', showCancelButton: true,
+      confirmButtonText: 'Eliminar datos', cancelButtonText: 'Cancelar',
+    });
+    if (!respuesta.isConfirmed) return;
+    const claves = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i));
+    claves.forEach(clave => {
+      if (clave && (/^[1-9]\d*(?:\.\d+)*$/.test(clave.trim()) ||
+          /^reporteIndependiente_/.test(clave) ||
+          ['progresoContable_v1', 'reporteFuenteOriginal', 'reporteChipModificado', 'datosTabla'].includes(clave))) {
+        localStorage.removeItem(clave);
+      }
+    });
+    this.datosTabla = [];
+    this.datosReporteActual = [];
+    this.tablaInicialGuardada = [];
+    this.reporteChipGuardado = [];
+    this.reportesIndependientes = {};
+    this.preferenciasColumnas = {};
+    this.revisionSaldosCiclo = [];
+    this.corrientesNoCorrientes = [];
+    this.corrientes = [];
+    this.noCorrientes = [];
+    this.rowColors = {};
+    this.filterValue = '';
+    this.reporteActivo = '';
+    this.reporteEnRecalculo = '';
+    this.validartabla = 0;
+    this.mostrarTabla = false;
+    this.estadoGuardado = '';
+    this.mostrarSelectorColumnas = false;
+    this.mostrarNuevos = false;
+    this.mostrarTabla3 = false;
+    this.codigosNoexistentes = [];
+    this.datosTabla2Recorrido = [];
+    this.datosHijosTabla = [];
+    this.convertedJson = '';
+    this.contadorAlert = 0;
+    this.recorrido2 = 0;
+    this.limpiarSeleccionTabla();
+    this.actualizarPaginacionTabla();
   }
 
   columnaDisponible(id: string): boolean {
@@ -29330,10 +29422,12 @@ export class PruebaComponent implements OnInit {
     this.displayedColumns = this.columnasReporteDisponibles.filter(
       (columna: string) => columnasVisibles.has(columna)
     );
+    this.guardarPreferenciasColumnas();
   }
 
   mostrarTodasLasColumnas(): void {
     this.displayedColumns = [...this.columnasReporteDisponibles];
+    this.guardarPreferenciasColumnas();
   }
 
   mostrarColumnasClasificacion(): void {
@@ -29341,6 +29435,7 @@ export class PruebaComponent implements OnInit {
     this.displayedColumns = this.columnasReporteDisponibles.filter(
       (columna: string) => columnasPreferidas.includes(columna)
     );
+    this.guardarPreferenciasColumnas();
   }
   secuenciaDecodigosNuevos() {}
   limpiarSeleccionTabla(): void {

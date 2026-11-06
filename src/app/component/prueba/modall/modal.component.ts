@@ -137,18 +137,21 @@ export class ModalTablaComponent implements OnInit {
   actualizarSaldoAnterior(index: number): void {
     const saldoAnterior = Number(this.saldosAnteriores[index]) || 0;
     const diferencia = saldoAnterior - this.saldosAnterioresOriginales[index];
-    const nuevoSaldo = this.nuevosSaldosOriginales[index] + diferencia;
+    const nuevoSaldo = Math.round((this.nuevosSaldosOriginales[index] + diferencia) * 100) / 100;
     const totalAnterior = this.totalesDistribucion[index];
     const corrienteAnterior = Number(this.valoresCorrientes[index]) || 0;
-    const proporcionCorriente = totalAnterior !== 0
-      ? corrienteAnterior / totalAnterior
-      : 0;
+    const noCorrienteAnterior = Number(this.valoresNoCorrientes[index]) || 0;
+    const cambio = Math.round((nuevoSaldo - totalAnterior) * 100) / 100;
 
     this.nuevosSaldos[index] = nuevoSaldo;
     this.totalesDistribucion[index] = nuevoSaldo;
-    this.valoresCorrientes[index] = nuevoSaldo * proporcionCorriente;
-    this.valoresNoCorrientes[index] =
-      nuevoSaldo - this.valoresCorrientes[index];
+    // Conservar el importe menor y aplicar todo el cambio al mayor.
+    if ((corrienteAnterior !== 0 && noCorrienteAnterior === 0) ||
+        (corrienteAnterior !== 0 && noCorrienteAnterior !== 0 && corrienteAnterior > noCorrienteAnterior)) {
+      this.valoresCorrientes[index] = Math.round((corrienteAnterior + cambio) * 100) / 100;
+    } else {
+      this.valoresNoCorrientes[index] = Math.round((noCorrienteAnterior + cambio) * 100) / 100;
+    }
     this.errorAjuste = '';
   }
 

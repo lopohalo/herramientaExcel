@@ -1,0 +1,61 @@
+const fs = require('fs');
+const vm = require('vm');
+const ts = require('typescript');
+const assert = require('assert/strict');
+function metodos(archivo, contexto) {
+  const fuente = ts.createSourceFile(archivo, fs.readFileSync(archivo, 'utf8'), ts.ScriptTarget.Latest, true);
+  const clase = fuente.statements.find(ts.isClassDeclaration);
+  const codigo = clase.members.filter(ts.isMethodDeclaration).map(m => m.getText(fuente)).join('\n');
+  vm.runInNewContext(ts.transpile(`class Prueba {${codigo}}; globalThis.Prueba = Prueba;`, { target: ts.ScriptTarget.ES2022 }), contexto);
+  return new contexto.Prueba();
+}
+const raiz = 'src/app/component/prueba/';
+const modal = metodos(raiz + 'modall/modal.component.ts', {});
+Object.assign(modal, { saldosAnteriores: [100], saldosAnterioresOriginales: [100], nuevosSaldosOriginales: [100], nuevosSaldos: [100], totalesDistribucion: [100], valoresCorrientes: [30], valoresNoCorrientes: [70] });
+modal.saldosAnteriores[0] = 120;
+modal.actualizarSaldoAnterior(0);
+assert.equal(modal.valoresCorrientes[0], 30);
+assert.equal(modal.valoresNoCorrientes[0], 90);
+modal.saldosAnteriores[0] = 80;
+modal.actualizarSaldoAnterior(0);
+assert.equal(modal.valoresNoCorrientes[0], 50);
+modal.valoresCorrientes[0] = 60;
+modal.actualizarDesdeCorriente(0);
+assert.equal(modal.valoresNoCorrientes[0], 20);
+modal.saldosAnteriores[0] = 90;
+modal.actualizarSaldoAnterior(0);
+assert.equal(modal.valoresCorrientes[0], 70);
+assert.equal(modal.valoresNoCorrientes[0], 20);
+modal.valoresNoCorrientes[0] = 40;
+modal.actualizarDesdeNoCorriente(0);
+assert.equal(modal.valoresCorrientes[0], 50);
+const almacen = new Map();
+const localStorage = { get length() { return almacen.size; }, key: i => [...almacen.keys()][i], getItem: k => almacen.get(k) || null, setItem: (k, v) => almacen.set(k, v), removeItem: k => almacen.delete(k) };
+const entorno = { localStorage, normalizarFuenteBalance: filas => filas, Swal: { fire: async () => ({ isConfirmed: true }) } };
+function nuevo() {
+  const c = metodos(raiz + 'prueba.component.ts', { ...entorno });
+  Object.assign(c, { columnasTablaBase: ['tipo', 'codigo', 'nombre', 'saldoAnterior', 'tipoDeCuenta', 'compartidoTipo'], preferenciasColumnas: {}, datosTabla: [{ codigo: '1', nuevoSaldo: 100 }], tablaInicialGuardada: [{ codigo: '1', nuevoSaldo: 100 }], datosReporteActual: [], dataTareasPaginated: [], seleccionados: [], seleccionadosNewTable: [], consultarTabla() {}, actualizarPaginacionTabla() {} });
+  return c;
+}
+(async () => {
+  const c = nuevo();
+  c.prepararVistaReporte('chip');
+  c.establecerVisibilidadColumna('saldoAnterior', false);
+  c.prepararVistaReporte('chip');
+  assert.equal(c.columnaVisible('saldoAnterior'), false, 'Reconstruir CHIP conserva columnas');
+  c.guardarProgreso();
+  const restaurado = nuevo();
+  restaurado.restaurarProgreso();
+  assert.equal(restaurado.reporteActivo, 'chip');
+  assert.equal(restaurado.columnaVisible('saldoAnterior'), false);
+  assert.equal(restaurado.datosTabla[0].nuevoSaldo, 100);
+  assert.equal(restaurado.mostrarTabla, true);
+  localStorage.setItem('ruta', 'contabilidad');
+  localStorage.setItem('1.1', '{}');
+  await restaurado.eliminarProgreso();
+  assert.equal(localStorage.getItem('progresoContable_v1'), null);
+  assert.equal(localStorage.getItem('1.1'), null);
+  assert.equal(localStorage.getItem('ruta'), 'contabilidad');
+  assert.equal(restaurado.mostrarTabla, false);
+  console.log('OK: compensación, saldo anterior, columnas CHIP, recuperación y borrado del progreso.');
+})().catch(error => { console.error(error); process.exitCode = 1; });
