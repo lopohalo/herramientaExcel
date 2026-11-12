@@ -46,7 +46,7 @@ export class CaculadoraComponent implements OnInit {
       localStorage.setItem(this.reportsKey, JSON.stringify(reports)); wroteReports = true;
       localStorage.setItem(this.storageKey, JSON.stringify(next));
       this.reports = reports; this.investments = next; additions.forEach(v => this.results.set(v.id, calculateInvestment(v)));
-      this.message = `${additions.length} inversiones registradas; ${report.positions.length - additions.length} existentes conservadas. Informe y fórmulas guardados en este navegador.`;
+      this.message = `${additions.length} inversiones registradas; ${report.positions.length - additions.length} existentes conservadas. Inversiones e informe original guardados en este navegador.`;
     } catch {
       try { if (wroteReports) { if (originalReports === null) localStorage.removeItem(this.reportsKey); else localStorage.setItem(this.reportsKey, originalReports); if (originalInvestments === null) localStorage.removeItem(this.storageKey); else localStorage.setItem(this.storageKey, originalInvestments); } } catch { /* Original values remain in memory for retry/backup. */ }
       this.reportError = 'No fue posible guardar el informe. Revisa el espacio del navegador y conserva un respaldo.';

@@ -98,3 +98,14 @@ summary { cursor: pointer; font-size: 13px; font-weight: 600; color: #3d6574; }
 .date-controls input { min-width: 0; }
 .comparison-scenario { font-size: 12px; line-height: 1.8; }
 @media (max-width: 550px) { .form-stepper button { flex-direction: column; font-size: 11px; text-align: center; } }
+
+.help-guide { margin: 20px 0; padding: 20px 24px; border: 1px solid #cee2df; border-left: 4px solid #176c72; border-radius: 10px; background: #f2f8f7; color: #345260; font-size: 14px; line-height: 1.7; }
+.help-guide h2, .help-guide h3 { margin: 0 0 12px; color: #173f55; font-size: 17px; }
+.help-guide ol { margin: 0 0 12px; padding-left: 22px; }
+.help-guide li + li { margin-top: 8px; }
+.help-guide p { margin: 10px 0 0; }
+.help-guide dl { margin: 0; }
+.help-guide dt { margin-top: 10px; color: #173f55; }
+.help-guide dd { margin: 0; }
+.compact-help summary { font-size: 14px; }
+@media (max-width: 550px) { .help-guide { padding: 16px; } }
