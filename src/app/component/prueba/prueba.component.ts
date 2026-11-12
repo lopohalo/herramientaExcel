@@ -1,3 +1,4 @@
+import { leerArchivoCuentasOrden, integrarCuentasOrden, resumenCuentasOrden } from './cuentas-orden';
 import { interpretarImportePegado } from './modall/importe-pegado';
 import { prepararDetalleHistorico, agruparDetalleHistorico } from './balance-historico';
 import { agregarNotasFinancieras, leerFuenteNotasBase, FuenteNotasBase, validarNotasFinancieras } from './notas-financieras';
@@ -32,6 +33,47 @@ import Swal from 'sweetalert2';
 export class PruebaComponent implements OnInit {
   @ViewChild('modalSaldosCiclo') modalSaldosCiclo!: TemplateRef<any>;
   private dialogoSaldosCiclo?: MatDialogRef<any>;
+
+  cargandoCuentasOrden = false;
+
+  async cargarCuentasOrden(evento: any): Promise<void> {
+    const archivo: File | undefined = evento.target.files?.[0];
+    if (!archivo) return;
+    this.cargandoCuentasOrden = true;
+    try {
+      this.asegurarTablaInicial();
+      const fuenteAntes = JSON.stringify(this.tablaInicialGuardada);
+      const carga = await leerArchivoCuentasOrden(archivo);
+      const escapar = (v: any) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+      const moneda = (v: number) => v.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const resumen = resumenCuentasOrden(carga.cuentas);
+      const confirmacion = await Swal.fire({
+        title: 'Revisar cuentas de orden', width: 960,
+        html: `<p>${escapar(carga.archivo)} · ${carga.cantidad} cuentas de detalle.</p>
+          <p>${carga.periodo ? `Periodo del archivo: ${carga.periodo.mes}/${carga.periodo.anio}. Verifica que corresponda al balance actual.` : 'El archivo no indica un periodo: verifica que corresponda al balance actual.'}</p>
+          <p>Se reemplazarán las cuentas 8 y 9 anteriores. Activos, pasivos, patrimonio y resultado se conservan.</p>
+          <table style="width:100%;text-align:left">${resumen.map(f => `<tr><td>${escapar(f.nombre)}</td><td style="text-align:right">${moneda(f.nuevoSaldo)}</td></tr>`).join('')}</table>
+          <details style="margin-top:15px;text-align:left"><summary>Ver cuentas de detalle</summary><div style="max-height:280px;overflow:auto"><table style="width:100%">${carga.cuentas.filter(f => f.codigo.split('.').length === 5).map(f => `<tr><td>${escapar(f.codigo)} ${escapar(f.nombre)}</td><td style="text-align:right">${moneda(f.nuevoSaldo)}</td></tr>`).join('')}</table></div></details>
+          <p>Un neto distinto de cero se conserva y se muestra como diferencia de control; no se ajusta automáticamente.</p>`,
+        showCancelButton: true, confirmButtonText: 'Aplicar cuentas de orden', cancelButtonText: 'Cancelar',
+      });
+      if (!confirmacion.isConfirmed) return;
+      if (fuenteAntes !== JSON.stringify(this.tablaInicialGuardada)) throw new Error('El balance cambió durante la revisión. Vuelve a cargar el archivo.');
+      const tipo = this.reporteActivo;
+      this.guardarFuenteOriginal(integrarCuentasOrden(this.tablaInicialGuardada, carga.cuentas));
+      this.limpiarSeleccionTabla();
+      if (tipo === 'chip') this.generarReporteChip();
+      else if (tipo === 'balance') this.generarReporteGeneral();
+      else if (tipo === 'situacion') this.generarEstadoSituacionFinanciera();
+      else if (tipo === 'resultados') this.generarReporteSecundario();
+      else this.mostrarInformacionOriginal();
+    } catch (error) {
+      Swal.fire('No se pudieron cargar las cuentas de orden', error instanceof Error ? error.message : 'Revisa el archivo.', 'error');
+    } finally {
+      this.cargandoCuentasOrden = false;
+      evento.target.value = '';
+    }
+  }
 
   abrirSaldosCiclo(): void {
     this.revisionSaldosCiclo = [];
@@ -27964,6 +28006,8 @@ export class PruebaComponent implements OnInit {
     const indicePatrimonio = this.datosTabla.findIndex((fila: any) => fila.codigo === 'TOTAL-PAT');
     const resultadoPendiente = totales.get('RESULTADO-PENDIENTE');
     if (indicePatrimonio >= 0 && resultadoPendiente) this.datosTabla.splice(indicePatrimonio + 1, 0, { ...resultadoPendiente }, { ...totales.get('TOTAL-PAT-R') });
+    const incluidosOrden = new Set(this.datosTabla.map((f: any) => f.codigo));
+    this.datosTabla.push(...this.tablaInicialGuardada.filter((f: any) => /^[89](?:\.|$)/.test(f.codigo) && !incluidosOrden.has(f.codigo)).map((f: any) => ({ ...f })));
     this.prepararVistaReporte('balance');
     this.mostrarTabla = true;
     this.consultarTabla();
@@ -28131,8 +28175,7 @@ export class PruebaComponent implements OnInit {
       fila('TOTAL-PAT-R', 'PATRIMONIO + RESULTADO DEL PERIODO', 0, 0, patrimonioConResultado, 'Patrimonio con resultado', true),
       fila('TOTAL-PP', 'PASIVO + PATRIMONIO + RESULTADO DEL PERIODO', 0, 0, totalPasivoPatrimonio, 'Comprobacion', true),
       fila('DIFERENCIA', 'DIFERENCIA ACTIVOS - PASIVO Y PATRIMONIO', 0, 0, this.redondearImporte(totalActivos - totalPasivoPatrimonio), 'Comprobacion', true),
-      fila('8', 'CUENTAS DE ORDEN DEUDORAS', 0, 0, saldo('8'), 'Cuentas de orden'),
-      fila('9', 'CUENTAS DE ORDEN ACREEDORAS', 0, 0, saldo('9'), 'Cuentas de orden'),
+      ...resumenCuentasOrden(fuente),
     ];
   }
 
@@ -28480,6 +28523,8 @@ export class PruebaComponent implements OnInit {
         </label>
         <input id="archivo-balance-comparativo" type="file" accept=".xls,.xlsx,.txt" style="display:none">
         <label style="display:block;margin-top:16px;text-align:left">Saldos por ciclo del periodo base (opcional)<input id="archivo-ciclos-base" type="file" accept=".xls,.xlsx" style="display:block;margin-top:8px;width:100%"></label>
+        <label style="display:block;margin-top:16px;text-align:left">Cuentas de orden del periodo base (opcional, clases 8 y 9)<input id="archivo-orden-base" type="file" accept=".txt,.xls,.xlsx" style="display:block;margin-top:8px;width:100%"></label>
+        <p style="font-size:12px;text-align:left;color:#64748b">Las cuentas de orden del periodo actual se cargan desde Cuentas procesadas. Sin detalle de orden se marcarán las notas 25 y 26 como pendientes.</p>
         <p style="font-size:12px;text-align:left;color:#64748b">El ciclo se aplica solamente al balance original del periodo base. Se usa SC Año Vigente del archivo de ese año.</p>`,
       showCancelButton: true,
       confirmButtonText: 'Guardar y seguir',
@@ -28501,6 +28546,7 @@ export class PruebaComponent implements OnInit {
         const archivo = (document.getElementById('archivo-balance-comparativo') as HTMLInputElement)?.files?.[0];
         const formato = (document.getElementById('formato-base') as HTMLSelectElement)?.value;
         const ciclos = (document.getElementById('archivo-ciclos-base') as HTMLInputElement)?.files?.[0];
+        const orden = (document.getElementById('archivo-orden-base') as HTMLInputElement)?.files?.[0];
         if (!mesActual || !mesBase || anioActual < 2000 || anioActual > 2100 || anioBase < 2000 || anioBase > 2100 || anioActual === anioBase && mesActual === mesBase) {
           Swal.showValidationMessage('Selecciona meses y años válidos.');
           return false;
@@ -28517,15 +28563,28 @@ export class PruebaComponent implements OnInit {
           Swal.showValidationMessage('Los saldos por ciclo requieren un balance original y un archivo de ciclo Excel.');
           return false;
         }
-        return { mesActual, anioActual, mesBase, anioBase, archivo, formato, ciclos };
+        if (orden && !/\.(txt|xlsx?)$/i.test(orden.name)) {
+          Swal.showValidationMessage('Las cuentas de orden deben estar en TXT o Excel.');
+          return false;
+        }
+        return { mesActual, anioActual, mesBase, anioBase, archivo, formato, ciclos, orden };
       },
     });
     if (!seleccion.isConfirmed || !seleccion.value) return;
     const valor = seleccion.value as any;
     const archivo = valor.archivo as File;
     try {
+      this.asegurarTablaInicial();
+      const periodoOrdenActual = this.tablaInicialGuardada.find(c => c.periodoOrden)?.periodoOrden;
+      if (periodoOrdenActual && (periodoOrdenActual.anio !== valor.anioActual || periodoOrdenActual.mes !== valor.mesActual)) {
+        throw new Error(`Las cuentas de orden actuales corresponden a ${periodoOrdenActual.mes}/${periodoOrdenActual.anio}; revisa el periodo seleccionado.`);
+      }
+      const ordenBase = valor.orden ? await leerArchivoCuentasOrden(valor.orden) : undefined;
+      if (ordenBase?.periodo && (ordenBase.periodo.anio !== valor.anioBase || ordenBase.periodo.mes !== valor.mesBase)) {
+        throw new Error(`Las cuentas de orden base corresponden a ${ordenBase.periodo.mes}/${ordenBase.periodo.anio}, no al periodo histórico seleccionado.`);
+      }
       if (valor.formato === 'original') {
-        await this.generarComparativoDesdeOriginal(archivo, valor.ciclos, `${meses[valor.mesActual - 1]} ${valor.anioActual}`, `${meses[valor.mesBase - 1]} ${valor.anioBase}`);
+        await this.generarComparativoDesdeOriginal(archivo, valor.ciclos, `${meses[valor.mesActual - 1]} ${valor.anioActual}`, `${meses[valor.mesBase - 1]} ${valor.anioBase}`, ordenBase?.cuentas);
         return;
       }
       const libroBase = XLSX.read(await archivo.arrayBuffer(), { type: 'array', cellDates: false });
@@ -28534,7 +28593,7 @@ export class PruebaComponent implements OnInit {
       if (!estructura.anios.some((item: any) => item.anio === valor.anioBase)) {
         throw new Error(`El archivo no contiene una columna para el año ${valor.anioBase}. Años encontrados: ${estructura.anios.map((x: any) => x.anio).join(', ')}.`);
       }
-      const datosBase = this.leerBalanceComparativo(libroBase, estructura, valor.anioBase);
+      let datosBase = this.leerBalanceComparativo(libroBase, estructura, valor.anioBase);
       if (!datosBase.length) throw new Error(`No se encontraron valores para el año ${valor.anioBase}.`);
       const estructuraResultados = this.detectarEstructuraBalanceComparativo(libroBase, 'resultados');
       if (!estructuraResultados) throw new Error('No se encontró la hoja Estado Resultados con las columnas de años.');
@@ -28548,6 +28607,11 @@ export class PruebaComponent implements OnInit {
       this.asegurarTablaInicial();
       const datosActuales = this.construirEstadoSituacionFinanciera();
       const resultadosActuales = this.construirEstadoResultadosFinancieros();
+      const fuenteNotasBase = leerFuenteNotasBase(libroBase, valor.anioBase);
+      if (ordenBase) {
+        fuenteNotasBase.cuentas = integrarCuentasOrden(fuenteNotasBase.cuentas, ordenBase.cuentas);
+        datosBase = [...datosBase.filter(f => !/^[89](?:\.|$)/.test(String(f.codigo)) && !/^NETO-[89]$/.test(String(f.codigo))), ...resumenCuentasOrden(ordenBase.cuentas)];
+      }
       this.exportarBalanceComparativo(
         datosActuales,
         datosBase,
@@ -28555,14 +28619,14 @@ export class PruebaComponent implements OnInit {
         `${meses[valor.mesBase - 1]} ${valor.anioBase}`,
         datosResultados,
         resultadosActuales,
-        leerFuenteNotasBase(libroBase, valor.anioBase)
+        fuenteNotasBase
       );
     } catch (error: any) {
       Swal.fire('No fue posible generar el comparativo', error?.message || 'Revisa el archivo seleccionado.', 'error');
     }
   }
 
-  private async generarComparativoDesdeOriginal(archivo: File, archivoCiclos: File | undefined, periodoActual: string, periodoBase: string): Promise<void> {
+  private async generarComparativoDesdeOriginal(archivo: File, archivoCiclos: File | undefined, periodoActual: string, periodoBase: string, cuentasOrdenBase?: any[]): Promise<void> {
     const contenido = await archivo.arrayBuffer();
     let filas: any[] = [];
     if (/\.txt$/i.test(archivo.name)) {
@@ -28582,11 +28646,18 @@ export class PruebaComponent implements OnInit {
     aislado.modeloDeDatosContabilidad = this.clonarDatos(this.modeloDeDatosContabilidad);
     aislado.modeloPorcentajes = this.clonarDatos(this.modeloPorcentajes);
     aislado.datosTabla = prepararDetalleHistorico(filas, aislado.modeloDeDatosContabilidad);
+    const ordenIncluidas = aislado.datosTabla.filter((c: any) => /^[89](?:\.|$)/.test(c.codigo));
+    aislado.datosTabla = aislado.datosTabla.filter((c: any) => !/^[89](?:\.|$)/.test(c.codigo));
     aislado.aplicarDistribucionAutomaticaInicial();
     aislado.datosTabla.forEach((cuenta: any) => {
       cuenta.tipoDeCuenta = this.redondearImporte(Number(cuenta.tipoDeCuenta || 0));
       cuenta.compartidoTipo = this.redondearImporte(cuenta.nuevoSaldo - cuenta.tipoDeCuenta);
     });
+    const ordenHistoricas = cuentasOrdenBase || (ordenIncluidas.length ? agruparDetalleHistorico(ordenIncluidas.map((c: any) => ({ ...c, tipoDeCuenta: 0, compartidoTipo: 0 })), this.modeloDeDatosSistemaContaduria) : undefined);
+    const agruparBase = () => {
+      const agrupada = agruparDetalleHistorico(aislado.datosTabla, this.modeloDeDatosSistemaContaduria);
+      return ordenHistoricas ? integrarCuentasOrden(agrupada, ordenHistoricas) : agrupada;
+    };
     let revision: RevisionSaldoCiclo[] = [];
     if (archivoCiclos) {
       const libro = XLSX.read(await archivoCiclos.arrayBuffer(), { type: 'array' });
@@ -28599,7 +28670,7 @@ export class PruebaComponent implements OnInit {
         cuenta.clasificacionPendiente = false;
       });
     }
-    aislado.tablaInicialGuardada = agruparDetalleHistorico(aislado.datosTabla, this.modeloDeDatosSistemaContaduria);
+    aislado.tablaInicialGuardada = agruparBase();
     const resultadoBase = aislado.construirEstadoResultadosFinancieros();
     const escapar = (texto: any): string => String(texto ?? '').replace(/[&<>"']/g, caracter => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[caracter]!));
     const moneda = (valor: number) => valor.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -28607,6 +28678,7 @@ export class PruebaComponent implements OnInit {
     const confirmado = await Swal.fire({
       title: `Revisar periodo base: ${periodoBase}`, width: 1000,
       html: `<p>${aislado.datosTabla.length} cuentas procesadas. ${pendientes} distribuciones pendientes de revisión.</p>
+        <p>${ordenHistoricas ? `${ordenHistoricas.filter(c => c.codigo.split('.').length === 5).length} cuentas de orden históricas incorporadas a las notas 25 y 26.` : 'Sin archivo de cuentas de orden histórico: notas 25 y 26 pendientes.'}</p>
         <p>${revision.filter(f => !f.motivo).length} rubros del ciclo aplicables · ${revision.filter(f => f.motivo).length} omitidos.</p>
         <p>Los saldos sin plazo definido se conservan en no corriente y se identifican en el detalle. El periodo actual no se modifica.</p>
         <p>Puedes editar corriente aquí. No corriente se calcula restando al saldo; los cambios solo afectan al periodo base.</p>
@@ -28638,7 +28710,7 @@ export class PruebaComponent implements OnInit {
     });
     if (!confirmado.isConfirmed) return;
     this.asegurarTablaInicial();
-    aislado.tablaInicialGuardada = agruparDetalleHistorico(aislado.datosTabla, this.modeloDeDatosSistemaContaduria);
+    aislado.tablaInicialGuardada = agruparBase();
     this.exportarBalanceComparativo(this.construirEstadoSituacionFinanciera(), aislado.construirEstadoSituacionFinanciera(), periodoActual, periodoBase,
       resultadoBase.map(fila => ({ ...fila, nuevoSaldo: fila.valor })), this.construirEstadoResultadosFinancieros(),
       { cuentas: aislado.tablaInicialGuardada, completa: true });
@@ -29156,6 +29228,8 @@ export class PruebaComponent implements OnInit {
       x.push(y[0]);
     });
     console.log(x);
+    const incluidos = new Set(x.filter(Boolean).map((fila: any) => fila.codigo));
+    x.push(...this.tablaInicialGuardada.filter((fila: any) => /^[89](?:\.|$)/.test(fila.codigo) && !incluidos.has(fila.codigo)));
     this.datosTabla = x;
     this.prepararVistaReporte('chip');
     this.mostrarTabla = true;

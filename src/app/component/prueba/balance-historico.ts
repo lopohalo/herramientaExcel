@@ -24,7 +24,7 @@ export function prepararDetalleHistorico(filas: FilaBalanceImportada[], modelo: 
     const definida = configuracion && (activo(configuracion.corriente) || activo(configuracion.noCorriente));
     const corriente = definida ? activo(configuracion.corriente) : true;
     const noCorriente = definida ? activo(configuracion.noCorriente) : true;
-    return { codigo, nombre: partes[2], saldoAnterior: importe(fila.saldoAnterior, raw[0]),
+    return { codigo, ...(/^[89]/.test(raw) ? { cuentaOrdenCargada: true } : {}), nombre: partes[2], saldoAnterior: importe(fila.saldoAnterior, raw[0]),
       nuevoSaldo: importe(fila.nuevoSaldo, raw[0]), debito: importe(fila.debito, '1'), credito: importe(fila.credito, '1'),
       corriente, noCorriente, tipoDeCuenta: 0, compartidoTipo: 0, tipo: false };
   });

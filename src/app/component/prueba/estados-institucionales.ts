@@ -97,6 +97,9 @@ export function crearEstadosInstitucionales(fuente: any[], situacion: any[], res
   const extras = (seccion: string, incluidos: string[]): Array<[string, number]> => situacion
     .filter(f => f.seccion === seccion && !f.esTotal && !incluidos.includes(f.codigo) && f.nuevoSaldo !== 0)
     .map(f => [f.nombre, f.nuevoSaldo]);
+  celda(hoja1, 66, 1, 'Cuentas de orden deudoras (sin contrapartida)');
+  celda(hoja1, 67, 1, 'Cuentas de orden acreedoras (sin contrapartida)');
+  insertar(hoja1, 69, situacion.filter(f => ['8.9', '9.9', 'NETO-8', 'NETO-9'].includes(f.codigo)).map(f => [f.nombre, f.nuevoSaldo]));
   // Insertar desde abajo conserva las posiciones de las filas superiores del modelo.
   insertar(hoja1, 63, [['Resultado del periodo', valor('RESULTADO-PENDIENTE')], ['Patrimonio + Resultado del periodo', valor('TOTAL-PAT-R')]]);
   insertar(hoja1, 61, extras('Patrimonio', ['3.1.05', '3.1.09', '3.1.10', '3.1.45', '3.1.51']));

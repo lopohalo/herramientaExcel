@@ -54,6 +54,11 @@ export function normalizarFuenteBalance(filas: any[]): any[] {
       const naturaleza = ['1', '5', '6', '7', '8'].includes(codigo.split('.')[0]) ? 'DB' : 'CR';
       cuenta.nuevoSaldo = Math.abs(numero(cuenta.nuevoSaldo)) * (cuenta.tipoSaldoNuevo === naturaleza ? 1 : -1);
     }
+    if (/^[89](?:\.|$)/.test(codigo)) {
+      cuenta.tipoDeCuenta = 0;
+      cuenta.compartidoTipo = 0;
+      return;
+    }
     const saldo = numero(cuenta.nuevoSaldo);
     let corriente = numero(cuenta.tipoDeCuenta), noCorriente = numero(cuenta.compartidoTipo);
     if (Math.abs(redondear(corriente + noCorriente) - saldo) > 0.005) {

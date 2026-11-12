@@ -6191,3 +6191,601 @@ export const catalogoNotas: any[] = [
   }
 ];
 export const agrupacionesNotas: string[][] = [["1211","121"],["1220","121"],["1221","121"],["1222","121"],["1223","121"],["1224","121"],["1216","122"],["1227","122"],["1230","122"],["1233","122"],["1234","123"],["1235","123"],["1236","123"],["1238","124"],["1239","124"],["128041","128"],["128042","128"],["128044","129"],["128046","129"],["128048","129"],["1337","131"],["1317","132"],["1322","132"],["1384","132"],["13869002","138"],["138602","139"],["13869001","139"],["13869003","139"],["13869004","139"]];
+
+// Códigos y títulos del modelo de notas; los importes se calculan al exportar.
+catalogoNotas.push(...[
+  {
+    "numero": 25,
+    "nombre": "Nota 25 AyP Contingentes",
+    "titulo": "NOTA 25. ACTIVOS Y PASIVOS CONTINGENTES",
+    "cuentas": [
+      {
+        "codigo": "81",
+        "nombre": "ACTIVOS CONTINGENTES"
+      },
+      {
+        "codigo": "8120",
+        "nombre": "Litigios y mecanismos alternativos de solución de conflictos"
+      },
+      {
+        "codigo": "812001",
+        "nombre": "Civiles"
+      },
+      {
+        "codigo": "812002",
+        "nombre": "Laborales"
+      },
+      {
+        "codigo": "812003",
+        "nombre": "Penales"
+      },
+      {
+        "codigo": "812004",
+        "nombre": "Administrativas"
+      },
+      {
+        "codigo": "812005",
+        "nombre": "Fiscales"
+      },
+      {
+        "codigo": "812090",
+        "nombre": "Otros litigios y mecanismos alternativos de solución de conflictos"
+      },
+      {
+        "codigo": "8124",
+        "nombre": "Contragarantías recibidas"
+      },
+      {
+        "codigo": "812413",
+        "nombre": "Del gobierno general"
+      },
+      {
+        "codigo": "812414",
+        "nombre": "De las empresas"
+      },
+      {
+        "codigo": "8125",
+        "nombre": "Garantía estatal en el régimen de prima media con prestación definida"
+      },
+      {
+        "codigo": "812501",
+        "nombre": "Colpensiones"
+      },
+      {
+        "codigo": "8128",
+        "nombre": "Garantías contractuales"
+      },
+      {
+        "codigo": "812801",
+        "nombre": "Acuerdos de concesión"
+      },
+      {
+        "codigo": "812802",
+        "nombre": "Contratos de asociación"
+      },
+      {
+        "codigo": "812803",
+        "nombre": "Contratos a riesgo compartido"
+      },
+      {
+        "codigo": "812804",
+        "nombre": "Contratos de obra"
+      },
+      {
+        "codigo": "812805",
+        "nombre": "Contratos para servicios públicos"
+      },
+      {
+        "codigo": "812806",
+        "nombre": "Uniones temporales"
+      },
+      {
+        "codigo": "812807",
+        "nombre": "Promesas de compraventa"
+      },
+      {
+        "codigo": "812890",
+        "nombre": "Otras garantías contractuales"
+      },
+      {
+        "codigo": "8129",
+        "nombre": "Derechos en opciones"
+      },
+      {
+        "codigo": "812907",
+        "nombre": "Vendidas"
+      },
+      {
+        "codigo": "812908",
+        "nombre": "Compradas"
+      },
+      {
+        "codigo": "8130",
+        "nombre": "Bienes aprehendidos o incautados"
+      },
+      {
+        "codigo": "813001",
+        "nombre": "Efectivo"
+      },
+      {
+        "codigo": "813002",
+        "nombre": "Inversiones"
+      },
+      {
+        "codigo": "813003",
+        "nombre": "Inventarios"
+      },
+      {
+        "codigo": "813004",
+        "nombre": "Propiedades, planta y equipo"
+      },
+      {
+        "codigo": "813005",
+        "nombre": "Otros activos"
+      },
+      {
+        "codigo": "813006",
+        "nombre": "Oro, piedras preciosas y joyas"
+      },
+      {
+        "codigo": "813007",
+        "nombre": "Obras de arte"
+      },
+      {
+        "codigo": "813008",
+        "nombre": "Armas y municiones"
+      },
+      {
+        "codigo": "813009",
+        "nombre": "Bienes fungibles"
+      },
+      {
+        "codigo": "813010",
+        "nombre": "Activos netos"
+      },
+      {
+        "codigo": "813090",
+        "nombre": "Otros bienes aprehendidos o incautados"
+      },
+      {
+        "codigo": "8190",
+        "nombre": "Otros activos contingentes"
+      },
+      {
+        "codigo": "819002",
+        "nombre": "Garantías"
+      },
+      {
+        "codigo": "819003",
+        "nombre": "Intereses de mora"
+      },
+      {
+        "codigo": "819004",
+        "nombre": "Derechos de reembolso relacionados con demandas, arbitrajes y conciliaciones extrajudiciales"
+      },
+      {
+        "codigo": "819005",
+        "nombre": "Derechos contingentes a favor en acuerdos no clasificados como operaciones conjuntas"
+      },
+      {
+        "codigo": "819090",
+        "nombre": "Otros activos contingentes"
+      },
+      {
+        "codigo": "91",
+        "nombre": "PASIVOS CONTINGENTES"
+      },
+      {
+        "codigo": "9120",
+        "nombre": "Litigios y mecanismos alternativos de solución de conflictos"
+      },
+      {
+        "codigo": "912001",
+        "nombre": "Civiles"
+      },
+      {
+        "codigo": "912002",
+        "nombre": "Laborales"
+      },
+      {
+        "codigo": "912004",
+        "nombre": "Administrativos"
+      },
+      {
+        "codigo": "912005",
+        "nombre": "Obligaciones fiscales"
+      },
+      {
+        "codigo": "912090",
+        "nombre": "Otros litigios y mecanismos alternativos de solución de conflictos"
+      },
+      {
+        "codigo": "9125",
+        "nombre": "Deuda garantizada"
+      },
+      {
+        "codigo": "912528",
+        "nombre": "Del gobierno general"
+      },
+      {
+        "codigo": "912529",
+        "nombre": "De las empresas"
+      },
+      {
+        "codigo": "9126",
+        "nombre": "Garantía estatal en el régimen de prima media con prestación definida"
+      },
+      {
+        "codigo": "912601",
+        "nombre": "Colpensiones"
+      },
+      {
+        "codigo": "9128",
+        "nombre": "Garantías contractuales"
+      },
+      {
+        "codigo": "912801",
+        "nombre": "Acuerdos de concesión"
+      },
+      {
+        "codigo": "912802",
+        "nombre": "Contratos de asociación"
+      },
+      {
+        "codigo": "912803",
+        "nombre": "Contratos a riesgo compartido"
+      },
+      {
+        "codigo": "912804",
+        "nombre": "Contratos de obra"
+      },
+      {
+        "codigo": "912805",
+        "nombre": "Contratos para servicios públicos"
+      },
+      {
+        "codigo": "912806",
+        "nombre": "Uniones temporales"
+      },
+      {
+        "codigo": "912807",
+        "nombre": "Promesas de compraventa"
+      },
+      {
+        "codigo": "912890",
+        "nombre": "Otras garantías contractuales"
+      },
+      {
+        "codigo": "9129",
+        "nombre": "Obligaciones en opciones"
+      },
+      {
+        "codigo": "912907",
+        "nombre": "Vendidas"
+      },
+      {
+        "codigo": "912908",
+        "nombre": "Compradas"
+      },
+      {
+        "codigo": "9130",
+        "nombre": "Bienes aprehendidos o incautados"
+      },
+      {
+        "codigo": "913001",
+        "nombre": "Efectivo"
+      },
+      {
+        "codigo": "913002",
+        "nombre": "Inversiones"
+      },
+      {
+        "codigo": "913003",
+        "nombre": "Inventarios"
+      },
+      {
+        "codigo": "913004",
+        "nombre": "Propiedades, planta y equipo"
+      },
+      {
+        "codigo": "913005",
+        "nombre": "Otros activos"
+      },
+      {
+        "codigo": "913006",
+        "nombre": "Oro, piedras preciosas y joyas"
+      },
+      {
+        "codigo": "913007",
+        "nombre": "Obras de arte"
+      },
+      {
+        "codigo": "913008",
+        "nombre": "Armas y municiones"
+      },
+      {
+        "codigo": "913009",
+        "nombre": "Bienes fungibles"
+      },
+      {
+        "codigo": "913010",
+        "nombre": "Activos netos"
+      },
+      {
+        "codigo": "913090",
+        "nombre": "Otros bienes aprehendidos o incautados"
+      },
+      {
+        "codigo": "9147",
+        "nombre": "Cálculo actuarial de los fondos de pensiones administrados por colpensiones"
+      },
+      {
+        "codigo": "914701",
+        "nombre": "Cálculo actuarial de pensiones actuales de los primeros diez años"
+      },
+      {
+        "codigo": "914702",
+        "nombre": "Cálculo actuarial de pensiones actuales de los años posteriores a los primeros diez años"
+      },
+      {
+        "codigo": "914703",
+        "nombre": "Cálculo actuarial de pensiones futuras de los primeros diez años"
+      },
+      {
+        "codigo": "914704",
+        "nombre": "Cálculo actuarial de pensiones futuras de los años posteriores a los primeros diez años"
+      },
+      {
+        "codigo": "914705",
+        "nombre": "Cálculo actuarial de cuotas partes de pensiones de los primeros diez años"
+      },
+      {
+        "codigo": "914706",
+        "nombre": "Cálculo actuarial de cuotas partes de pensiones de los años posteriores a los primeros diez años"
+      },
+      {
+        "codigo": "9148",
+        "nombre": "Bonos pensionales o cuotas partes de bonos pensionales emitidos por los fondos de pensiones administrados por colpensiones"
+      },
+      {
+        "codigo": "914801",
+        "nombre": "Bonos pensionales emitidos"
+      },
+      {
+        "codigo": "9190",
+        "nombre": "Otros pasivos contingentes"
+      },
+      {
+        "codigo": "919002",
+        "nombre": "Garantías y avales otorgados"
+      },
+      {
+        "codigo": "919003",
+        "nombre": "Obligaciones contingentes a cargo en acuerdos no clasificados como operaciones conjuntas"
+      },
+      {
+        "codigo": "919004",
+        "nombre": "Obligaciones de reembolso relacionadas con demandas, arbitrajes y conciliaciones extrajudiciales"
+      },
+      {
+        "codigo": "919090",
+        "nombre": "Otros pasivos contingentes"
+      }
+    ],
+    "campos": [
+      "Cantidad y estado de procesos o casos",
+      "Incertidumbres sobre importes y fechas de resolución"
+    ]
+  },
+  {
+    "numero": 26,
+    "nombre": "Nota 26 Ctas de Orden",
+    "titulo": "NOTA 26. CUENTAS DE ORDEN",
+    "cuentas": [
+      {
+        "codigo": "8",
+        "nombre": "CUENTAS DE ORDEN DEUDORAS"
+      },
+      {
+        "codigo": "81",
+        "nombre": "ACTIVOS  CONTINGENTES"
+      },
+      {
+        "codigo": "82",
+        "nombre": "DEUDORAS FISCALES"
+      },
+      {
+        "codigo": "83",
+        "nombre": "DEUDORAS DE CONTROL"
+      },
+      {
+        "codigo": "8301",
+        "nombre": "Bienes y derechos entregados en garantía"
+      },
+      {
+        "codigo": "8306",
+        "nombre": "Bienes entregados en custodia"
+      },
+      {
+        "codigo": "8307",
+        "nombre": "Derechos - fonpet"
+      },
+      {
+        "codigo": "8310",
+        "nombre": "Bonos, títulos y especies no colocados"
+      },
+      {
+        "codigo": "8312",
+        "nombre": "Documentos entregados para su cobro"
+      },
+      {
+        "codigo": "8313",
+        "nombre": "Mercancías entregadas en consignación"
+      },
+      {
+        "codigo": "8315",
+        "nombre": "Bienes y derechos retirados"
+      },
+      {
+        "codigo": "8317",
+        "nombre": "Bienes entregados en explotación"
+      },
+      {
+        "codigo": "8333",
+        "nombre": "Facturación glosada en venta de servicios de salud"
+      },
+      {
+        "codigo": "8344",
+        "nombre": "Activos y flujos futuros titularizados"
+      },
+      {
+        "codigo": "8347",
+        "nombre": "Bienes entregados a terceros"
+      },
+      {
+        "codigo": "8354",
+        "nombre": "Recaudo por la enajenación de activos al sector privado"
+      },
+      {
+        "codigo": "8355",
+        "nombre": "Ejecución de proyectos de inversión"
+      },
+      {
+        "codigo": "8361",
+        "nombre": "Responsabilidades en proceso"
+      },
+      {
+        "codigo": "8365",
+        "nombre": "Regalías por recaudar"
+      },
+      {
+        "codigo": "8369",
+        "nombre": "Desembolsos bienestar universitario"
+      },
+      {
+        "codigo": "8370",
+        "nombre": "Gastos de investigación instituciones de educación superior"
+      },
+      {
+        "codigo": "8372",
+        "nombre": "Gastos y retiros – fonpet"
+      },
+      {
+        "codigo": "8390",
+        "nombre": "Otras cuentas deudoras de control"
+      },
+      {
+        "codigo": "89",
+        "nombre": "DEUDORAS POR CONTRA (CR)"
+      },
+      {
+        "codigo": "8905",
+        "nombre": "Activos contingentes por contra (cr)"
+      },
+      {
+        "codigo": "8910",
+        "nombre": "Deudoras fiscales por contra (cr)"
+      },
+      {
+        "codigo": "8915",
+        "nombre": "Deudoras de control por contra (cr)"
+      },
+      {
+        "codigo": "9",
+        "nombre": "CUENTAS DE ORDEN ACREEDORAS"
+      },
+      {
+        "codigo": "91",
+        "nombre": "PASIVOS CONTINGENTES"
+      },
+      {
+        "codigo": "92",
+        "nombre": "DEUDORAS FISCALES"
+      },
+      {
+        "codigo": "93",
+        "nombre": "ACREEDORAS DE CONTROL"
+      },
+      {
+        "codigo": "9301",
+        "nombre": "Bienes y derechos recibidos en garantía"
+      },
+      {
+        "codigo": "9304",
+        "nombre": "Recursos administrados en nombre de terceros-fonpet"
+      },
+      {
+        "codigo": "9306",
+        "nombre": "Bienes recibidos en custodia"
+      },
+      {
+        "codigo": "9307",
+        "nombre": "Obligaciones – fonpet"
+      },
+      {
+        "codigo": "9308",
+        "nombre": "Recursos administrados en nombre de terceros"
+      },
+      {
+        "codigo": "9311",
+        "nombre": "Cálculo actuarial de pensiones para el cumplimiento de disposiciones legales"
+      },
+      {
+        "codigo": "9312",
+        "nombre": "Liquidación provisional de bonos pensionales"
+      },
+      {
+        "codigo": "9325",
+        "nombre": "Bienes aprehendidos o incautados"
+      },
+      {
+        "codigo": "9350",
+        "nombre": "Préstamos por recibir"
+      },
+      {
+        "codigo": "9355",
+        "nombre": "Ejecución de proyectos de inversión"
+      },
+      {
+        "codigo": "9367",
+        "nombre": "Reservas probadas"
+      },
+      {
+        "codigo": "9369",
+        "nombre": "Rendimientos y aportes - fonpet"
+      },
+      {
+        "codigo": "9370",
+        "nombre": "Regalías distribuidas con elementos por identificar"
+      },
+      {
+        "codigo": "9371",
+        "nombre": "Recaudo de regalías con obras"
+      },
+      {
+        "codigo": "9390",
+        "nombre": "Otras cuentas acreedoras de control"
+      },
+      {
+        "codigo": "99",
+        "nombre": "ACREEDORAS POR CONTRA (DB)"
+      },
+      {
+        "codigo": "9905",
+        "nombre": "Pasivos contingentes por contra (db)"
+      },
+      {
+        "codigo": "9910",
+        "nombre": "Acreedoras fiscales por contra (db)"
+      },
+      {
+        "codigo": "9915",
+        "nombre": "Acreedoras de control por contra (db)"
+      }
+    ],
+    "campos": [
+      "Descripción y finalidad de los controles",
+      "Explicación de diferencias con las cuentas por contra"
+    ]
+  }
+]);

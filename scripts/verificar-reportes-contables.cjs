@@ -8,7 +8,7 @@ const assert = require('assert/strict');
 const XLSX = require('xlsx-js-style');
 const base = path.resolve(__dirname, '../src/app/component/prueba');
 function cargar(nombre) {
-  const contexto = { exports: {}, require: ruta => ruta.startsWith('.') ? cargar(path.relative(base, path.resolve(base, path.dirname(nombre), ruta + '.ts'))) : require(ruta) };
+  const contexto = { exports: {}, TextDecoder, require: ruta => ruta.startsWith('.') ? cargar(path.relative(base, path.resolve(base, path.dirname(nombre), ruta + '.ts'))) : require(ruta) };
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.join(base, nombre), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText, contexto);
@@ -21,10 +21,12 @@ const { prepararDetalleHistorico, agruparDetalleHistorico } = cargar('balance-hi
 const { interpretarImportePegado } = cargar('modall/importe-pegado.ts');
 const { leerBalanceOficialTxt, limpiarFilasBalance } = cargar('importar-balance.ts');
 const { leerSaldosCiclo, revisarSaldosCiclo } = cargar('saldos-ciclo.ts');
+const { leerArchivoCuentasOrden, integrarCuentasOrden, resumenCuentasOrden } = cargar('cuentas-orden.ts');
 const source = ts.createSourceFile('component.ts', fs.readFileSync(path.join(base, 'prueba.component.ts'), 'utf8'), ts.ScriptTarget.Latest, true);
 const clase = source.statements.find(ts.isClassDeclaration);
 let exportado;
 const contexto = {
+  leerArchivoCuentasOrden, integrarCuentasOrden, resumenCuentasOrden,
   XLSX, leerBalanceOficialTxt, limpiarFilasBalance, TextDecoder, prepararDetalleHistorico, agruparDetalleHistorico, interpretarImportePegado, agregarNotasFinancieras, leerFuenteNotasBase, validarNotasFinancieras, crearEstadosInstitucionales, normalizarFuenteBalance, crearLectorBalance, leerSaldosCiclo, revisarSaldosCiclo,
   XLSXStyle: { ...XLSX, writeFile: libro => { exportado = libro; } },
   Swal: { fire() {} },
@@ -90,8 +92,9 @@ function verificar(fuente, esperado, etiqueta) {
   }
   c.exportarEstadoSituacionFinanciera();
   assert.deepEqual(Array.from(exportado.SheetNames.slice(0, 4)), ['Balance institucional', 'Resultados institucionales', 'Situacion financiera', 'Estado de resultados']);
-  assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 28);
-  assert(!exportado.SheetNames.some(n => /^Nota (25|26)\b/.test(n)));
+  assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 30);
+  assert(exportado.SheetNames.includes('Nota 25 AyP Contingentes'));
+  assert(exportado.SheetNames.includes('Nota 26 Ctas de Orden'));
   assert(exportado.SheetNames.includes('Indice de notas'));
   validarNotasExportadas(exportado, situacion);
 
@@ -196,6 +199,8 @@ for (const [clase, corriente, noCorriente, total] of [['1', 'TOTAL-AC', 'TOTAL-A
 }
 verificar(editado.datosTabla, esperadoEditado, '40 redistribuciones sucesivas');
 const argumentos = process.argv.slice(2);
+const indiceOrden = argumentos.indexOf('--orden');
+const archivoOrden = indiceOrden < 0 ? null : argumentos.splice(indiceOrden, 2)[1];
 const indiceCiclos = argumentos.indexOf('--ciclos');
 const archivoCiclos = indiceCiclos < 0 ? null : argumentos.splice(indiceCiclos, 2)[1];
 let ultimaFuente;
@@ -333,19 +338,26 @@ if (archivoOficial) {
   // Swal se simula solo para confirmar/cancelar; se prueban los procesadores y exportadores reales.
   const probarHistorico = async () => {
     entorno.Swal = { fire: async () => ({ isConfirmed: true }) };
-    await actual.generarComparativoDesdeOriginal(archivoMock(archivoOficial), archivoCiclos ? archivoMock(archivoCiclos) : undefined, 'Septiembre 2026', 'Septiembre 2025');
+    const ordenBase = archivoOrden ? await leerArchivoCuentasOrden(archivoMock(archivoOrden)) : undefined;
+    await actual.generarComparativoDesdeOriginal(archivoMock(archivoOficial), archivoCiclos ? archivoMock(archivoCiclos) : undefined, 'Septiembre 2026', 'Septiembre 2025', ordenBase?.cuentas);
     assert.equal(JSON.stringify(actual.tablaInicialGuardada), antesActual, 'Histórico aislado de la fuente actual');
     assert.equal(JSON.stringify(Array.from(almacenamiento)), antesAlmacenamiento, 'Histórico sin escrituras en localStorage');
     const detalleHistorico = releerHoja('Detalle periodo base');
     const pension = detalleHistorico.find(f => f[0] === '1.3.84.08.02');
     if (archivoCiclos) cerca(pension[6], 1739891084, 'Ciclo aplicado solo al periodo base');
-    assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 28);
+    assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 30);
+    if (ordenBase) {
+      const notaOrden = releerHoja('Nota 26 Ctas de Orden');
+      cerca(notaOrden.find(f => f[0] === '8')[7], 104211285434.31, 'Nota comparativa del auxiliar de orden histórico');
+      cerca(detalleHistorico.find(f => f[0] === '8.9')[5], -104211285434.31, 'Por contra en detalle base');
+      assert(notaOrden.find(f => f[0] === '8')[4] == null, 'No trasladar cuentas históricas al periodo actual');
+    }
     const exportacionAnterior = exportado;
     entorno.Swal = { fire: async () => ({ isConfirmed: false }) };
     await actual.generarComparativoDesdeOriginal(archivoMock(archivoOficial), undefined, 'Septiembre 2026', 'Septiembre 2025');
     assert.equal(exportado, exportacionAnterior, 'Cancelar no genera descarga');
     assert.equal(JSON.stringify(actual.tablaInicialGuardada), antesActual, 'Cancelar no modifica datos actuales');
-    console.log('OK histórico original: ciclo independiente, 28 notas comparativas, detalle de ambos periodos y cancelación sin cambios.');
+    console.log('OK histórico original: ciclo independiente, 30 notas comparativas, detalle de ambos periodos y cancelación sin cambios.');
   };
   // Los siguientes tests son síncronos; diferir la ejecución evita compartir el libro capturado.
   globalThis.pruebaHistoricoCompleto = probarHistorico;
@@ -365,11 +377,11 @@ efectivoNotas = tablaNotas.find(f => f[0] === '11');
 assert.equal(efectivoNotas[7], 80); assert.equal(efectivoNotas[8], 20);
 const desdeNotas = leerFuenteNotasBase(baseCompleta, 2025);
 assert.equal(desdeNotas.cuentas.find(f => f.codigo === '1.1').nuevoSaldo, 80);
-console.log('OK notas: 28 hojas automáticas/complementarias, exclusión de 8/9, comparativo con base disponible y base ausente.');
+console.log('OK notas: 30 hojas automáticas/complementarias, inclusión de 8/9, comparativo con base disponible y base ausente.');
 
 const exportadorComparativo = componente([{ codigo: '1.1', nombre: 'EFECTIVO', nuevoSaldo: 100, tipoDeCuenta: 60, compartidoTipo: 40 }]);
 exportadorComparativo.exportarBalanceComparativo(exportadorComparativo.construirEstadoSituacionFinanciera(), [], 'Septiembre 2026', 'Septiembre 2025', [{ nombre: 'INGRESOS', codigo: '4', nuevoSaldo: 0 }], exportadorComparativo.construirEstadoResultadosFinancieros(), { cuentas: [], completa: false });
-assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 28);
+assert.equal(exportado.SheetNames.filter(n => /^Nota /.test(n)).length, 30);
 assert(exportado.SheetNames.includes('Estado situación'));
 const comparativoReal = releerHoja('Nota 5 EF y Eq').find(f => f[0] === '11');
 assert.equal(comparativoReal[4], 100); assert(comparativoReal[7] == null);
