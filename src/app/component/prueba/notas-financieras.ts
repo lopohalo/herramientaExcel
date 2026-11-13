@@ -1,3 +1,4 @@
+import { titulosNotas } from './encabezados-notas';
 import { hayCuentasOrden } from './cuentas-orden';
 import * as XLSX from 'xlsx-js-style';
 import { catalogoNotas, agrupacionesNotas } from './catalogo-notas';
@@ -23,10 +24,10 @@ export function leerFuenteNotasBase(libro: XLSX.WorkBook, anio: number): FuenteN
   const cuentas = new Map<string, any>();
   libro.SheetNames.filter(n => /^Nota\s/.test(n)).forEach(n => {
     const filas: any[][] = XLSX.utils.sheet_to_json(libro.Sheets[n], { header: 1, range: `A1:${libro.Sheets[n]['!ref']?.split(':').pop() || 'A1'}`, defval: null });
-    const indice = filas.findIndex(f => f[0] === 'Código' && f[1] === 'Concepto');
+    const indice = filas.findIndex(f => String(f[0]).toUpperCase() === 'CÓDIGO' && String(f[1]).toUpperCase() === 'CONCEPTO');
     if (indice < 0) return;
     const headers = filas[indice].map(String);
-    const actual = headers.findIndex(h => h === `Saldo final ${anio}` || h === `Saldo final Diciembre ${anio}` || h.endsWith(` ${anio}`) && /^Saldo final/.test(h));
+    const actual = headers.findIndex(h => h === `SALDO FINAL ${anio}` || h === `Saldo final ${anio}` || h === `Saldo final Diciembre ${anio}` || h.endsWith(` ${anio}`) && /^Saldo final/.test(h));
     if (actual < 0) return;
     const colC = actual - 2, colNC = actual - 1;
     filas.slice(indice + 1).forEach(f => {
@@ -89,10 +90,12 @@ export function agregarNotasFinancieras(libro: any, fuente: any[], periodo: stri
     ['Nota', 'Concepto', 'Contenido']];
   catalogoNotas.slice().sort((a, b) => a.numero - b.numero).forEach(nota => {
     const comparativo = !!periodoBase;
-    const headers = ['Código', 'Concepto', `Corriente ${periodo}`, `No corriente ${periodo}`, `Saldo final ${periodo}`,
-      ...(comparativo ? [`Corriente ${periodoBase}`, `No corriente ${periodoBase}`, `Saldo final ${periodoBase}`, 'Variación saldo final'] : []), 'Observación'];
+    const anio = periodo.match(/\b\d{4}\b/)?.[0] || periodo;
+    const anioBase = periodoBase?.match(/\b\d{4}\b/)?.[0] || periodoBase;
+    const headers = ['CÓDIGO', 'CONCEPTO', `SALDO CTE ${anio}`, `SALDO NO CTE ${anio}`, `SALDO FINAL ${anio}`,
+      ...(comparativo ? [`SALDO CTE ${anioBase}`, `SALDO NO CTE ${anioBase}`, `SALDO FINAL ${anioBase}`, 'VALOR VARIACIÓN'] : []), 'OBSERVACIÓN'];
     const columnas = headers.length;
-    const filas: any[][] = [['UNIVERSIDAD INDUSTRIAL DE SANTANDER'], [nota.titulo],
+    const filas: any[][] = [['UNIVERSIDAD INDUSTRIAL DE SANTANDER'], [titulosNotas[nota.numero] || nota.titulo],
       [`Periodo: ${periodo}${comparativo ? ` · Comparado con ${periodoBase}` : ''}`],
       ['Los grupos incluyen a sus auxiliares: no sumar todas las filas. Campos complementarios pendientes no equivalen a cero.'], [], headers];
     const registros: any[] = nota.cuentas.slice();

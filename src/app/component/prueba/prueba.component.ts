@@ -28452,6 +28452,8 @@ export class PruebaComponent implements OnInit {
       );
     }
 
+    if (this.reporteActivo === 'chip') this.redondearExcelChip(libro);
+
     const fecha = new Date();
     const sello = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
     const archivo = `UIS_${this.nombreReporteActual().replace(/[^a-zA-Z0-9]+/g, '_')}_${sello}.xlsx`;
@@ -29125,6 +29127,22 @@ export class PruebaComponent implements OnInit {
       }
     }
     return hoja;
+  }
+
+  /** Solo transforma las celdas de salida CHIP; conserva la fuente y su precisión. */
+  redondearExcelChip(libro: XLSX.WorkBook): void {
+    for (const nombre of ['Resumen', 'Reporte', 'Corriente', 'No corriente', 'Cambios CHIP']) {
+      const hoja = libro.Sheets[nombre];
+      if (!hoja) continue;
+      for (const referencia of Object.keys(hoja)) {
+        const celda = hoja[referencia];
+        if (referencia.startsWith('!') || celda?.t !== 'n' || !Number.isFinite(celda.v)) continue;
+        celda.v = Math.sign(celda.v) * Math.round(Math.abs(celda.v));
+        celda.z = '#,##0;[Red](#,##0);"-"';
+        celda.s = { ...celda.s, numFmt: celda.z };
+        delete celda.w;
+      }
+    }
   }
 
   obtenerCambiosChip(): any[] {

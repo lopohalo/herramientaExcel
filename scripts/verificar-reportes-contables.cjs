@@ -396,3 +396,24 @@ if (globalThis.pruebaHistoricoCompleto) globalThis.pruebaHistoricoCompleto().cat
 const libroConError = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(libroConError, XLSX.utils.aoa_to_sheet([['Código', 'Concepto'], ['2512', 'Beneficio', 8087757691, 0.12, 0]]), 'Nota 22 Benef Empeados');
 assert.throws(() => validarNotasFinancieras(libroConError, []), /no coincide/, 'Bloquear la inconsistencia real de la nota 22');
+
+// CHIP redondea únicamente la salida. Los balances y la fuente retienen centavos.
+const fuentePrecision = [{ codigo: '1.1', nombre: 'EFECTIVO', saldoAnterior: 100.49, debito: 1.25, credito: 0.11, nuevoSaldo: 101.63, tipoDeCuenta: 60.5, compartidoTipo: 41.13 }];
+const chipPrecision = componente(fuentePrecision);
+chipPrecision.reporteActivo = 'chip';
+chipPrecision.exportarLibroInstitucional();
+let salidaPrecision = releerHoja('Reporte').find(f => f[0] === '1.1');
+assert.equal(salidaPrecision[2], 100);assert.equal(salidaPrecision[5], 102);assert.equal(salidaPrecision[8], 61);
+assert.equal(releerHoja('Información original').find(f => f[0] === '1.1')[5],101.63);
+assert.equal(fuentePrecision[0].nuevoSaldo,101.63);
+assert.equal(exportado.Sheets.Reporte.F6.z, '#,##0;[Red](#,##0);"-"');
+chipPrecision.reporteActivo = 'balance';chipPrecision.exportarLibroInstitucional();
+salidaPrecision = releerHoja('Reporte').find(f => f[0] === '1.1');assert.equal(salidaPrecision[5],101.63);
+assert.equal(exportado.Sheets.Reporte.F6.z, '#,##0.00;[Red](#,##0.00);-');
+const negativosChip = XLSX.utils.book_new();XLSX.utils.book_append_sheet(negativosChip,XLSX.utils.aoa_to_sheet([[-1.5,-1.49,1.5]]),'Reporte');
+chipPrecision.redondearExcelChip(negativosChip);
+assert.equal(negativosChip.Sheets.Reporte.A1.v,-2);assert.equal(negativosChip.Sheets.Reporte.B1.v,-1);assert.equal(negativosChip.Sheets.Reporte.C1.v,2);
+assert.equal(baseCompleta.Sheets['Nota 5 EF y Eq'].B6.v,'CONCEPTO');
+assert.equal(baseCompleta.Sheets['Nota 5 EF y Eq'].C6.v,'SALDO CTE 2026');
+assert.equal(baseCompleta.Sheets['Nota 5 EF y Eq'].I6.v,'VALOR VARIACIÓN');
+console.log('OK presentación: CHIP sin decimales, fuente y balance con centavos, notas con encabezados UIS y variación conservada.');
