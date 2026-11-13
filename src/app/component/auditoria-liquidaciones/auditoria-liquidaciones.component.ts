@@ -1,3 +1,4 @@
+import { StudentAddress, AddressReference, AddressCheck, readStudentAddress, addressField, identityKey, addressQuality, compareLocality, sameAddressKey, compareAddressReference, compareSisbenAddress } from './address-audit';
 import { Component } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom, timeout } from 'rxjs';
@@ -22,6 +23,14 @@ type Criticidad = 'Crítica' | 'Alta' | 'Media' | 'Sin alerta';
 
 interface CasoAuditoria {
   original: Record<string, any>;
+  direccion: StudentAddress;
+  calidadDireccion: AddressCheck;
+  cruceUbicacion: AddressCheck;
+  direccionSisben?: StudentAddress;
+  cruceDireccionSisben: AddressCheck;
+  cruceDireccionBase: AddressCheck;
+  referenciaDireccion?: StudentAddress;
+  estudiantesMismaDireccion: number;
   codigo: string;
   nombre: string;
   tipoInstitucion: string;
@@ -36,6 +45,7 @@ interface CasoAuditoria {
   puntaje: number;
   observaciones: string[];
 
+  errorConsulta?: string;
   sisbenConsultado?: string;
   descripcionSisben?: string;
   grupoIngresos?: string;
@@ -111,6 +121,49 @@ export class AuditoriaLiquidacionesComponent {
 
   tamanoPagina = 25;
 
+  baseDirecciones = new Map<string, AddressReference[]>();
+  nombreBaseDirecciones = '';
+  filtroDireccion = 'Todos';
+  get direccionesPorRevisar(): number { return this.registros.filter(c=>c.calidadDireccion.estado!=='Datos completos').length; }
+  get diferenciasDireccionSisben(): number { return this.registros.filter(c=>c.cruceDireccionSisben.estado === 'Dirección diferente').length; }
+  get sinDireccionSisben(): number { return this.registros.filter(c=>c.cruceDireccionSisben.estado === 'Sisbén no informa dirección').length; }
+  get ubicacionesDiferentes(): number { return this.registros.filter(c=>c.cruceUbicacion.estado==='Ubicación diferente').length; }
+  get direccionesCompartidas(): number { return new Set(this.registros.filter(c=>c.estudiantesMismaDireccion>1).map(c=>identityKey(c.tipoDocumento,c.documento)).filter(Boolean)).size; }
+  private actualizarDirecciones(): void {
+    const households=new Map<string, Set<string>>();
+    this.registros.forEach(c=>{const key=sameAddressKey(c.direccion),id=identityKey(c.tipoDocumento,c.documento);if(key&&id){if(!households.has(key))households.set(key,new Set());households.get(key)!.add(id);}});
+    this.registros.forEach(c=>{
+      c.calidadDireccion=addressQuality(c.direccion);
+      c.cruceDireccionSisben=compareSisbenAddress(c.direccion,c.direccionSisben,['Consultado','No encontrado'].includes(c.estadoConsulta||''));
+      c.cruceUbicacion=compareLocality(c.direccion,c.municipioSisben||'',c.departamentoSisben||'',c.estadoConsulta==='Consultado');
+      c.estudiantesMismaDireccion=households.get(sameAddressKey(c.direccion))?.size||0;
+      const references=this.baseDirecciones.get(identityKey(c.tipoDocumento,c.documento))||[];
+      c.cruceDireccionBase=compareAddressReference(c.direccion,references);
+      c.referenciaDireccion=references.length===1?references[0].address:undefined;
+    });
+  }
+  async cargarBaseDirecciones(event: Event): Promise<void> {
+    const input=event.target as HTMLInputElement,file=input.files?.[0];if(!file)return;
+    try {
+      if(file.size>10000000)throw new Error('La base supera 10 MB.');
+      const book=XLSX.read(await file.arrayBuffer(),{type:'array'});
+      const rows=XLSX.utils.sheet_to_json<Record<string,unknown>>(book.Sheets[book.SheetNames[0]],{defval:''});
+      if(!rows.length)throw new Error('La base no tiene registros.');
+      const entries=new Map<string,AddressReference[]>();
+      for(const [index,row] of rows.entries()) {
+        const tipoDocumento=addressField(row,['Tipo de documento','Tipo documento']);
+        const documento=addressField(row,['Número de documento','Documento','Identificación']);
+        const key=identityKey(tipoDocumento,documento),address=readStudentAddress(row);
+        if(!key)throw new Error(`Falta tipo o número de documento en la fila ${index+2}.`);
+        if(Object.values(address).every(v=>!v.trim()))throw new Error(`No hay datos de ubicación en la fila ${index+2}.`);
+        const ref={tipoDocumento,documento,address};entries.set(key,[...(entries.get(key)||[]),ref]);
+      }
+      this.baseDirecciones=entries;this.nombreBaseDirecciones=file.name;this.actualizarDirecciones();this.pagina=0;
+      Swal.fire('Base cruzada',`${rows.length} filas relacionadas por tipo y número de documento. Las diferencias requieren revisión.`, 'success');
+    } catch(error:any){Swal.fire('No se pudo cruzar la base',error?.message||'Revisa los encabezados y documentos.','error');}
+    finally{input.value='';}
+  }
+  quitarBaseDirecciones(): void {this.baseDirecciones.clear();this.nombreBaseDirecciones='';this.actualizarDirecciones();this.pagina=0;}
   constructor(private http: HttpClient) {}
 
   /**
@@ -125,9 +178,16 @@ export class AuditoriaLiquidacionesComponent {
     return this.registros.filter(
       (caso) =>
         (this.filtro === 'Todos' || caso.criticidad === this.filtro) &&
+        (this.filtroDireccion === 'Todos' ||
+          this.filtroDireccion === 'Diferencia SISBEN' && caso.cruceDireccionSisben.estado === 'Dirección diferente' ||
+          this.filtroDireccion === 'Sin dirección SISBEN' && caso.cruceDireccionSisben.estado === 'Sisbén no informa dirección' ||
+          this.filtroDireccion === 'Incompletas' && caso.calidadDireccion.estado !== 'Datos completos' ||
+          this.filtroDireccion === 'Ubicación diferente' && caso.cruceUbicacion.estado === 'Ubicación diferente' ||
+          this.filtroDireccion === 'Compartidas' && caso.estudiantesMismaDireccion > 1 ||
+          this.filtroDireccion === 'Diferencia base' && ['Diferencia con base','Referencia ambigua'].includes(caso.cruceDireccionBase.estado)) &&
         (!texto ||
           this.normalizar(
-            `${caso.codigo} ${caso.nombre} ${caso.documento} ${caso.colegio}`,
+            `${caso.codigo} ${caso.nombre} ${caso.documento} ${caso.colegio} ${caso.direccion.direccion} ${caso.direccion.barrio} ${caso.direccion.ciudad} ${caso.direccion.departamento}`,
           ).includes(texto)),
     );
   }
@@ -214,6 +274,7 @@ export class AuditoriaLiquidacionesComponent {
         datos.map((fila) => this.construirCaso(fila)),
       );
 
+      this.actualizarDirecciones(); this.filtroDireccion = 'Todos';
       this.nombreArchivo = archivo.name;
 
       this.pagina = 0;
@@ -243,6 +304,7 @@ export class AuditoriaLiquidacionesComponent {
       this.registros.map((x) => this.construirCaso(x.original, x)),
     );
 
+    this.actualizarDirecciones();
     this.pagina = 0;
   }
 
@@ -265,19 +327,20 @@ export class AuditoriaLiquidacionesComponent {
    * ============================================================
    */
 
-  async consultarAlertasSisben(): Promise<void> {
+  async consultarAlertasSisben(direcciones = false): Promise<void> {
     const documentosVistos = new Set<string>();
 
-    const casos = this.registros.filter((x) => {
+    const casos = (direcciones ? this.casosFiltrados : this.registros).filter((x) => {
       if (
-        !['Crítica', 'Alta'].includes(x.criticidad) ||
+        (!direcciones && !['Crítica', 'Alta'].includes(x.criticidad)) ||
+        (direcciones && ['Consultado','No encontrado'].includes(x.estadoConsulta||'')) ||
         !x.documento ||
-        documentosVistos.has(x.documento)
+        documentosVistos.has(identityKey(x.tipoDocumento,x.documento))
       ) {
         return false;
       }
 
-      documentosVistos.add(x.documento);
+      documentosVistos.add(identityKey(x.tipoDocumento,x.documento));
 
       return true;
     });
@@ -320,6 +383,7 @@ export class AuditoriaLiquidacionesComponent {
     mostrarModal = true,
   ): Promise<void> {
     caso.estadoConsulta = 'Consultando';
+    caso.errorConsulta = '';
 
     const tipo = this.codigoTipoDocumento(caso.tipoDocumento);
 
@@ -340,7 +404,7 @@ export class AuditoriaLiquidacionesComponent {
     try {
       const cacheKey = `${tipo}:${caso.documento}`;
 
-      const cache = this.cacheSisben.get(cacheKey);
+      const cache = mostrarModal ? undefined : this.cacheSisben.get(cacheKey);
 
       let grupo: any;
 
@@ -390,6 +454,9 @@ export class AuditoriaLiquidacionesComponent {
           window.electronAPI.obtenerDatosRui(caso.documento, tipo),
         ]);
       } else {
+        if (window.location.protocol === 'file:') {
+          throw new Error('No se cargó el puente de consultas de Electron. Abre la aplicación desde la carpeta completa del ZIP extraído.');
+        }
 
       /**
        * ==========================================
@@ -442,6 +509,20 @@ export class AuditoriaLiquidacionesComponent {
        * ==========================================
        */
 
+      for (const [servicio, respuesta] of [['SISBÉN', grupo], ['RUI', rui]] as const) {
+        if (!respuesta || typeof respuesta !== 'object' || typeof respuesta.ok !== 'boolean') {
+          throw new Error(`${servicio}: respuesta no reconocida. No se pudo verificar el registro.`);
+        }
+        if (!respuesta.ok && (respuesta.error || respuesta.msg || respuesta.mensaje || respuesta.message)) {
+          const mensaje = String(respuesta.error || respuesta.msg || respuesta.mensaje || respuesta.message);
+          if (!/no\s+(?:se\s+)?(?:encontr|registr|existe|hay\s+(?:datos|informaci[oó]n))/i.test(mensaje)) {
+            throw new Error(`${servicio}: DNP respondió: ${mensaje.replace(/<[^>]*>/g, "").replace(/\d{5,}/g, "[dato omitido]").slice(0, 400)}. No se pudo verificar el registro.`);
+          }
+        }
+      }
+      if (grupo.ok && (typeof grupo.grupo !== 'string' || !grupo.grupo.trim())) {
+        throw new Error('SISBÉN: respuesta sin grupo de clasificación.');
+      }
       if (!cache) {
         this.cacheSisben.set(cacheKey, {
           grupo,
@@ -471,6 +552,7 @@ export class AuditoriaLiquidacionesComponent {
 
       caso.nivelRui = rui?.nivelRui || '';
 
+      caso.direccionSisben = grupo?.ok ? readStudentAddress(grupo) : undefined;
       caso.municipioSisben = grupo?.municipio || rui?.municipio || '';
 
       caso.departamentoSisben = grupo?.departamento || rui?.departamento || '';
@@ -499,6 +581,7 @@ export class AuditoriaLiquidacionesComponent {
        */
 
       if (
+        !caso.observaciones.some(o => o.startsWith('Diferencia SISBÉN:')) &&
         caso.sisbenConsultado !== 'NO REGISTRA' &&
         this.normalizar(caso.sisbenExcel) !==
           this.normalizar(caso.sisbenConsultado)
@@ -523,6 +606,7 @@ export class AuditoriaLiquidacionesComponent {
        */
 
       if (
+        !caso.observaciones.includes('El nombre del RUI no coincide exactamente con el nombre del Excel.') &&
         caso.nombreRui &&
         this.normalizar(caso.nombre) !== this.normalizar(caso.nombreRui)
       ) {
@@ -543,6 +627,7 @@ export class AuditoriaLiquidacionesComponent {
        * ==========================================
        */
 
+      this.actualizarDirecciones();
       if (mostrarModal) {
         this.mostrarResultadoSisben(caso, grupo, rui);
       }
@@ -550,11 +635,13 @@ export class AuditoriaLiquidacionesComponent {
       console.error('Error consultando SISBÉN:', error);
 
       caso.estadoConsulta = 'Error';
-
+      caso.sisbenConsultado = undefined;
+      caso.errorConsulta = error instanceof Error ? error.message : 'No se pudo verificar el registro.';
+      this.actualizarDirecciones();
       if (mostrarModal) {
         Swal.fire(
           'No fue posible consultar SISBÉN',
-          'El servicio no respondió o agotó el tiempo de espera.',
+          caso.errorConsulta,
           'error',
         );
       }
@@ -590,6 +677,9 @@ export class AuditoriaLiquidacionesComponent {
       'Sexo RUI',
       'Edad RUI',
       'Estado consulta',
+      'Dirección SISBÉN', 'Barrio SISBÉN', 'Ciudad dirección SISBÉN', 'Departamento dirección SISBÉN', 'Comparación dirección estudiante-SISBÉN', 'Diferencias dirección SISBÉN',
+      'Calidad dirección', 'Cruce geográfico SISBÉN', 'Observaciones ubicación', 'Estudiantes distintos misma dirección',
+      'Base de direcciones', 'Cruce dirección base', 'Observaciones cruce base', 'Dirección base', 'Barrio base', 'Ciudad base', 'Departamento base',
     ];
 
     const filas = this.registros.map((caso) => [
@@ -624,6 +714,11 @@ export class AuditoriaLiquidacionesComponent {
       caso.edadRui ?? '',
 
       caso.estadoConsulta || 'Pendiente',
+      caso.direccionSisben?.direccion||'', caso.direccionSisben?.barrio||'', caso.direccionSisben?.ciudad||'', caso.direccionSisben?.departamento||'', caso.cruceDireccionSisben.estado, caso.cruceDireccionSisben.notas.join(' | '),
+      caso.calidadDireccion.estado, caso.cruceUbicacion.estado,
+      [...caso.calidadDireccion.notas,...caso.cruceUbicacion.notas].join(' | '), caso.estudiantesMismaDireccion,
+      this.nombreBaseDirecciones, caso.cruceDireccionBase.estado, caso.cruceDireccionBase.notas.join(' | '),
+      caso.referenciaDireccion?.direccion||'', caso.referenciaDireccion?.barrio||'', caso.referenciaDireccion?.ciudad||'', caso.referenciaDireccion?.departamento||'',
     ]);
 
     const contenido = [
@@ -719,7 +814,7 @@ export class AuditoriaLiquidacionesComponent {
             alignment: {
               vertical: 'top',
 
-              wrapText: c === encabezadosOriginales.length + 2,
+              wrapText: c === encabezadosOriginales.length + 2 || c >= encabezadosOriginales.length + 15,
             },
           };
         }
@@ -858,6 +953,13 @@ export class AuditoriaLiquidacionesComponent {
 
     return {
       original: fila,
+      direccion: readStudentAddress(fila),
+      calidadDireccion: addressQuality(readStudentAddress(fila)),
+      cruceUbicacion: {estado:'Pendiente de consulta',notas:[]},
+      direccionSisben: previo?.direccionSisben,
+      cruceDireccionSisben: {estado:'Pendiente de consulta',notas:[]},
+      cruceDireccionBase: {estado:'Sin referencia',notas:[]},
+      estudiantesMismaDireccion: 0,
 
       codigo: String(valor('Código estudiante') || ''),
 
@@ -908,6 +1010,7 @@ export class AuditoriaLiquidacionesComponent {
       edadRui: previo?.edadRui,
 
       estadoConsulta: previo?.estadoConsulta || 'Pendiente',
+      errorConsulta: previo?.errorConsulta,
     };
   }
 
@@ -1147,6 +1250,12 @@ export class AuditoriaLiquidacionesComponent {
               ${fila('Estrato', caso.estrato)}
 
               ${fila('SISBÉN reportado', caso.sisbenExcel)}
+              ${fila('Dirección', caso.direccion.direccion)}
+              ${fila('Barrio / vereda', caso.direccion.barrio)}
+              ${fila('Ciudad', caso.direccion.ciudad)}
+              ${fila('Departamento', caso.direccion.departamento)}
+              ${fila('Cruce geográfico', caso.cruceUbicacion.estado)}
+              ${fila('Observaciones de ubicación', caso.cruceUbicacion.notas.join(' | '))}
 
             </section>
 
@@ -1171,6 +1280,10 @@ export class AuditoriaLiquidacionesComponent {
               ${fila('Municipio', grupo?.municipio)}
 
               ${fila('Departamento', grupo?.departamento)}
+              ${fila('Dirección SISBÉN', caso.direccionSisben?.direccion || 'No informada por el servicio')}
+              ${fila('Barrio SISBÉN', caso.direccionSisben?.barrio || 'No informado')}
+              ${fila('Cruce de dirección', caso.cruceDireccionSisben.estado)}
+              ${fila('Diferencias de dirección', caso.cruceDireccionSisben.notas.join(' | '))}
 
             </section>
 

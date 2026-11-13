@@ -43,3 +43,6 @@ Thumbs.db
 
 # Informes locales y respaldos privados de inversiones
 .local-data/
+
+# Paquetes generados de escritorio
+/release

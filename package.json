@@ -1,31 +1,29 @@
 {
   "name": "herramienta-excel",
   "productName": "HerramientaExcel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Herramienta de auditoría y consulta de liquidaciones",
   "author": "Juan Sebastian Rueda",
   "main": "electron/main.js",
   "private": true,
-
   "engines": {
     "node": ">=20.18.1 <21",
     "npm": ">=9 <11"
   },
-
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-
     "electron": "electron .",
-
     "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && cross-env ELECTRON_DEV=true electron .\"",
-
-    "electron:build": "ng build --configuration production --base-href ./ && electron-builder"
+    "build:desktop": "ng build --configuration production --base-href ./",
+    "electron:zip": "npm run build:desktop && electron-builder --win zip --x64",
+    "electron:zip:mac": "npm run build:desktop && electron-builder --mac zip",
+    "electron:build": "ng build --configuration production --base-href ./ && electron-builder",
+    "test:electron": "node --test electron/tests/*.test.cjs"
   },
-
   "dependencies": {
     "@angular/animations": "^15.2.0",
     "@angular/cdk": "^15.2.6",
@@ -51,7 +49,6 @@
     "xlsx-js-style": "^1.2.0",
     "zone.js": "~0.12.0"
   },
-
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.4",
     "@angular/cli": "~15.2.4",
@@ -71,23 +68,27 @@
     "typescript": "~4.9.4",
     "wait-on": "^9.1.0"
   },
-
   "build": {
     "appId": "com.juanrueda.herramientaexcel",
     "productName": "HerramientaExcel",
-
     "directories": {
-      "output": "release"
+      "output": "release",
+      "app": "electron"
     },
-
     "files": [
-      "electron/**/*",
-      "dist/herramienta-excel/**/*",
-      "package.json"
+      "main.js",
+      "preload.js",
+      "dnp-client.js",
+      "package.json",
+      {
+        "from": "../dist/herramienta-excel",
+        "to": "dist/herramienta-excel",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
-
     "asar": true,
-
     "win": {
       "target": [
         {
@@ -98,7 +99,6 @@
         }
       ]
     },
-
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,

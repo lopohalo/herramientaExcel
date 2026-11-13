@@ -2,7 +2,9 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
-const DNP_ORIGIN = "https://ventanillasocial.dnp.gov.co";
+const { createDnpClient } = require("./dnp-client");
+// Preserve the transport used by the original working integration.
+const dnpClient = createDnpClient((url, options) => fetch(url, options));
 
 let mainWindow;
 
@@ -25,6 +27,10 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: false
     }
+  });
+
+  mainWindow.webContents.on("preload-error", (_event, _path, error) => {
+    console.error("No se cargó el puente Electron para consultar DNP:", error.message);
   });
 
   /**
@@ -67,50 +73,13 @@ function createWindow() {
   console.log("process.resourcesPath:", process.resourcesPath);
   console.log("=================================");
 
-  let indexPath;
-
-  /**
-   * Cuando ejecutamos:
-   *
-   * npx electron .
-   *
-   * Angular está en:
-   *
-   * proyecto/dist/herramienta-excel/index.html
-   */
-  if (!app.isPackaged) {
-    indexPath = path.join(
-      __dirname,
-      "..",
-      "dist",
-      "herramienta-excel",
-      "index.html"
-    );
-  }
-
-  /**
-   * Cuando ejecutamos el .exe instalado,
-   * electron-builder mete la aplicación dentro de app.asar.
-   *
-   * __dirname ya apunta a:
-   *
-   * resources/app.asar/electron
-   *
-   * por lo tanto:
-   *
-   * ../dist/herramienta-excel/index.html
-   *
-   * sigue siendo la ruta correcta.
-   */
-  else {
-    indexPath = path.join(
-      __dirname,
-      "..",
-      "dist",
-      "herramienta-excel",
-      "index.html"
-    );
-  }
+  // Works in the source checkout and in the packaged desktop app.
+  const indexPath = path.join(
+    app.getAppPath(),
+    "dist",
+    "herramienta-excel",
+    "index.html"
+  );
 
   console.log("Buscando Angular en:");
   console.log(indexPath);
@@ -176,179 +145,11 @@ function createWindow() {
  * CONSULTAR GRUPO SISBÉN
  * ============================================================
  */
-ipcMain.handle(
-  "dnp:consultar-grupo-sisben",
-  async (event, datos) => {
-    try {
-      const { pNumDoc, pTipDoc } = datos || {};
-
-      if (!pNumDoc || !pTipDoc) {
-        throw new Error(
-          "Faltan pNumDoc o pTipDoc"
-        );
-      }
-
-      const target = new URL(
-        "/Home/ConsultarGrupoSisben",
-        DNP_ORIGIN
-      );
-
-      target.searchParams.set(
-        "pNumDoc",
-        String(pNumDoc)
-      );
-
-      target.searchParams.set(
-        "pTipDoc",
-        String(pTipDoc)
-      );
-
-      console.log(
-        "Consultando grupo SISBÉN desde Electron..."
-      );
-
-      const response = await fetch(
-        target.toString(),
-        {
-          method: "POST",
-
-          headers: {
-            Origin: DNP_ORIGIN,
-
-            Referer: `${DNP_ORIGIN}/`,
-
-            Accept:
-              "application/json, text/plain, */*",
-
-            "User-Agent":
-              "Mozilla/5.0"
-          }
-        }
-      );
-
-      const body = await response.text();
-
-      console.log(
-        "SISBÉN status:",
-        response.status
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `DNP respondió ${response.status}: ${body}`
-        );
-      }
-
-      try {
-        return JSON.parse(body);
-      } catch {
-        return body;
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Error consultando SISBÉN:",
-        error
-      );
-
-      throw new Error(
-        error?.message ||
-        "No fue posible consultar SISBÉN"
-      );
-    }
-  }
+ipcMain.handle("dnp:consultar-grupo-sisben", (_event, datos) =>
+  dnpClient.consultarGrupoSisben(datos?.pNumDoc, datos?.pTipDoc)
 );
-
-/**
- * ============================================================
- * OBTENER DATOS RUI
- * ============================================================
- */
-ipcMain.handle(
-  "dnp:obtener-datos-rui",
-  async (event, datos) => {
-    try {
-      const { pNumDoc, pTipDoc } =
-        datos || {};
-
-      if (!pNumDoc || !pTipDoc) {
-        throw new Error(
-          "Faltan pNumDoc o pTipDoc"
-        );
-      }
-
-      console.log(
-        "Consultando RUI desde Electron..."
-      );
-
-      const formData = new FormData();
-
-      formData.append(
-        "pNumDoc",
-        String(pNumDoc)
-      );
-
-      formData.append(
-        "pTipDoc",
-        String(pTipDoc)
-      );
-
-      const response = await fetch(
-        `${DNP_ORIGIN}/Home/ObtenerDatosRUI`,
-        {
-          method: "POST",
-
-          headers: {
-            Origin: DNP_ORIGIN,
-
-            Referer:
-              `${DNP_ORIGIN}/`,
-
-            Accept:
-              "application/json, text/plain, */*",
-
-            "User-Agent":
-              "Mozilla/5.0"
-          },
-
-          body: formData
-        }
-      );
-
-      const body =
-        await response.text();
-
-      console.log(
-        "RUI status:",
-        response.status
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `DNP respondió ${response.status}: ${body}`
-        );
-      }
-
-      try {
-        return JSON.parse(body);
-      } catch {
-        return body;
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Error consultando RUI:",
-        error
-      );
-
-      throw new Error(
-        error?.message ||
-        "No fue posible consultar RUI"
-      );
-    }
-  }
+ipcMain.handle("dnp:obtener-datos-rui", (_event, datos) =>
+  dnpClient.obtenerDatosRui(datos?.pNumDoc, datos?.pTipDoc)
 );
 
 /**

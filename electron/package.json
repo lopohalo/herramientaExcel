@@ -1,0 +1,10 @@
+{
+  "name": "herramienta-excel",
+  "productName": "HerramientaExcel",
+  "version": "1.0.1",
+  "description": "Herramienta de auditoría y consulta de liquidaciones",
+  "author": "Juan Sebastian Rueda",
+  "main": "main.js",
+  "private": true,
+  "dependencies": {}
+}
